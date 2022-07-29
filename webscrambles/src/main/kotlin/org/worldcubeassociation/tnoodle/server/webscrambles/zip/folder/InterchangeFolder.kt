@@ -1,16 +1,16 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.stripNewlines
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.ScrambleDrawingData
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.ScrambleSheet
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.util.StringUtil.toFileSafeString
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.util.StringUtil.stripNewlines
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
-import org.worldcubeassociation.tnoodle.server.webscrambles.zip.ZipInterchangeInfo
+import org.worldcubeassociation.tnoodle.server.webscrambles.serial.ZipInterchangeInfo
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.Folder
 import java.time.LocalDateTime
 
-data class InterchangeFolder(val wcif: Competition, val uniqueTitles: Map<String, ScrambleDrawingData>, val globalTitle: String) {
+data class InterchangeFolder(val wcif: Competition, val uniqueTitles: Map<String, ScrambleSheet>, val globalTitle: String) {
     fun assemble(generationDate: LocalDateTime, versionTag: String, generationUrl: String?): Folder {
         val safeGlobalTitle = globalTitle.toFileSafeString()
 
@@ -20,13 +20,15 @@ data class InterchangeFolder(val wcif: Competition, val uniqueTitles: Map<String
         val jsonpFileName = "$safeGlobalTitle.jsonp"
         val jsonpStr = "var SCRAMBLES_JSON = $jsonStr;"
 
-        val viewerResource = this::class.java.getResourceAsStream(HTML_SCRAMBLE_VIEWER).bufferedReader().readText()
+        val viewerResource = this::class.java.getResourceAsStream(HTML_SCRAMBLE_VIEWER)
+            .bufferedReader()
+            .readText()
             .replace("%SCRAMBLES_JSONP_FILENAME%", jsonpFileName)
 
         return folder("Interchange") {
             folder("txt") {
-                for ((uniqueTitle, scrambleRequest) in uniqueTitles) {
-                    val scrambleLines = scrambleRequest.scrambleSet.allScrambles.flatMap { it.allScrambleStrings }
+                for ((uniqueTitle, scrambleSheet) in uniqueTitles) {
+                    val scrambleLines = scrambleSheet.scrambles.flatMap { it.allScrambleStrings }
                     val txtScrambles = scrambleLines.stripNewlines().joinToString("\r\n")
                     file("$uniqueTitle.txt", txtScrambles)
                 }

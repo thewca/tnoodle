@@ -1,25 +1,31 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.zip
 
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.ScrambleDrawingData
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.ScrambleSheet
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.util.StringUtil.toFileSafeString
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder.InterchangeFolder
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder.PrintingFolder
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive
 import java.time.LocalDateTime
+import java.util.Locale
 
-data class ScrambleZip(val namedSheets: Map<String, ScrambleDrawingData>, val wcif: Competition) {
-    val globalTitle = wcif.shortName
+data class ScrambleZip(
+    val wcif: Competition,
+    val namedSheets: Map<String, ScrambleSheet>,
+    val fmcTranslations: List<Locale>,
+    val watermark: String?
+) {
+    private val globalTitle get() = wcif.shortName
 
-    fun assemble(generationDate: LocalDateTime, versionTag: String, password: String?, generationUrl: String?): ZipArchive {
+    fun assemble(generationDate: LocalDateTime, versionTag: String, pdfPassword: String?, generationUrl: String?): ZipArchive {
         val computerDisplayZip = ComputerDisplayZip(namedSheets, globalTitle)
-        val computerDisplayZipBytes = computerDisplayZip.assemble(generationDate.toLocalDate(), versionTag)
+        val computerDisplayZipBytes = computerDisplayZip.assemble()
 
         val interchangeFolder = InterchangeFolder(wcif, namedSheets, globalTitle)
         val interchangeFolderNode = interchangeFolder.assemble(generationDate, versionTag, generationUrl)
 
-        val printingFolder = PrintingFolder(namedSheets, globalTitle, wcif.schedule)
-        val printingFolderNode = printingFolder.assemble(generationDate.toLocalDate(), versionTag, password)
+        val printingFolder = PrintingFolder(wcif, namedSheets, fmcTranslations, watermark)
+        val printingFolderNode = printingFolder.assemble(pdfPassword)
 
         val passcodeList = computerDisplayZip.passcodes.entries
             .joinToString("\r\n") { "${it.key}: ${it.value}" }

@@ -2,78 +2,73 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 
 import org.slf4j.LoggerFactory
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcGenericSolutionSheet
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcScrambleCutoutSheet
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FewestMovesSheet
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcCutoutSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcSolutionSheet
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.CompetitionDrawingData
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.ScrambleDrawingData
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.ScrambleSheet
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.Document
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.util.StringUtil.toFileSafeString
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder.getCachedPdf
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Schedule
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ScrambleSet
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcLanguagesExtension
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.SheetCopyCountExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.Folder
-import java.time.LocalDate
 import java.util.*
 
-data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, val globalTitle: String, val wcifSchedule: Schedule) {
+data class PrintingFolder(
+    val competition: Competition,
+    val uniqueTitles: Map<String, ScrambleSheet>,
+    val fmcTranslations: List<Locale>,
+    val watermark: String?
+) {
     val scrambleSheetsFlat = uniqueTitles.values.toList()
-    val scrambleDrawingData = CompetitionDrawingData(globalTitle, scrambleSheetsFlat)
+    val competitionName get() = competition.shortName
+    val wcifSchedule get() = competition.schedule
 
-    fun assemble(generationDate: LocalDate, versionTag: String, password: String?): Folder {
-        val fmcRequests = uniqueTitles.filterValues { it.isFmc }
-
-        val printingCompletePdf = WCIFDataBuilder.requestsToCompletePdf(scrambleDrawingData, generationDate, versionTag, Translate.DEFAULT_LOCALE)
+    fun assemble(pdfPassword: String?): Folder {
+        val fmcRequests = uniqueTitles.filterValues { it is FewestMovesSheet }
 
         return folder("Printing") {
             folder("Scramble Sets") {
-                for ((uniq, req) in uniqueTitles) {
-                    // Without passcode, for printing
-                    val pdfPrintingByteStream = req.getCachedPdf(generationDate, versionTag, globalTitle, Translate.DEFAULT_LOCALE)
-
-                    file("$uniq.pdf", pdfPrintingByteStream.render())
+                for ((uniq, sheet) in uniqueTitles) {
+                    file("$uniq.pdf", sheet.render(pdfPassword))
                 }
             }
 
             if (fmcRequests.isNotEmpty()) {
                 folder("Fewest Moves - Additional Files") {
-                    val defaultGenericPrintingSheet = FmcGenericSolutionSheet(globalTitle, Translate.DEFAULT_LOCALE)
+                    val defaultGenericPrintingSheet = FmcSolutionSheet.genericBlankSheet(Translate.DEFAULT_LOCALE, competitionName, watermark)
                     file("3x3x3 Fewest Moves Solution Sheet.pdf", defaultGenericPrintingSheet.render())
 
-                    val allDistinctTranslations = fmcRequests.values
-                        .flatMap { it.getTranslationLocales() }.distinct()
-
-                    if (allDistinctTranslations.isNotEmpty()) {
+                    if (fmcTranslations.isNotEmpty()) {
                         folder("Translations") {
-                            for (locale in allDistinctTranslations) {
+                            for (locale in fmcTranslations) {
                                 folder(locale.toLanguageTag()) {
-                                    val translatedGenericPrintingSheet = FmcGenericSolutionSheet(globalTitle, locale)
+                                    val translatedGenericPrintingSheet = FmcSolutionSheet.genericBlankSheet(locale, competitionName, watermark)
                                     file("3x3x3 Fewest Moves Solution Sheet.pdf", translatedGenericPrintingSheet.render())
                                 }
                             }
                         }
                     }
 
-                    for ((uniq, req) in fmcRequests) {
-                        val defaultCutoutSheet = FmcScrambleCutoutSheet(req.scrambleSet, req.activityCode, globalTitle, Translate.DEFAULT_LOCALE, req.hasGroupID)
-                        file("$uniq - Scramble Cutout Sheet.pdf", defaultCutoutSheet.render(password))
+                    for ((uniq, sheet) in uniqueTitles) {
+                        if (sheet is FewestMovesSheet) {
+                            val defaultCutoutSheet = FmcCutoutSheet(sheet.scramble, sheet.activityCode, sheet.scrambleSetId, Translate.DEFAULT_LOCALE, sheet.totalAttemptsNum, competitionName, sheet.hasGroupId, sheet.watermark)
+                            file("$uniq - Scramble Cutout Sheet.pdf", defaultCutoutSheet.render(pdfPassword))
 
-                        val translationLocales = req.getTranslationLocales()
+                            if (fmcTranslations.isNotEmpty()) {
+                                folder("Translations") {
+                                    for (locale in fmcTranslations) {
+                                        folder(locale.toLanguageTag()) {
+                                            // fewest moves regular sheet
+                                            val localPrintingSheet = FmcSolutionSheet(sheet.scramble, sheet.activityCode, sheet.scrambleSetId, locale, sheet.totalAttemptsNum, competitionName, sheet.hasGroupId, sheet.watermark)
+                                            file("$uniq.pdf", localPrintingSheet.render(pdfPassword))
 
-                        if (translationLocales.isNotEmpty()) {
-                            folder("Translations") {
-                                for (locale in translationLocales) {
-                                    folder(locale.toLanguageTag()) {
-                                        // fewest moves regular sheet
-                                        val localPrintingSheet = FmcSolutionSheet(req.scrambleSet, req.activityCode, globalTitle, locale, req.hasGroupID)
-
-                                        // scramble cutout sheet
-                                        val localCutoutSheet = FmcScrambleCutoutSheet(req.scrambleSet, req.activityCode, globalTitle, locale, req.hasGroupID)
-
-                                        file("$uniq.pdf", localPrintingSheet.render(password))
-                                        file("$uniq Scramble Cutout Sheet.pdf", localCutoutSheet.render(password))
+                                            // scramble cutout sheet
+                                            val localCutoutSheet = FmcCutoutSheet(sheet.scramble, sheet.activityCode, sheet.scrambleSetId, locale, sheet.totalAttemptsNum, competitionName, sheet.hasGroupId, sheet.watermark)
+                                            file("$uniq Scramble Cutout Sheet.pdf", localCutoutSheet.render(pdfPassword))
+                                        }
                                     }
                                 }
                             }
@@ -83,28 +78,37 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
             }
 
             if (wcifSchedule.isNotEmpty()) {
-                val drawingScrambleSets = scrambleDrawingData.scrambleSheets.map { it.scrambleSet }
+                val drawingScrambleSetIds = scrambleSheetsFlat.map { it.scrambleSetId }
 
-                if (wcifSchedule.containsAll(drawingScrambleSets)) {
-                    val orderedScramblesFolder = OrderedScramblesFolder(globalTitle, scrambleDrawingData)
-                    val orderedScramblesNode = orderedScramblesFolder.assemble(wcifSchedule, generationDate, versionTag)
+                if (wcifSchedule.containsAll(drawingScrambleSetIds)) {
+                    val orderedScramblesFolder = OrderedScramblesFolder(competitionName, scrambleSheetsFlat)
+                    val orderedScramblesNode = orderedScramblesFolder.assemble(wcifSchedule, pdfPassword)
 
                     folder(orderedScramblesNode)
                 } else {
-                    val requiredIds = drawingScrambleSets.map { it.id }
                     val unmatchedActivities = wcifSchedule.leafActivities
                         .filter { it.activityCode.eventModel != null } // don't want to report that "lunch" or "other" is unmatched
-                        .filter { it.scrambleSetId !in requiredIds }
+                        .filter { it.scrambleSetId !in drawingScrambleSetIds }
 
                     LOGGER.warn("Skipping OrderedScrambles because there are unmatched activities: $unmatchedActivities")
                 }
             }
 
-            val safeGlobalTitle = globalTitle.toFileSafeString()
+            val wcifRounds = competition.events.flatMap { it.rounds }
 
-            // Note that we're not passing the password into this function. It seems pretty silly
-            // to put a password protected pdf inside of a password protected zip file.
-            file("$safeGlobalTitle - All Scrambles.pdf", printingCompletePdf.render())
+            val scrambleSheetsWithCopies = scrambleSheetsFlat.flatMap { sheet ->
+                val sheetRound = wcifRounds.first { it.idCode.isParentOf(sheet.activityCode) }
+
+                val copyCountExtension = sheetRound.findExtension<SheetCopyCountExtension>()
+                val numCopies = copyCountExtension?.numCopies ?: 1
+
+                Document.clone(sheet.document, numCopies)
+            }
+
+            val printingCompletePdf = WCIFDataBuilder.compileOutlinePdfBytes(scrambleSheetsWithCopies, pdfPassword)
+
+            val safeGlobalTitle = competitionName.toFileSafeString()
+            file("$safeGlobalTitle - All Scrambles.pdf", printingCompletePdf)
         }
     }
 
@@ -113,20 +117,9 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
 
         private fun Schedule.isNotEmpty() = leafActivities.isNotEmpty()
 
-        private fun Schedule.containsAll(scrambleSets: Collection<ScrambleSet>): Boolean {
+        private fun Schedule.containsAll(scrambleSetIds: Collection<Int>): Boolean {
             val scheduleMatchedIds = allActivities.mapNotNull { it.scrambleSetId }
-            val requiredIds = scrambleSets.map { it.id }
-
-            return scheduleMatchedIds.containsAll(requiredIds)
+            return scheduleMatchedIds.containsAll(scrambleSetIds)
         }
-
-        private fun ScrambleDrawingData.getTranslationLocales(): List<Locale> {
-            val requestedTranslations = scrambleSet.findExtension<FmcLanguagesExtension>()
-                ?.languageTags ?: FMC_LOCALES_BY_TAG.keys
-
-            return requestedTranslations.mapNotNull { FMC_LOCALES_BY_TAG[it] }
-        }
-
-        val FMC_LOCALES_BY_TAG = Translate.TRANSLATED_LOCALES.associateBy { it.toLanguageTag() }
     }
 }

@@ -16,6 +16,8 @@ object Translate {
     val TRANSLATED_LOCALES
         get() = TRANSLATIONS.keys
 
+    val LOCALES_BY_LANG_TAG = TRANSLATED_LOCALES.associateBy { it.toLanguageTag() }
+
     private fun loadTranslationResources(): Map<Locale, Map<String, *>> {
         val yaml = Yaml(Constructor(HashMap::class.java))
         val locales = Locale.getAvailableLocales() + DEFAULT_LOCALE

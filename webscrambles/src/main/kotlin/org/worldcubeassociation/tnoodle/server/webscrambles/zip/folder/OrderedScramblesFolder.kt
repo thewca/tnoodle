@@ -1,24 +1,22 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 
-import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.ScheduleMatchingException
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.CompetitionDrawingData
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.ScrambleSheet
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.util.StringUtil.toFileSafeString
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Schedule
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.Folder
-import java.time.LocalDate
 import java.time.Period
 import java.time.ZonedDateTime
 
-data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingData: CompetitionDrawingData) {
-    fun assemble(wcifSchedule: Schedule, generationDate: LocalDate, versionTag: String): Folder {
+data class OrderedScramblesFolder(val globalTitle: String, val scrambleSheets: List<ScrambleSheet>) {
+    fun assemble(wcifSchedule: Schedule, pdfPassword: String?): Folder {
         val wcifBindings = wcifSchedule.allActivities
             // scrambleSetId as assigned by WCIFScrambleMatcher#matchActivity
             .filter { it.scrambleSetId != null }
             .associateWith { act ->
-                scrambleDrawingData.scrambleSheets.filter { it.scrambleSet.id == act.scrambleSetId }.unlessEmpty()
+                scrambleSheets.filter { it.scrambleSetId == act.scrambleSetId }.unlessEmpty()
                     ?: ScheduleMatchingException.error("Ordered Scrambles: Could not find ScrambleSet ${act.scrambleSetId} associated with Activity $act")
             }.mapValues { (act, scrs) ->
                 scrs.filter { act.activityCode.isParentOf(it.activityCode) }.unlessEmpty()
@@ -87,10 +85,8 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
                                     .sortedBy { it.key.getLocalStartTime(timezone) }
                                     .flatMap { it.value }
 
-                                val sheetData = scrambleDrawingData.copy(scrambleSheets = sortedScrambles)
-                                val sheet = WCIFDataBuilder.requestsToCompletePdf(sheetData, generationDate, versionTag, Translate.DEFAULT_LOCALE)
-
-                                file(pdfFileName, sheet.render())
+                                val sheet = WCIFDataBuilder.compileOutlinePdf(sortedScrambles, pdfPassword)
+                                file(pdfFileName, sheet)
                             }
                         }
                     }
@@ -105,11 +101,10 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
                 .flatten()
                 .distinct()
 
-            val allScramblesData = scrambleDrawingData.copy(scrambleSheets = allScramblesOrdered)
-            val completeOrderedPdf = WCIFDataBuilder.requestsToCompletePdf(allScramblesData, generationDate, versionTag, Translate.DEFAULT_LOCALE)
+            val completeOrderedPdf = WCIFDataBuilder.compileOutlinePdf(allScramblesOrdered, pdfPassword)
 
             val safeGlobalTitle = globalTitle.toFileSafeString()
-            file("Ordered $safeGlobalTitle - All Scrambles.pdf", completeOrderedPdf.render())
+            file("Ordered $safeGlobalTitle - All Scrambles.pdf", completeOrderedPdf)
         }
     }
 

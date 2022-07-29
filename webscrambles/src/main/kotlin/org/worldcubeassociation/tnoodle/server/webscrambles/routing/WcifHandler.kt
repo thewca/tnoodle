@@ -8,6 +8,7 @@ import io.ktor.websocket.*
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 import org.worldcubeassociation.tnoodle.server.ServerEnvironmentConfig
+import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.BadWcifParameterException
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.job.JobSchedulingHandler.registerJobPaths
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.job.LongRunningJob
@@ -121,11 +122,18 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
             route("zip") {
                 val job = ScramblingJob(mapOf(WORKER_PDF to 1)) { req, wcif, backend ->
                     val generationDate = LocalDateTime.now()
+                    val generationUrl = req.requestUrl
+
+                    val versionTag = environmentConfig.title
 
                     val pdfPassword = req.request.pdfPassword
                     val zipPassword = req.request.zipPassword
 
-                    val zip = WCIFDataBuilder.wcifToZip(wcif, pdfPassword, generationDate, environmentConfig.title, req.requestUrl)
+                    val fmcTranslations = req.request.fmcLanguages?.languageTags.orEmpty()
+                        .mapNotNull { Translate.LOCALES_BY_LANG_TAG[it] }
+
+                    // TODO GB allow building ZIPs in languages other than English?
+                    val zip = WCIFDataBuilder.wcifToZip(wcif, pdfPassword, versionTag, Translate.DEFAULT_LOCALE, fmcTranslations, generationDate, generationUrl)
                     val bytes = zip.compress(zipPassword)
 
                     backend.onProgress(WORKER_PDF)

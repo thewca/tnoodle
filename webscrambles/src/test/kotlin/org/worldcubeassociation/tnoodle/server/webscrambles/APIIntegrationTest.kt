@@ -9,6 +9,7 @@ import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.UpcomingCompetition
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder.toDocuments
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFScrambleMatcher
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.MultiScrambleCountExtension
@@ -39,13 +40,13 @@ class APIIntegrationTest {
                 val scrambledWcif = WCIFScrambleMatcher.fillScrambleSets(blankWcif)
 
                 println("[$it] Scrambles generated successfully. On to rendering the PDF…")
-                val completePdf = WCIFDataBuilder.wcifToCompletePdf(scrambledWcif, generationDate.toLocalDate(), "JUnit-Test", Translate.DEFAULT_LOCALE)
-                val renderedPdf = Assertions.assertDoesNotThrow(ThrowingSupplier { completePdf.render() })
+                val sheets = scrambledWcif.toDocuments("JUnit-Test", Translate.DEFAULT_LOCALE)
+                val renderedPdf = Assertions.assertDoesNotThrow(ThrowingSupplier { WCIFDataBuilder.compileOutlinePdf(sheets) })
                 Assertions.assertTrue(renderedPdf.isNotEmpty())
 
                 val computationTime = measureTimeMillis {
                     println("[$it] Single PDF rendered successfully. On to compiling the ZIP…")
-                    val completeZip = WCIFDataBuilder.wcifToZip(scrambledWcif, null, generationDate, "JUnit-Test", "https://test.local")
+                    val completeZip = WCIFDataBuilder.wcifToZip(scrambledWcif, null, "JUnit-Test", Translate.DEFAULT_LOCALE, emptyList(), generationDate, "https://test.local")
                     Assertions.assertTrue(completeZip.allFiles.isNotEmpty())
                     val compiledZip = Assertions.assertDoesNotThrow(ThrowingSupplier { completeZip.compress() })
                     Assertions.assertTrue(compiledZip.isNotEmpty())

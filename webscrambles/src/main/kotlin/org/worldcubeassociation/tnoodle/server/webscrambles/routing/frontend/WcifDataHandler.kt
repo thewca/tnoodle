@@ -6,6 +6,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.JsonNull
 import org.worldcubeassociation.tnoodle.server.RouteHandler
+import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFCompetitorInfo
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder.PrintingFolder
@@ -24,7 +25,7 @@ object WcifDataHandler : RouteHandler {
                 }
 
                 get("available") {
-                    val tagsWithNames = PrintingFolder.FMC_LOCALES_BY_TAG
+                    val tagsWithNames = Translate.LOCALES_BY_LANG_TAG
                         .mapValues { it.value.displayName }
                         .toSortedMap()
 
