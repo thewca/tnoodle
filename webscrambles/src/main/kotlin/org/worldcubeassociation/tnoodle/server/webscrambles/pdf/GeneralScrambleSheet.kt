@@ -37,7 +37,7 @@ class GeneralScrambleSheet(
         val highestLineCount = scramblePhrases.maxOf { it.lineTokens.size }
         val useHighlighting = highestLineCount >= MIN_LINES_HIGHLIGHTING
 
-        leading = 1f
+        leading = 0.8f
 
         for ((index, scramble) in scramblePhrases.withIndex()) {
             row {

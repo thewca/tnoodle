@@ -51,7 +51,8 @@ object FontUtil {
         // at first, try one-line (silly for big events but not computation-intensive at all)
         val oneLineScramble = ScramblePhrase.NBSP_STRING + scramble + ScramblePhrase.NBSP_STRING
         // TODO magic number same as genericSheet phrase computation
-        val oneLineFontSize = computeOptimalOneLineFontSize(oneLineScramble, boxHeight, boxWidth * 0.95f, Font.MONO, baseUnit)
+        val oneLineFontSize =
+            computeOptimalOneLineFontSize(oneLineScramble, boxHeight, boxWidth * 0.95f, Font.MONO, baseUnit)
 
         // can we fit the entire scramble on one line without making it terribly small
         if (oneLineFontSize > ScramblePhrase.MIN_ONE_LINE_FONT_SIZE) {
@@ -75,8 +76,15 @@ object FontUtil {
             .minOf { computeOptimalOneLineFontSize(it, lineHeight, boxWidth, Font.MONO, baseUnit) }
 
         if (multiLineFontSize > ScramblePhrase.MAX_PHRASE_FONT_SIZE) {
-            val maxLineTokens = splitToFixedSizeLines(phraseChunks, ScramblePhrase.MAX_PHRASE_FONT_SIZE, boxWidth, baseUnit)
-            return ScramblePhrase(scramble, isExtra, chunksWithBreakFlags, maxLineTokens, ScramblePhrase.MAX_PHRASE_FONT_SIZE)
+            val maxLineTokens =
+                splitToFixedSizeLines(phraseChunks, ScramblePhrase.MAX_PHRASE_FONT_SIZE, boxWidth, baseUnit)
+            return ScramblePhrase(
+                scramble,
+                isExtra,
+                chunksWithBreakFlags,
+                maxLineTokens,
+                ScramblePhrase.MAX_PHRASE_FONT_SIZE
+            )
         }
 
         return ScramblePhrase(scramble, isExtra, chunksWithBreakFlags, lineTokens, multiLineFontSize)
@@ -128,7 +136,11 @@ object FontUtil {
             return accu
         }
 
-        val (candidateLine, rest) = takeChunksThatFitOneLine(chunksSections, boxRelativeWidth, ScramblePhrase.NBSP_STRING)
+        val (candidateLine, rest) = takeChunksThatFitOneLine(
+            chunksSections,
+            boxRelativeWidth,
+            ScramblePhrase.NBSP_STRING
+        )
 
         val currentLine = candidateLine.ifEmpty {
             chunksSections.first().toMutableList().apply { add(0, ScramblePhrase.NBSP_STRING) }
@@ -150,37 +162,63 @@ object FontUtil {
         }
 
         val nextAccu = currentAccu + chunkSections.first()
-        val joinedChunk = nextAccu.joinToString(" ")
 
-        val nextChunkFontScale = computeFontScale(joinedChunk, Font.MONO, boxRelativeWidth)
+        // local helper function to determine if a temporary working state (accu) fits the current line
+        fun accuFits(accu: List<String>): Boolean {
+            val lineChunk = accu.joinToString(" ")
+            val fontScale = computeFontScale(lineChunk, Font.MONO, boxRelativeWidth)
 
-        // fontScale is by definition never more than 1 so checking for "not equal" suffices.
-        if (!nextChunkFontScale.epsilonEqual(1f)) {
-            // the next chunk does NOT fit on the line anymore.
-            if (lineEndPadding != null) {
-                val paddedAccu = currentAccu + lineEndPadding
-                val paddedChunk = paddedAccu.joinToString(" ")
+            // if we have to scale the line down (scale < 1), it means it does NOT fit.
+            // fontScale is by definition never more than 1 so checking for equality suffices.
+            return fontScale.epsilonEqual(1f)
+        }
 
-                // prevent situations where we fill an entire line only with padding
-                val onlyPadding = paddedAccu.all { it == lineEndPadding }
+        // unfortunately, padding is complicated. :(
+        if (lineEndPadding != null) {
+            // prevent situations where we fill an entire line only with padding
+            val onlyPadding = currentAccu.all { it == lineEndPadding }
 
+            val paddedExistingAccu = currentAccu + lineEndPadding
+            val paddingExistingLineFits = accuFits(paddedExistingAccu)
+
+            if (!onlyPadding) {
+                // make sure we can AT LEAST insert a padding at the end of the line.
+                if (!paddingExistingLineFits) {
+                    // we cannot even insert line end padding. Give up immediately.
+                    return currentAccu to chunkSections
+                }
+
+                // NOT returning the padded accu even if it fits, because we might end up
+                // being able to insert a "real" chunk which is even better than padding.
+            }
+
+            if (!accuFits(nextAccu)) {
+                // If we haven't even managed to insert one single chunk, give up.
                 if (onlyPadding) {
                     return emptyList<String>() to chunkSections
                 }
 
-                val paddedFontScale = computeFontScale(paddedChunk, Font.MONO, boxRelativeWidth)
+                // we know for sure that we can fit at least the padding, because we've tried that at the beginning.
+                // Two versions how to proceed. Top version: pad at most once. Bottom version: pad as much as possible.
 
-                if (paddedFontScale.epsilonEqual(1f)) {
-                    // Top version: pad at most once. Bottom version: pad as much as possible.
-                    // return paddedAccu to chunkSections
-                    return takeChunksThatFitOneLine(chunkSections, boxRelativeWidth, lineEndPadding, paddedAccu)
-                }
+                // return paddedAccu to chunkSections
+                return takeChunksThatFitOneLine(chunkSections, boxRelativeWidth, lineEndPadding, paddedExistingAccu)
             }
 
+            val paddedNextAccu = nextAccu + lineEndPadding
+
+            if (!accuFits(paddedNextAccu)) {
+                // we would be able to add a token but then the line is too full to end with padding
+                return paddedExistingAccu to chunkSections
+            }
+        } else if (!accuFits(nextAccu)) {
+            // we don't do padding, and we're not able to fill more chunks
             return currentAccu to chunkSections
         }
 
+        // we consumed one chunk of tokens!
         val tail = chunkSections.drop(1)
+
         return takeChunksThatFitOneLine(tail, boxRelativeWidth, lineEndPadding, nextAccu)
     }
 
