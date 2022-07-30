@@ -8,7 +8,7 @@ class TextBuilder(val content: String, parent: ElementBuilder?) : PropertiesElem
     var background: RgbColor? = RgbColor.DEFAULT
 
     fun setOptimalOneLineFontSize(height: Float, width: Float, unitToInches: Float = 1f) {
-        fontSize = FontUtil.computeOptimalOneLineFontSize(content, height, width, fontName.orEmpty(), unitToInches)
+        fontSize = FontUtil.computeOneLineFontSize(content, height, width, fontName.orEmpty(), unitToInches, leading)
     }
 
     fun compile(): Text {
