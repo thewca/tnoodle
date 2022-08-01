@@ -11,5 +11,6 @@ class Page(
     val marginRight: Int = Drawing.Margin.DEFAULT_HORIZONTAL,
     val headerLines: Pair<String, String>? = null,
     val footerLine: String? = null,
+    val canvas: List<TurtleCommand> = emptyList(),
     val elements: List<Element>
 ) : ContainerElement<Element>(elements)

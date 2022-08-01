@@ -92,6 +92,17 @@ object IText7Engine {
             if (page.footerLine != null)
                 addedPage.showFooterCenter(page.footerLine, itextPageSize, footerHeight)
 
+            if (page.canvas.isNotEmpty()) {
+                val turtleCanvas = PdfCanvas(addedPage)
+                    .saveState()
+
+                for (command in page.canvas) {
+                    turtleCanvas.executeCommand(command)
+                }
+
+                turtleCanvas.restoreState()
+            }
+
             for (element in page.elements) {
                 val itextElement = render(element, pdfDocument, fontIndex)
 
@@ -215,6 +226,16 @@ object IText7Engine {
 
     private fun com.itextpdf.layout.element.Text.setFontStyle(style: Font.Weight) {
         if (style == Font.Weight.BOLD) setBold()
+    }
+
+    private fun PdfCanvas.executeCommand(turtleCmd: TurtleCommand) {
+        when (turtleCmd) {
+            is TurtleCommand.MoveTo -> moveTo(turtleCmd.x.toDouble(), turtleCmd.y.toDouble())
+            is TurtleCommand.LineTo -> lineTo(turtleCmd.x.toDouble(), turtleCmd.y.toDouble())
+            is TurtleCommand.SetLineWidth -> setLineWidth(turtleCmd.width)
+            is TurtleCommand.SetStrokeColor -> setStrokeColor(convertColor(turtleCmd.color))
+            is TurtleCommand.Stroke -> stroke()
+        }
     }
 
     private fun render(element: Element, pdfDocument: PdfDocument, fontIndex: Map<String, PdfFont>): IElement {
