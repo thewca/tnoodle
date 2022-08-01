@@ -36,11 +36,14 @@ object FontUtil {
         width: Float,
         leading: Float = Font.Leading.DEFAULT
     ): Float {
+        return width / (height * getCalcLeading(leading))
+    }
+
+    private fun getCalcLeading(leading: Float): Float {
         // leading below 1 won't make the text itself smaller!
         // it will squish the next line over the current one,
         // but we only care about text height here anyway.
-        val calcLeading = max(1f, leading)
-        return width / (calcLeading * height)
+        return max(1f, leading)
     }
 
     fun computeOneLineFontSize(
@@ -52,9 +55,11 @@ object FontUtil {
         leading: Float = Font.Leading.DEFAULT
     ): Float {
         val relativeWidth = computeRelativeWidth(height, width, leading)
-        val optimalFontScale = computeFontScale(content, relativeWidth, fontName)
 
-        return (height * unitToInches * optimalFontScale).inchesToPixelPrecise
+        val optimalFontScale = computeFontScale(content, relativeWidth, fontName)
+        val calcLeading = getCalcLeading(leading)
+
+        return (height * unitToInches * optimalFontScale).inchesToPixelPrecise / calcLeading
     }
 
     fun generatePhrase(
@@ -67,7 +72,8 @@ object FontUtil {
     ): ScramblePhrase {
         // at first, try one-line (silly for big events but not computation-intensive at all)
         val oneLineScramble = ScramblePhrase.NBSP_STRING + scramble + ScramblePhrase.NBSP_STRING
-        val oneLineFontSize = computeOneLineFontSize(oneLineScramble, boxHeight, boxWidth, Font.MONO, unitToInches, leading)
+        // ignore leading between lines because we're deliberately trying for one line only
+        val oneLineFontSize = computeOneLineFontSize(oneLineScramble, boxHeight, boxWidth, Font.MONO, unitToInches, 1f)
 
         val chunksWithBreakFlags = ScramblePhrase.splitToChunks(scramble)
 
@@ -86,7 +92,7 @@ object FontUtil {
         val lineHeight = boxHeight / lineTokens.size
 
         val multiLineFontSize = lineTokens
-            .map { it.joinToString(" ", prefix = ScramblePhrase.NBSP_STRING, postfix = ScramblePhrase.NBSP_STRING) }
+            .map { it.joinToStringWithPadding(" ", ScramblePhrase.NBSP_STRING) }
             .minOf { computeOneLineFontSize(it, lineHeight, boxWidth, Font.MONO, unitToInches, leading) }
 
         if (multiLineFontSize > ScramblePhrase.MAX_PHRASE_FONT_SIZE) {
@@ -181,6 +187,22 @@ object FontUtil {
         return splitChunksToLines(actRest, lineRelWidth, padding, merge(accu, currentLine))
     }
 
+    fun <T> List<T>.joinToStringWithPadding(
+        glue: String,
+        padding: T? = null
+    ): String {
+        val prefix = takeWhile { it == padding }
+            .joinToString("")
+        val suffix = takeLastWhile { it == padding }
+            .joinToString("")
+
+        val content = drop(prefix.length)
+            .dropLast(suffix.length)
+            .joinToString(glue)
+
+        return prefix + content + suffix
+    }
+
     private fun takeChunksThatFitOneLine(
         chunkSections: List<List<String>>,
         lineRelativeWidth: Float,
@@ -195,7 +217,7 @@ object FontUtil {
 
         // local helper function to determine if a temporary working state (accu) fits the current line
         fun accuFits(accu: List<String>): Boolean {
-            val lineChunk = accu.joinToString(" ")
+            val lineChunk = accu.joinToStringWithPadding(" ", linePadding)
             val fontScale = computeFontScale(lineChunk, lineRelativeWidth, Font.MONO)
 
             // if we have to scale the line down (scale < 1), it means it does NOT fit.

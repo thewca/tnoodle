@@ -6,6 +6,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Paper.inchesToPixel
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Paper.pixelsToInch
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil.joinToStringWithPadding
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.ScramblePhrase
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import java.util.*
@@ -51,15 +52,17 @@ class GeneralScrambleSheet(
                     horizontalAlignment = Alignment.Horizontal.JUSTIFIED
                     verticalAlignment = Alignment.Vertical.MIDDLE
 
-                    // FIXME the layout in iText is weird, the lines are far apart even for leading < .8
-                    leading = 1 / SCRAMBLE_TEXT_LEADING
+                    leading = SCRAMBLE_TEXT_LEADING
                     padding = 2 * Drawing.Padding.DEFAULT
 
                     paragraph {
                         fontName = Font.MONO
                         fontSize = scramble.fontSize
 
-                        val rawScrambleLines = scramble.lineTokens.map { it.joinToString(" ") }
+                        val rawScrambleLines = scramble.lineTokens.map {
+                            it.joinToStringWithPadding(" ", ScramblePhrase.NBSP_STRING)
+                        }
+
                         val maxLength = rawScrambleLines.maxOf { it.length }
 
                         for ((ln, scrLine) in rawScrambleLines.withIndex()) {
@@ -104,9 +107,13 @@ class GeneralScrambleSheet(
         }
 
         val smallestFontSize = basicScramblePhrases.minOf { it.fontSize }
+        val allOneLine = basicScramblePhrases.all { it.lineTokens.size == 1 }
 
         return basicScramblePhrases.map {
-            val breakChunks = FontUtil.splitAtPossibleBreaks(it.rawTokens)
+            val breakChunks = if (allOneLine)
+                it.scramble.split(" ")
+                    .map(::listOf) else
+                        FontUtil.splitAtPossibleBreaks(it.rawTokens)
 
             val maxLineTokens = FontUtil.splitToFixedSizeLines(
                 breakChunks,
@@ -141,9 +148,8 @@ class GeneralScrambleSheet(
                 val heightExtraPenalty =
                     if (scrambleSet.extraScrambles.isNotEmpty()) 2 * EXTRA_SCRAMBLE_LABEL_SIZE else 0f
 
-                val tableWidthIn = size.widthIn - (marginLeft + marginRight).pixelsToInch
-                val tableHeightIn = size.heightIn - (marginTop + marginBottom).pixelsToInch -
-                    ceil(heightExtraPenalty).toInt().pixelsToInch
+                val tableWidthIn = availableWidthIn
+                val tableHeightIn = availableHeightIn - ceil(heightExtraPenalty).toInt().pixelsToInch
 
                 table(3) {
                     // PDF tables are calculated by *relative* width. So to figure out the scramble image width we...
@@ -176,10 +182,13 @@ class GeneralScrambleSheet(
                     val desiredPaddingPx = 2 * Drawing.Padding.DEFAULT
                     val paddingPenalty = (desiredPaddingPx * 2).pixelsToInch / tableWidthIn
 
+                    val chunkHeight = (relHeightPerScramble - paddingPenalty) * SCRAMBLE_ONE_PAGE_BACKOFF
+                    val chunkWidth = (scrambleTextWidth - paddingPenalty) * SCRAMBLE_ONE_PAGE_BACKOFF
+
                     val scramblePhrases = computeScramblePhrases(
                         scramblePageChunk,
-                        relHeightPerScramble - paddingPenalty,
-                        scrambleTextWidth - paddingPenalty,
+                        chunkHeight,
+                        chunkWidth,
                         tableWidthIn
                     )
 
@@ -225,6 +234,8 @@ class GeneralScrambleSheet(
         const val MIN_LINES_HIGHLIGHTING = 4
 
         const val SCRAMBLE_TEXT_LEADING = 1.2f
+
+        const val SCRAMBLE_ONE_PAGE_BACKOFF = 1f
 
         const val TABLE_HEADING_EXTRA_SCRAMBLES = "Extra Scrambles" // TODO i18n
         const val EXTRA_SCRAMBLE_PREFIX = "E"
