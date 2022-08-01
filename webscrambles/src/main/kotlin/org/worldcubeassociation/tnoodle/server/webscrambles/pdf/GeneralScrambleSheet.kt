@@ -6,16 +6,17 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Paper.inchesToPixel
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Paper.pixelsToInch
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil.joinToStringWithPadding
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.ScramblePhrase
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.ScrambleRow
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import java.util.*
 import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.max
 
 class GeneralScrambleSheet(
-    val scrambleSet: ScrambleSet,
-    val tNoodleVersion: String,
+    private val scrambleSet: ScrambleSet,
+    private val tNoodleVersion: String,
     competitionTitle: String,
     activityCode: ActivityCode,
     hasGroupId: Boolean,
@@ -35,21 +36,20 @@ class GeneralScrambleSheet(
         unitToInches: Float,
         labelPrefix: String? = null
     ) {
-        val highestLineCount = scramblePhrases.maxOf { it.lineTokens.size }
+        val highestLineCount = scramblePhrases.maxOf { it.lines.size }
         val useHighlighting = highestLineCount >= MIN_LINES_HIGHLIGHTING
 
-        for ((index, scramble) in scramblePhrases.withIndex()) {
+        for (scramblePhrase in scramblePhrases) {
             row {
                 cell {
                     verticalAlignment = Alignment.Vertical.MIDDLE
                     horizontalAlignment = Alignment.Horizontal.CENTER
 
-                    val labelString = "${labelPrefix.orEmpty()}${index + 1}".trim()
+                    val labelString = "${labelPrefix.orEmpty()}${scramblePhrase.row.index + 1}".trim()
                     text(labelString)
                 }
 
                 cell {
-                    horizontalAlignment = Alignment.Horizontal.JUSTIFIED
                     verticalAlignment = Alignment.Vertical.MIDDLE
 
                     leading = SCRAMBLE_TEXT_LEADING
@@ -57,15 +57,11 @@ class GeneralScrambleSheet(
 
                     paragraph {
                         fontName = Font.MONO
-                        fontSize = scramble.fontSize
+                        fontSize = scramblePhrase.fontSize
 
-                        val rawScrambleLines = scramble.lineTokens.map {
-                            it.joinToStringWithPadding(" ", ScramblePhrase.NBSP_STRING)
-                        }
+                        val maxLength = scramblePhrase.lines.maxOf { it.length }
 
-                        val maxLength = rawScrambleLines.maxOf { it.length }
-
-                        for ((ln, scrLine) in rawScrambleLines.withIndex()) {
+                        for ((ln, scrLine) in scramblePhrase.lines.withIndex()) {
                             val paddedLine = scrLine.padEnd(maxLength, Typography.nbsp)
 
                             line(paddedLine) {
@@ -83,22 +79,21 @@ class GeneralScrambleSheet(
                     val scrImageWidthPx = (scrImageWidth * unitToInches).inchesToPixel - (2 * padding + 1)
                     val scrLineHeightPx = (scrLineHeight * unitToInches).inchesToPixel - (2 * padding + 1)
 
-                    svgScrambleImage(scramble.scramble, scrImageWidthPx, scrLineHeightPx)
+                    svgScrambleImage(scramblePhrase.row.scramble, scrImageWidthPx, scrLineHeightPx)
                 }
             }
         }
     }
 
     private fun computeScramblePhrases(
-        scramblePageChunk: List<Pair<String, Boolean>>,
+        scramblePageChunk: List<ScrambleRow>,
         availableHeight: Float,
         availableTextWidth: Float,
         unitToInches: Float
     ): List<ScramblePhrase> {
-        val basicScramblePhrases = scramblePageChunk.map { (scr, isExtra) ->
-            FontUtil.generatePhrase(
-                scr,
-                isExtra,
+        val basicScramblePhrases = scramblePageChunk.map { row ->
+            ScramblePhrase.fromScrambleRow(
+                row,
                 availableHeight,
                 availableTextWidth,
                 unitToInches,
@@ -107,40 +102,38 @@ class GeneralScrambleSheet(
         }
 
         val smallestFontSize = basicScramblePhrases.minOf { it.fontSize }
-        val allOneLine = basicScramblePhrases.all { it.lineTokens.size == 1 }
+        val allOneLine = basicScramblePhrases.all { it.lines.size == 1 }
 
         return basicScramblePhrases.map {
-            val breakChunks = if (allOneLine)
-                it.scramble.split(" ")
-                    .map(::listOf) else
-                        FontUtil.splitAtPossibleBreaks(it.rawTokens)
+            val breakChunks = if (allOneLine) listOf(it.row.rawTokens) else it.row.paddedTokens
 
             val maxLineTokens = FontUtil.splitToFixedSizeLines(
                 breakChunks,
                 smallestFontSize,
                 availableTextWidth,
                 unitToInches,
-                ScramblePhrase.NBSP_STRING
+                ScramblePhrase.DEFAULT_GLUE,
+                ScramblePhrase.DEFAULT_PADDING
             )
 
-            it.copy(lineTokens = maxLineTokens, fontSize = smallestFontSize)
+            it.copy(lines = maxLineTokens, fontSize = smallestFontSize)
         }
     }
 
     override fun DocumentBuilder.writeContents() {
         showHeaderTimestamp = true
 
-        val allScrambles = ScramblePhrase.splitScrambleSet(scrambleSet)
-        val scramblePageChunks = allScrambles.chunked(MAX_SCRAMBLES_PER_PAGE)
+        val scrambleRows = ScrambleRow.rowsFromScrambleSet(scrambleSet)
+        val scrambleRowPages = scrambleRows.chunked(MAX_SCRAMBLES_PER_PAGE)
 
         val scramblerPreferredSize = scramblingPuzzle.preferredSize
         val scramblerWidthToHeight = scramblerPreferredSize.width.toFloat() / scramblerPreferredSize.height
 
-        showPageNumbers = scramblePageChunks.size > 1
+        showPageNumbers = scrambleRowPages.size > 1
 
         val roundDetails = activityCode.compileTitleString(locale, true, hasGroupId)
 
-        for (scramblePageChunk in scramblePageChunks) {
+        for (scramblePageChunk in scrambleRowPages) {
             page {
                 headerLines = competitionTitle to roundDetails
                 footerLine = "Generated by $tNoodleVersion" // TODO i18n
@@ -161,29 +154,30 @@ class GeneralScrambleSheet(
                     val fullWidth = relHeightPerScramble * scramblerWidthToHeight
                     // and finally limit it down to one third of the page.
                     val scrambleImageProportion = 1 / fullWidth
-                    val scrambleImageParts = max(3f, scrambleImageProportion)
+                    val scrambleImageParts = max(MAX_SCRAMBLE_IMAGE_RATIO.toFloat(), scrambleImageProportion)
 
                     // label column is 1/25, scrambles are 1/scrambleImageParts.
                     // poor man's LCM: 25*scrambleImageParts :)
-                    val gcd = 25 * scrambleImageParts
+                    val gcd = MAX_INDEX_COLUMN_RATIO * scrambleImageParts
                     // 25 parts go to label column, $scrambleImageParts parts go to the scramble Image.
-                    val scrambleStringParts = gcd - 25 - scrambleImageParts
+                    val scrambleStringParts = gcd - MAX_INDEX_COLUMN_RATIO - scrambleImageParts
                     // finally, put it all together :)
                     // when calculating the GCD, we extended 1/25 by n and 1/n by 25.
                     // that's why the column order _seems_ to be flipped around here.
                     // but proportionally everything is in order!
-                    relativeWidths = listOf(scrambleImageParts, scrambleStringParts, 25f)
+                    relativeWidths = listOf(scrambleImageParts, scrambleStringParts, MAX_INDEX_COLUMN_RATIO.toFloat())
 
                     val totalWidth = relativeWidths.sum()
 
-                    val scrambleImageWidth = 25f / totalWidth
+                    val scrambleImageWidth = MAX_INDEX_COLUMN_RATIO / totalWidth
                     val scrambleTextWidth = scrambleStringParts / totalWidth
 
-                    val desiredPaddingPx = 2 * Drawing.Padding.DEFAULT
-                    val paddingPenalty = (desiredPaddingPx * 2).pixelsToInch / tableWidthIn
+                    val paddingPenalty = (DEFAULT_CELL_PADDING * 2).pixelsToInch / tableWidthIn
 
-                    val chunkHeight = (relHeightPerScramble - paddingPenalty) * SCRAMBLE_ONE_PAGE_BACKOFF
-                    val chunkWidth = (scrambleTextWidth - paddingPenalty) * SCRAMBLE_ONE_PAGE_BACKOFF
+                    // leading calculation for smaller font sizes in iText 7 is currently broken
+                    // so we make the text boxes artificially smaller than they actually are.
+                    val chunkHeight = (relHeightPerScramble - 2 * paddingPenalty)
+                    val chunkWidth = (scrambleTextWidth - 1.2f * paddingPenalty) // FIXME GB
 
                     val scramblePhrases = computeScramblePhrases(
                         scramblePageChunk,
@@ -192,7 +186,7 @@ class GeneralScrambleSheet(
                         tableWidthIn
                     )
 
-                    val (standardScrambles, extraScrambles) = scramblePhrases.partition { !it.isExtra }
+                    val (standardScrambles, extraScrambles) = scramblePhrases.partition { !it.row.isExtra }
 
                     scrambleRows(
                         standardScrambles,
@@ -207,7 +201,7 @@ class GeneralScrambleSheet(
                                 horizontalAlignment = Alignment.Horizontal.CENTER
 
                                 border = Drawing.Border.NONE
-                                padding = 2 * Drawing.Padding.DEFAULT
+                                padding = DEFAULT_CELL_PADDING
 
                                 text(TABLE_HEADING_EXTRA_SCRAMBLES) {
                                     fontWeight = Font.Weight.BOLD
@@ -233,14 +227,17 @@ class GeneralScrambleSheet(
         const val MAX_SCRAMBLES_PER_PAGE = 7
         const val MIN_LINES_HIGHLIGHTING = 4
 
-        const val SCRAMBLE_TEXT_LEADING = 1.2f
-
-        const val SCRAMBLE_ONE_PAGE_BACKOFF = 1f
+        const val SCRAMBLE_TEXT_LEADING = 0.95f
 
         const val TABLE_HEADING_EXTRA_SCRAMBLES = "Extra Scrambles" // TODO i18n
         const val EXTRA_SCRAMBLE_PREFIX = "E"
 
         const val EXTRA_SCRAMBLE_LABEL_SIZE = Font.Size.DEFAULT
+
+        const val DEFAULT_CELL_PADDING = 2 * Drawing.Padding.DEFAULT
+
+        const val MAX_SCRAMBLE_IMAGE_RATIO = 3
+        const val MAX_INDEX_COLUMN_RATIO = 25
 
         val SCRAMBLE_BACKGROUND_COLOR = RgbColor(192, 192, 192)
         val SCRAMBLE_HIGHLIGHTING_COLOR = RgbColor(230, 230, 230)

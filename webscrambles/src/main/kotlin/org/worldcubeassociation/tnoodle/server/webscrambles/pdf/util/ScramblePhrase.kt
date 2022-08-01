@@ -1,74 +1,72 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util
 
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ScrambleSet
-import org.worldcubeassociation.tnoodle.server.webscrambles.zip.util.StringUtil.stripNewlines
-import kotlin.math.ceil
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Font
 
 data class ScramblePhrase(
-    val scramble: String,
-    val isExtra: Boolean,
-    val rawTokens: List<Pair<String, Boolean>>,
-    val lineTokens: List<List<String>>,
+    val row: ScrambleRow,
+    val lines: List<String>,
     val fontSize: Float
 ) {
     companion object {
-        val NBSP_STRING = Typography.nbsp.toString()
+        const val DEFAULT_FONT = Font.MONO
+        const val DEFAULT_GLUE = ScrambleStringUtil.MOVES_DELIMITER
+        val DEFAULT_PADDING = ScrambleStringUtil.NBSP_STRING
 
-        val MIN_ONE_LINE_FONT_SIZE = 15f
-        val MAX_PHRASE_FONT_SIZE = 20f
+        fun fromScrambleRow(
+            row: ScrambleRow,
+            boxHeight: Float,
+            boxWidth: Float,
+            unitToInches: Float = 1f,
+            leading: Float = Font.Leading.DEFAULT
+        ): ScramblePhrase {
+            // at first, try one-line (silly for big events but not computation-intensive at all)
+            val oneLineScramble = DEFAULT_PADDING + row.scramble + DEFAULT_PADDING
 
-        fun padTurnsUniformly(scramble: String, padding: String = NBSP_STRING): String {
-            val maxTurnLength = scramble.split("\\s+".toRegex()).maxOfOrNull { it.length } ?: 0
-            val lines = scramble.lines().dropLastWhile { it.isEmpty() }
+            // ignore leading between lines because we're deliberately trying for one line only
+            val oneLineFontSize = FontUtil.computeOneLineFontSize(
+                oneLineScramble,
+                boxHeight,
+                boxWidth,
+                DEFAULT_FONT,
+                unitToInches,
+                1f // deliberately ignore leading because we aim for one single line anyway.
+            )
 
-            return lines.joinToString("\n") { line ->
-                val lineTurns = line.split("\\s+".toRegex()).dropLastWhile { it.isEmpty() }
-
-                lineTurns.joinToString(" ") { turn ->
-                    val missingPad = maxTurnLength - turn.length
-                    val repetitions = ceil(missingPad.toDouble() / padding.length)
-
-                    val actualPadding = padding.repeat(repetitions.toInt())
-                        // TODO - this is a disgusting hack for sq1. We don't pad the /
-                        // turns because they're guaranteed to occur as every other turn,
-                        // so stuff will line up nicely without padding them. I don't know
-                        // what a good general solution to this problem is.
-                        .takeUnless { turn == "/" }
-                        .orEmpty()
-
-                    turn + actualPadding
-                }
-            }
-        }
-
-        fun splitToChunks(scramble: String): List<Pair<String, Boolean>> {
-            // replace \n from Mega with regular spaces.
-            val flat = scramble.stripNewlines()
-
-            // make sure we're splitting at space, NOT at non-breakable space!
-            val paddedMoves = padTurnsUniformly(flat).split(" ")
-
-            val isSquareOne = "/" in scramble
-            val isMegaminx = "\n" in scramble
-
-            val lineBreaks = paddedMoves.map {
-                if (isSquareOne) it == "/" else
-                    if (isMegaminx) it.first() == 'U' else
-                        true
+            // can we fit the entire scramble on one line without making it terribly small?
+            if (oneLineFontSize > ScrambleStringUtil.MIN_ONE_LINE_FONT_SIZE) {
+                // if the scramble ends up on one line, there's no need for padding individual moves
+                return ScramblePhrase(row, listOf(row.scramble), oneLineFontSize)
             }
 
-            return paddedMoves.zip(lineBreaks)
-        }
+            val lineTokens = FontUtil.splitToMaxFontSizeLines(
+                row.paddedTokens,
+                boxHeight,
+                boxWidth,
+                leading,
+                DEFAULT_GLUE,
+                DEFAULT_PADDING
+            )
 
-        fun splitScrambleSet(scrambleSet: ScrambleSet): List<Pair<String, Boolean>> {
-            val standard = scrambleSet.scrambles
-                .map { scr -> scr.scrambleString to false }
+            // leading is considered further down
+            val lineHeight = boxHeight / lineTokens.size
 
-            val extra = scrambleSet.extraScrambles
-                .map { scr -> scr.scrambleString to true }
+            val multiLineFontSize = lineTokens
+                .minOf { FontUtil.computeOneLineFontSize(it, lineHeight, boxWidth, DEFAULT_FONT, unitToInches, leading) }
 
-            // TODO can we do some shenanigans with `partition` here?
-            return standard + extra
+            if (multiLineFontSize > ScrambleStringUtil.MAX_PHRASE_FONT_SIZE) {
+                val maxLineTokens = FontUtil.splitToFixedSizeLines(
+                    row.paddedTokens,
+                    ScrambleStringUtil.MAX_PHRASE_FONT_SIZE,
+                    boxWidth,
+                    unitToInches,
+                    DEFAULT_GLUE,
+                    DEFAULT_PADDING
+                )
+
+                return ScramblePhrase(row, maxLineTokens, ScrambleStringUtil.MAX_PHRASE_FONT_SIZE)
+            }
+
+            return ScramblePhrase(row, lineTokens, multiLineFontSize)
         }
     }
 }

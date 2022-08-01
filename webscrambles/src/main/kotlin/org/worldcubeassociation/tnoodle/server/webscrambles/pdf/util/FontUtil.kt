@@ -6,7 +6,6 @@ import com.itextpdf.kernel.font.PdfFont
 import com.itextpdf.kernel.font.PdfFontFactory
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Font
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Paper.inchesToPixelPrecise
-import org.worldcubeassociation.tnoodle.server.webscrambles.zip.util.StringUtil.stripNewlines
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -55,70 +54,9 @@ object FontUtil {
         leading: Float = Font.Leading.DEFAULT
     ): Float {
         val relativeWidth = computeRelativeWidth(height, width, leading)
-
         val optimalFontScale = computeFontScale(content, relativeWidth, fontName)
-        val calcLeading = getCalcLeading(leading)
 
-        return (height * unitToInches * optimalFontScale).inchesToPixelPrecise / calcLeading
-    }
-
-    fun generatePhrase(
-        scramble: String,
-        isExtra: Boolean,
-        boxHeight: Float,
-        boxWidth: Float,
-        unitToInches: Float = 1f,
-        leading: Float = Font.Leading.DEFAULT
-    ): ScramblePhrase {
-        // at first, try one-line (silly for big events but not computation-intensive at all)
-        val oneLineScramble = ScramblePhrase.NBSP_STRING + scramble + ScramblePhrase.NBSP_STRING
-        // ignore leading between lines because we're deliberately trying for one line only
-        val oneLineFontSize = computeOneLineFontSize(oneLineScramble, boxHeight, boxWidth, Font.MONO, unitToInches, 1f)
-
-        val chunksWithBreakFlags = ScramblePhrase.splitToChunks(scramble)
-
-        // can we fit the entire scramble on one line without making it terribly small
-        if (oneLineFontSize > ScramblePhrase.MIN_ONE_LINE_FONT_SIZE) {
-            // if the scramble ends up on one line, there's no need for padding individual moves
-            val oneLineRawTokens = oneLineScramble.stripNewlines().split(" ")
-
-            return ScramblePhrase(scramble, isExtra, chunksWithBreakFlags, listOf(oneLineRawTokens), oneLineFontSize)
-        }
-
-        val phraseChunks = splitAtPossibleBreaks(chunksWithBreakFlags)
-        val lineTokens = splitToMaxFontSizeLines(phraseChunks, boxHeight, boxWidth, leading) // no padding on purpose
-
-        // leading is considered further down
-        val lineHeight = boxHeight / lineTokens.size
-
-        val multiLineFontSize = lineTokens
-            .map { it.joinToStringWithPadding(" ", ScramblePhrase.NBSP_STRING) }
-            .minOf { computeOneLineFontSize(it, lineHeight, boxWidth, Font.MONO, unitToInches, leading) }
-
-        if (multiLineFontSize > ScramblePhrase.MAX_PHRASE_FONT_SIZE) {
-            val maxLineTokens = splitToFixedSizeLines(
-                phraseChunks,
-                ScramblePhrase.MAX_PHRASE_FONT_SIZE,
-                boxWidth,
-                unitToInches,
-                ScramblePhrase.NBSP_STRING
-            )
-
-            return ScramblePhrase(
-                scramble,
-                isExtra,
-                chunksWithBreakFlags,
-                maxLineTokens,
-                ScramblePhrase.MAX_PHRASE_FONT_SIZE
-            )
-        }
-
-        return ScramblePhrase(scramble, isExtra, chunksWithBreakFlags, lineTokens, multiLineFontSize)
-    }
-
-    private fun <T> merge(accu: List<List<T>>, element: List<T>): List<List<T>> {
-        // FIXME for some reason, Kotlin cannot resolve the `plus` operator correctly :(
-        return accu.toMutableList().apply { add(element) }
+        return (height * unitToInches * optimalFontScale).inchesToPixelPrecise / getCalcLeading(leading)
     }
 
     fun splitToFixedSizeLines(
@@ -126,68 +64,70 @@ object FontUtil {
         fontSize: Float,
         lineWidth: Float,
         unitToInches: Float = 1f,
+        chunkGlue: String,
         padding: String? = null,
-    ): List<List<String>> {
+    ): List<String> {
         val widthInPx = (lineWidth * unitToInches).inchesToPixelPrecise
         val relWidthForFont = widthInPx / fontSize
 
-        return splitChunksToLines(phraseChunks, relWidthForFont, padding)
+        val lineTokens = splitChunksToLines(phraseChunks, relWidthForFont, chunkGlue, padding)
+        return lineTokens.map { it.joinToStringWithPadding(chunkGlue, padding) }
     }
 
-    private fun splitToMaxFontSizeLines(
+    fun splitAtPossibleBreaks(
+        chunksWithBreakFlags: List<Pair<String, Boolean>>,
+        currentPhraseAccu: List<String> = emptyList(),
+        accu: List<List<String>> = emptyList()
+    ): List<List<String>> {
+        if (chunksWithBreakFlags.isEmpty()) {
+            if (accu.isEmpty()) {
+                // not a single line break in the entire sequence.
+                return listOf(currentPhraseAccu)
+            }
+
+            return accu
+        }
+
+        val head = chunksWithBreakFlags.first()
+        val tail = chunksWithBreakFlags.drop(1)
+
+        val phrase = currentPhraseAccu + head.first
+
+        return if (head.second) {
+            // we can split!
+            splitAtPossibleBreaks(tail, emptyList(), merge(accu, phrase))
+        } else {
+            // no split yet, try consuming more tokens
+            splitAtPossibleBreaks(tail, phrase, accu)
+        }
+    }
+
+    fun splitToMaxFontSizeLines(
         chunkSections: List<List<String>>,
         boxHeight: Float,
         boxWidth: Float,
         leading: Float = Font.Leading.DEFAULT,
+        chunkGlue: String,
         padding: String? = null,
         nLines: Int = 2
-    ): List<List<String>> {
+    ): List<String> {
         if (nLines > chunkSections.size) {
-            return chunkSections
+            return chunkSections.map { it.joinToStringWithPadding(chunkGlue, padding) }
         }
 
         val singleLineHeight = boxHeight / nLines
         val boxRelativeWidth = computeRelativeWidth(singleLineHeight, boxWidth, leading)
 
-        val splitCurrentLines = splitChunksToLines(chunkSections, boxRelativeWidth, padding)
+        val splitCurrentLines = splitChunksToLines(chunkSections, boxRelativeWidth, chunkGlue, padding)
 
         if (splitCurrentLines.size <= nLines) {
-            return splitCurrentLines
+            return splitCurrentLines.map { it.joinToStringWithPadding(chunkGlue, padding) }
         }
 
-        return splitToMaxFontSizeLines(chunkSections, boxHeight, boxWidth, leading, padding, nLines + 1)
+        return splitToMaxFontSizeLines(chunkSections, boxHeight, boxWidth, leading, chunkGlue, padding, nLines + 1)
     }
 
-    private fun splitChunksToLines(
-        chunks: List<List<String>>,
-        lineRelWidth: Float,
-        padding: String? = null,
-        accu: List<List<String>> = emptyList()
-    ): List<List<String>> {
-        if (chunks.isEmpty()) {
-            return accu
-        }
-
-        val (candidateLine, rest) = takeChunksThatFitOneLine(chunks, lineRelWidth, padding)
-
-        val currentLine = candidateLine.ifEmpty {
-            chunks.first().toMutableList().apply {
-                if (padding != null) {
-                    // pad beginning
-                    add(0, padding)
-
-                    // pad end
-                    add(padding)
-                }
-            }
-        }
-
-        val actRest = if (candidateLine.isEmpty()) chunks.drop(1) else rest
-
-        return splitChunksToLines(actRest, lineRelWidth, padding, merge(accu, currentLine))
-    }
-
-    fun <T> List<T>.joinToStringWithPadding(
+    private fun <T> List<T>.joinToStringWithPadding(
         glue: String,
         padding: T? = null
     ): String {
@@ -203,9 +143,38 @@ object FontUtil {
         return prefix + content + suffix
     }
 
+    private fun <T> merge(accu: List<List<T>>, element: List<T>): List<List<T>> {
+        // FIXME for some reason, Kotlin cannot resolve the `plus` operator correctly :(
+        return accu.toMutableList().apply { add(element) }
+    }
+
+    private fun splitChunksToLines(
+        chunks: List<List<String>>,
+        lineRelWidth: Float,
+        chunkGlue: String,
+        padding: String? = null,
+        accu: List<List<String>> = emptyList()
+    ): List<List<String>> {
+        if (chunks.isEmpty()) {
+            return accu
+        }
+
+        val (candidateLine, rest) = takeChunksThatFitOneLine(chunks, lineRelWidth, chunkGlue, padding)
+
+        return if (candidateLine.isEmpty()) {
+            val nextLine = listOfNotNull(padding) + chunks.first() + listOfNotNull(padding)
+            val remainingChunks = chunks.drop(1)
+
+            splitChunksToLines(remainingChunks, lineRelWidth, chunkGlue, padding, merge(accu, nextLine))
+        } else {
+            splitChunksToLines(rest, lineRelWidth, chunkGlue, padding, merge(accu, candidateLine))
+        }
+    }
+
     private fun takeChunksThatFitOneLine(
         chunkSections: List<List<String>>,
         lineRelativeWidth: Float,
+        chunkGlue: String,
         linePadding: String? = null,
         currentAccu: List<String> = listOfNotNull(linePadding)
     ): Pair<List<String>, List<List<String>>> {
@@ -217,7 +186,7 @@ object FontUtil {
 
         // local helper function to determine if a temporary working state (accu) fits the current line
         fun accuFits(accu: List<String>): Boolean {
-            val lineChunk = accu.joinToStringWithPadding(" ", linePadding)
+            val lineChunk = accu.joinToStringWithPadding(chunkGlue, linePadding)
             val fontScale = computeFontScale(lineChunk, lineRelativeWidth, Font.MONO)
 
             // if we have to scale the line down (scale < 1), it means it does NOT fit.
@@ -253,7 +222,13 @@ object FontUtil {
                 // Two versions how to proceed. Top version: pad at most once. Bottom version: pad as much as possible.
 
                 //return paddedExistingAccu to chunkSections
-                return takeChunksThatFitOneLine(chunkSections, lineRelativeWidth, linePadding, paddedExistingAccu)
+                return takeChunksThatFitOneLine(
+                    chunkSections,
+                    lineRelativeWidth,
+                    chunkGlue,
+                    linePadding,
+                    paddedExistingAccu
+                )
             }
 
             val paddedNextAccu = nextAccu + linePadding
@@ -265,7 +240,13 @@ object FontUtil {
                 }
 
                 // we would be able to add a token but then the line is too full to end with padding
-                return takeChunksThatFitOneLine(chunkSections, lineRelativeWidth, linePadding, paddedExistingAccu)
+                return takeChunksThatFitOneLine(
+                    chunkSections,
+                    lineRelativeWidth,
+                    chunkGlue,
+                    linePadding,
+                    paddedExistingAccu
+                )
             }
         } else if (!accuFits(nextAccu)) {
             // we don't do padding, and we're not able to fill more chunks
@@ -275,31 +256,6 @@ object FontUtil {
         // we consumed one chunk of tokens!
         val tail = chunkSections.drop(1)
 
-        return takeChunksThatFitOneLine(tail, lineRelativeWidth, linePadding, nextAccu)
-    }
-
-    fun splitAtPossibleBreaks(
-        chunksWithBreakFlags: List<Pair<String, Boolean>>,
-        currentPhraseAccu: List<String> = emptyList(),
-        accu: List<List<String>> = emptyList()
-    ): List<List<String>> {
-        if (chunksWithBreakFlags.isEmpty()) {
-            if (accu.isEmpty()) {
-                // not a single line break in the entire sequence.
-                return listOf(currentPhraseAccu)
-            }
-
-            return accu
-        }
-
-        val head = chunksWithBreakFlags.first()
-        val tail = chunksWithBreakFlags.drop(1)
-
-        val phrase = currentPhraseAccu + head.first
-
-        val nextPhraseAccu = if (head.second) emptyList() else phrase
-        val nextAccu = if (head.second) merge(accu, phrase) else accu
-
-        return splitAtPossibleBreaks(tail, nextPhraseAccu, nextAccu)
+        return takeChunksThatFitOneLine(tail, lineRelativeWidth, chunkGlue, linePadding, nextAccu)
     }
 }

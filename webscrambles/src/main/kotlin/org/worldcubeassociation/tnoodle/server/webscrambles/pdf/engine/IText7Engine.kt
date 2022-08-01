@@ -310,12 +310,25 @@ object IText7Engine {
         return itextCell
     }
 
+    private fun hackLeading(fontSize: Float, desiredLeading: Float): Float {
+        if (fontSize > 12)
+            return desiredLeading
+
+        val hackLeading = -0.000441919f * fontSize * fontSize * fontSize +
+            0.00727814f * fontSize * fontSize +
+            0.0515296f * fontSize +
+            0.0454113f
+
+        return hackLeading.coerceAtMost(1f) * desiredLeading
+    }
+
     private fun renderParagraph(
         paragraph: Paragraph,
         fontIndex: Map<String, PdfFont>
     ): com.itextpdf.layout.element.Paragraph {
         val itextParagraph = com.itextpdf.layout.element.Paragraph()
-        itextParagraph.setMultipliedLeading(paragraph.leading)
+        val minFontSize = paragraph.lines.minOf { it.fontSize }
+        itextParagraph.setMultipliedLeading(hackLeading(minFontSize, paragraph.leading))
 
         for (line in paragraph.lines) {
             val renderedLine = renderText(line, fontIndex)
