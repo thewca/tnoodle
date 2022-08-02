@@ -11,7 +11,6 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.ScrambleRow
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import java.util.*
 import kotlin.math.ceil
-import kotlin.math.floor
 import kotlin.math.max
 
 class GeneralScrambleSheet(
@@ -53,7 +52,7 @@ class GeneralScrambleSheet(
                     verticalAlignment = Alignment.Vertical.MIDDLE
 
                     leading = SCRAMBLE_TEXT_LEADING
-                    padding = 2 * Drawing.Padding.DEFAULT
+                    padding = DEFAULT_CELL_PADDING
 
                     paragraph {
                         fontName = Font.MONO
@@ -75,9 +74,12 @@ class GeneralScrambleSheet(
 
                 cell {
                     background = SCRAMBLE_BACKGROUND_COLOR
+                    padding = DEFAULT_CELL_PADDING
 
-                    val scrImageWidthPx = (scrImageWidth * unitToInches).inchesToPixel - (2 * padding + 1)
-                    val scrLineHeightPx = (scrLineHeight * unitToInches).inchesToPixel - (2 * padding + 1)
+                    val paddingBackoff = paddingBackoff(DEFAULT_CELL_PADDING)
+
+                    val scrImageWidthPx = (scrImageWidth * unitToInches).inchesToPixel - paddingBackoff
+                    val scrLineHeightPx = (scrLineHeight * unitToInches).inchesToPixel - paddingBackoff
 
                     svgScrambleImage(scramblePhrase.row.scramble, scrImageWidthPx, scrLineHeightPx)
                 }
@@ -91,9 +93,9 @@ class GeneralScrambleSheet(
         availableTextWidth: Float,
         unitToInches: Float
     ): List<ScramblePhrase> {
-        val basicScramblePhrases = scramblePageChunk.map { row ->
+        val basicScramblePhrases = scramblePageChunk.map {
             ScramblePhrase.fromScrambleRow(
-                row,
+                it,
                 availableHeight,
                 availableTextWidth,
                 unitToInches,
@@ -172,12 +174,12 @@ class GeneralScrambleSheet(
                     val scrambleImageWidth = MAX_INDEX_COLUMN_RATIO / totalWidth
                     val scrambleTextWidth = scrambleStringParts / totalWidth
 
-                    val paddingPenalty = (DEFAULT_CELL_PADDING * 2).pixelsToInch / tableWidthIn
+                    val paddingPenalty = paddingBackoff(DEFAULT_CELL_PADDING).pixelsToInch / tableWidthIn
 
                     // leading calculation for smaller font sizes in iText 7 is currently broken
-                    // so we make the text boxes artificially smaller than they actually are.
+                    // so we make the text boxes artificially lower than they actually are.
                     val chunkHeight = (relHeightPerScramble - 2 * paddingPenalty)
-                    val chunkWidth = (scrambleTextWidth - 1.2f * paddingPenalty) // FIXME GB
+                    val chunkWidth = (scrambleTextWidth - paddingPenalty)
 
                     val scramblePhrases = computeScramblePhrases(
                         scramblePageChunk,
@@ -241,5 +243,16 @@ class GeneralScrambleSheet(
 
         val SCRAMBLE_BACKGROUND_COLOR = RgbColor(192, 192, 192)
         val SCRAMBLE_HIGHLIGHTING_COLOR = RgbColor(230, 230, 230)
+
+        // fitting stuff into padded boxes doesn't work the way I thought it would.
+        private fun paddingBackoff(padding: Int): Int {
+            // `2 * padding` is the intuitive part. (horizontal: left AND right, vertical: top AND bottom)
+            // However, both text lines and also images seem to struggle with fitting *exactly* inside the padded box.
+            // Both need an additional backoff of at least 1px per direction.
+            //
+            // As of writing this comment, it is unclear whether this is due to human error on my part
+            // or an actual quirk in the iText 7 layout. Signed GB 2022-Aug-02
+            return 2 * padding + 2
+        }
     }
 }
