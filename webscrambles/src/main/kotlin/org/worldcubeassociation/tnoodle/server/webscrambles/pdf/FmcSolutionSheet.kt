@@ -242,7 +242,7 @@ class FmcSolutionSheet(
                     val scrambleAdviceHeightIn = (2 * infoSectionHeightIn / UPPER_RIGHT_INFO_BOX_RATIO) - paddingBackoff(padding).pixelsToInch
 
                     val separateSheetAdvice = Translate("fmc.scrambleOnSeparateSheet", locale)
-                    optimalText(separateSheetAdvice, columnWidthPx.pixelsToInch, scrambleAdviceHeightIn)
+                    optimalText(separateSheetAdvice, scrambleAdviceHeightIn, columnWidthPx.pixelsToInch)
                 }
             }
         }
