@@ -1,7 +1,5 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties
 
-import kotlin.math.roundToInt
-
 object Paper {
     enum class Size(val widthIn: Float, val heightIn: Float) {
         A4(210.mmToInch, 297.mmToInch);
@@ -21,6 +19,6 @@ object Paper {
     val Int.mmToInch get(): Float = this / (10 * INCH_TO_CM)
     val Int.pixelsToInch get(): Float = this.toFloat() / DPI
     val Float.inchesToPixelPrecise get(): Float = this * DPI
-    // TODO is it okay to round here?
-    val Float.inchesToPixel get(): Int = inchesToPixelPrecise.roundToInt()
+    // PDF doesn't round so we don't round.
+    val Float.inchesToPixel get(): Int = inchesToPixelPrecise.toInt()
 }

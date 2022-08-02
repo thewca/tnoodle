@@ -13,18 +13,18 @@ import java.util.*
 
 class FmcCutoutSheet(
     scramble: Scramble,
-    activityCode: ActivityCode,
-    scrambleSetId: Int,
-    locale: Locale,
     totalAttemptsNum: Int,
+    scrambleSetId: Int,
     competitionTitle: String,
+    activityCode: ActivityCode,
     hasGroupId: Boolean,
+    locale: Locale,
     watermark: String? = null
 ) : FewestMovesSheet(scramble, totalAttemptsNum, scrambleSetId, competitionTitle, activityCode, hasGroupId, locale, watermark) {
     override fun DocumentBuilder.writeContents() {
         page {
-            setVerticalMargins(10)
-            setHorizontalMargins(20)
+            setVerticalMargins(MARGIN_VERTICAL)
+            setHorizontalMargins(MARGIN_HORIZONTAL)
 
             addFmcScrambleCutoutSheet()
         }
@@ -39,11 +39,8 @@ class FmcCutoutSheet(
         val baseFont = Font.fontForLocale(Translate.DEFAULT_LOCALE)
         val localFont = Font.fontForLocale(locale)
 
-        val paddingHeightPenalty = SCRAMBLES_PER_SHEET * 2 * Drawing.Padding.DEFAULT
-
-        val actualWidthIn = size.widthIn - (marginLeft + marginRight).pixelsToInch
-        val actualHeightIn = size.heightIn - (marginTop + marginBottom).pixelsToInch -
-            paddingHeightPenalty.pixelsToInch
+        val actualWidthIn = availableWidthIn
+        val actualHeightIn = availableHeightIn
 
         val scramblerPreferredSize = scramblingPuzzle.preferredSize
         val scramblerWidthToHeight = scramblerPreferredSize.width.toFloat() / scramblerPreferredSize.height
@@ -56,7 +53,7 @@ class FmcCutoutSheet(
             val scrambleWidth = relHeightPerScramble * scramblerWidthToHeight
 
             // as we're always printing more than 1 scramble per sheet,
-            // naively assume that fullWidth < 1
+            // naively assume that scrambleWidth < 1
             val textWidth = 1 - scrambleWidth
             relativeWidths = listOf(textWidth, scrambleWidth)
 
@@ -69,39 +66,33 @@ class FmcCutoutSheet(
 
                     cell {
                         paragraph {
-                            leading = 1f
+                            leading = LEFT_SIDE_LEADING
 
-                            // TODO this is a hack to prevent some margins overlapping
-                            // TODO magic number factor
-                            val scaledTextWidth = textWidth * 0.98f
+                            val paddingPenalty = paddingBackoff(padding).pixelsToInch / actualWidthIn
 
-                            line(competitionTitle) {
+                            val scaledTextHeight = relHeightPerScramble - paddingPenalty
+                            val scaledTextWidth = textWidth - paddingPenalty
+
+                            optimalLine(competitionTitle, scaledTextHeight / LEFT_SIDE_SMALL_TEXT_RATIO, scaledTextWidth, actualWidthIn) {
                                 fontName = baseFont
-
-                                val relHeightForCompName = relHeightPerScramble / 8
-                                setOptimalOneLineFontSize(relHeightForCompName, scaledTextWidth, actualWidthIn)
                             }
-                            line(title) {
+                            optimalLine(title, scaledTextHeight / LEFT_SIDE_LARGE_TEXT_RATIO, scaledTextWidth, actualWidthIn) {
                                 fontName = localFont
-
-                                val relHeightForTitle = relHeightPerScramble / 4
-                                setOptimalOneLineFontSize(relHeightForTitle, scaledTextWidth, actualWidthIn)
                             }
-                            line(scramble.scrambleString) {
+                            optimalLine(scramble.scrambleString, scaledTextHeight / LEFT_SIDE_LARGE_TEXT_RATIO, scaledTextWidth, actualWidthIn) {
                                 fontName = baseFont
-
-                                val relHeightForScrambleString = relHeightPerScramble / 2
-                                setOptimalOneLineFontSize(relHeightForScrambleString, scaledTextWidth, actualWidthIn)
                             }
                         }
                     }
 
                     cell {
-                        padding = 2 * Drawing.Padding.DEFAULT
+                        padding = SCRAMBLE_IMAGE_PADDING
                         horizontalAlignment = Alignment.Horizontal.CENTER
 
-                        val scrambleWidthPx = (scrambleWidth * actualWidthIn).inchesToPixel
-                        svgScrambleImage(scramble.scrambleString, scrambleWidthPx)
+                        val scrambleWidthPx = (scrambleWidth * actualWidthIn).inchesToPixel - paddingBackoff(SCRAMBLE_IMAGE_PADDING)
+                        val scrambleHeightPx = (relHeightPerScramble * actualWidthIn).inchesToPixel - paddingBackoff(SCRAMBLE_IMAGE_PADDING)
+
+                        svgScrambleImage(scramble.scrambleString, scrambleWidthPx, scrambleHeightPx)
                     }
                 }
             }
@@ -109,6 +100,16 @@ class FmcCutoutSheet(
     }
 
     companion object {
-        val SCRAMBLES_PER_SHEET = 8
+        const val SCRAMBLES_PER_SHEET = 8
+
+        const val MARGIN_HORIZONTAL = 20
+        const val MARGIN_VERTICAL = 10
+
+        const val SCRAMBLE_IMAGE_PADDING = 2 * Drawing.Padding.DEFAULT
+
+        const val LEFT_SIDE_LEADING = 1.3f
+
+        const val LEFT_SIDE_LARGE_TEXT_RATIO = 3
+        const val LEFT_SIDE_SMALL_TEXT_RATIO = 8
     }
 }
