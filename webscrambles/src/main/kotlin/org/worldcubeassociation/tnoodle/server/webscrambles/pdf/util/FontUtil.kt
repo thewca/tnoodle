@@ -42,19 +42,16 @@ object FontUtil {
         return max(1f, coefficient)
     }
 
-    private fun computeRelativeWidth(
-        height: Float,
-        width: Float,
-        leading: Float = Font.Leading.DEFAULT
-    ): Float {
-        return width / (height * getCalcLeading(leading))
-    }
-
-    private fun getCalcLeading(leading: Float): Float {
+    private fun getCalcLeading(leading: Float, fontName: String): Float {
         // leading below 1 won't make the text itself smaller!
         // it will squish the next line over the current one,
         // but we only care about text height here anyway.
-        return max(1f, leading)
+        val flatLeading = max(1f, leading)
+        val fontLeading = computeFontHeightScale(fontName)
+
+        val largestLeading = max(flatLeading, fontLeading)
+
+        return max(1f, largestLeading)
     }
 
     fun computeOneLineFontSize(
@@ -69,7 +66,7 @@ object FontUtil {
 
         val widthScale = computeFontWidthScale(content, relativeWidth, fontName)
 
-        val heightRenderingScale = getCalcLeading(max(leading, computeFontHeightScale(fontName)))
+        val heightRenderingScale = getCalcLeading(leading, fontName)
         val heightFactor = widthScale * heightRenderingScale
         val heightScale = max(1f, heightFactor)
 
@@ -133,7 +130,7 @@ object FontUtil {
         }
 
         val singleLineHeight = boxHeight / nLines
-        val boxRelativeWidth = computeRelativeWidth(singleLineHeight, boxWidth, leading)
+        val boxRelativeWidth = boxWidth / (singleLineHeight * getCalcLeading(leading, Font.MONO))
 
         val splitCurrentLines = splitChunksToLines(chunkSections, boxRelativeWidth, chunkGlue, padding)
 

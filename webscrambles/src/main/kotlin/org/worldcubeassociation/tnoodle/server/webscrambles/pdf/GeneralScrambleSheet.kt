@@ -176,9 +176,7 @@ class GeneralScrambleSheet(
 
                     val paddingPenalty = paddingBackoff(DEFAULT_CELL_PADDING).pixelsToInch / tableWidthIn
 
-                    // leading calculation for smaller font sizes in iText 7 is currently broken
-                    // so we make the text boxes artificially lower than they actually are.
-                    val chunkHeight = (relHeightPerScramble - 2 * paddingPenalty)
+                    val chunkHeight = (relHeightPerScramble - paddingPenalty)
                     val chunkWidth = (scrambleTextWidth - paddingPenalty)
 
                     val scramblePhrases = computeScramblePhrases(
