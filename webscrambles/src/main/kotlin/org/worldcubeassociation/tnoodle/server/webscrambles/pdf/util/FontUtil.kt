@@ -4,6 +4,7 @@ import com.itextpdf.io.font.FontProgram
 import com.itextpdf.io.font.PdfEncodings
 import com.itextpdf.kernel.font.PdfFont
 import com.itextpdf.kernel.font.PdfFontFactory
+import com.itextpdf.layout.renderer.TextRenderer
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Font
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Paper.inchesToPixelPrecise
 import kotlin.math.abs
@@ -19,15 +20,26 @@ object FontUtil {
         return abs(this - f) < FLOAT_EPSILON
     }
 
-    private fun computeFontScale(text: String, relativeWidth: Float, fontName: String): Float {
+    private fun computeFontWidthScale(text: String, relativeWidth: Float, fontName: String): Float {
         val font = FONT_PROGRAM_CACHE.getOrPut(fontName) {
             PdfFontFactory.createFont("fonts/$fontName.ttf", PdfEncodings.IDENTITY_H)
         }
 
-        val textWidth = font.getWidth(text)
-        val coefficient = relativeWidth * FontProgram.UNITS_NORMALIZATION / textWidth
+        val textWidth = font.getWidth(text) / FontProgram.UNITS_NORMALIZATION.toFloat()
+        val coefficient = relativeWidth / textWidth
 
         return min(1f, coefficient)
+    }
+
+    private fun computeFontHeightScale(fontName: String): Float {
+        val font = FONT_PROGRAM_CACHE.getOrPut(fontName) {
+            PdfFontFactory.createFont("fonts/$fontName.ttf", PdfEncodings.IDENTITY_H)
+        }
+
+        val (asc, desc) = TextRenderer.calculateAscenderDescender(font)
+        val coefficient = (asc - desc) / FontProgram.UNITS_NORMALIZATION.toFloat()
+
+        return max(1f, coefficient)
     }
 
     private fun computeRelativeWidth(
@@ -53,10 +65,15 @@ object FontUtil {
         unitToInches: Float = 1f,
         leading: Float = Font.Leading.DEFAULT
     ): Float {
-        val relativeWidth = computeRelativeWidth(height, width, leading)
-        val optimalFontScale = computeFontScale(content, relativeWidth, fontName)
+        val relativeWidth = width / height
 
-        return (height * unitToInches * optimalFontScale).inchesToPixelPrecise / getCalcLeading(leading)
+        val widthScale = computeFontWidthScale(content, relativeWidth, fontName)
+
+        val heightRenderingScale = getCalcLeading(max(leading, computeFontHeightScale(fontName)))
+        val heightFactor = widthScale * heightRenderingScale
+        val heightScale = max(1f, heightFactor)
+
+        return (height * unitToInches * widthScale).inchesToPixelPrecise / heightScale
     }
 
     fun splitToFixedSizeLines(
@@ -187,7 +204,7 @@ object FontUtil {
         // local helper function to determine if a temporary working state (accu) fits the current line
         fun accuFits(accu: List<String>): Boolean {
             val lineChunk = accu.joinToStringWithPadding(chunkGlue, linePadding)
-            val fontScale = computeFontScale(lineChunk, lineRelativeWidth, Font.MONO)
+            val fontScale = computeFontWidthScale(lineChunk, lineRelativeWidth, Font.MONO)
 
             // if we have to scale the line down (scale < 1), it means it does NOT fit.
             // fontScale is by definition never more than 1 so checking for equality suffices.

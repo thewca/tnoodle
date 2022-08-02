@@ -8,7 +8,9 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Drawing
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Font
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Paper.inchesToPixel
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Paper.inchesToPixelPrecise
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Paper.pixelsToInch
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFScrambleMatcher
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import java.util.*
@@ -28,8 +30,8 @@ class FmcSolutionSheet(
 
     override fun DocumentBuilder.writeContents() {
         page {
-            // yes, setting the *vertical* margins to the narrower *horizontal* margins on purpose.
-            setVerticalMargins(Drawing.Margin.DEFAULT_HORIZONTAL)
+            // yes, setting *all* margins to the narrower *horizontal* margins on purpose.
+            setMargins(Drawing.Margin.DEFAULT_HORIZONTAL)
 
             addFmcSolutionSheet()
         }
@@ -46,8 +48,6 @@ class FmcSolutionSheet(
         val tableRows = directions.zip(moves)
 
         return table(numColumns) {
-            fontSize = 7f
-
             relativeWidths = listOf(5f, 1f, 1f, 1f, 1f, 1f, 1f)
 
             row {
@@ -72,11 +72,10 @@ class FmcSolutionSheet(
                     for (move in line) {
                         cell {
                             verticalAlignment = Alignment.Vertical.MIDDLE
-                            padding = 2 * Drawing.Padding.DEFAULT
 
                             text(move) {
                                 fontName = Font.MONO
-                                fontSize = 11f
+                                fontSize *= 1.1f
                             }
                         }
                     }
@@ -85,17 +84,12 @@ class FmcSolutionSheet(
         }
     }
 
-    protected fun CellBuilder.addTopLeftRulesAndDescriptionTable(): Table {
+    protected fun CellBuilder.addTopLeftRulesAndDescriptionTable(columnWidthIn: Float, infoSectionHeightIn: Float): Table {
         val substitutions = mapOf("maxMoves" to WCA_MAX_MOVES_FMC.toString())
 
-        val rulesList = listOf(
-            Translate("fmc.rule1", locale),
-            Translate("fmc.rule2", locale),
-            Translate("fmc.rule3", locale),
-            Translate("fmc.rule4", locale, substitutions),
-            Translate("fmc.rule5", locale),
-            Translate("fmc.rule6", locale)
-        )
+        val rulesList = List(NUMBER_OF_RULES) {
+            Translate("fmc.rule${it + 1}", locale, substitutions)
+        }.map { "• $it" }
 
         val pureMoves = DIRECTION_MODIFIERS.map { mod -> WCA_MOVES.map { mov -> "$mov$mod" } }
         val rotationMoves = DIRECTION_MODIFIERS.map { mod ->
@@ -111,25 +105,32 @@ class FmcSolutionSheet(
 
         return table(1) {
             border = Drawing.Border.NONE
-            fontSize = 8f
-            leading = 1.5f
 
             row {
                 cell {
                     horizontalAlignment = Alignment.Horizontal.CENTER
+                    leading = COMPETITION_TITLE_LEADING
 
-                    text(localEventTitle) {
-                        fontSize = 25f
-                    }
+                    optimalText(localEventTitle, infoSectionHeightIn / UPPER_LEFT_TITLE_RATIO, columnWidthIn)
                 }
             }
+
+            val ruleBoxHeight = (infoSectionHeightIn - paddingBackoff(padding).pixelsToInch) / UPPER_LEFT_RULES_RATIO
+            val ruleLineHeight = ruleBoxHeight / NUMBER_OF_RULES
+            // TODO GB
+            val ruleFontHack = 10f * ruleLineHeight / (10f + NUMBER_OF_RULES)
+
+            val ruleFontSize = rulesList.maxOf {
+                FontUtil.computeOneLineFontSize(it, ruleFontHack, columnWidthIn, fontName.orEmpty(), leading = 1f)
+            }
+
             row {
                 cell {
                     horizontalAlignment = Alignment.Horizontal.JUSTIFIED
 
-                    paragraph {
+                    evenParagraph {
                         for (rule in rulesList) {
-                            line("• $rule")
+                            line(rule) { fontSize = ruleFontSize }
                         }
                     }
                 }
@@ -137,6 +138,8 @@ class FmcSolutionSheet(
             for ((moveType, moves) in moveTypes) {
                 row {
                     cell {
+                        fontSize = ruleFontSize
+
                         addNotationTable(moveType, moves)
                     }
                 }
@@ -144,20 +147,26 @@ class FmcSolutionSheet(
         }
     }
 
-    protected fun TableBuilder.addTopRightCompetitionInfoTable(scrambleImageWidthPx: Int) {
-        fontSize = 9f
-
+    protected fun TableBuilder.addTopRightCompetitionInfoTable(columnWidthIn: Float, infoSectionHeightIn: Float) {
         if (drawScramble) {
             row {
                 cell {
                     horizontalAlignment = Alignment.Horizontal.CENTER
 
-                    paragraph {
-                        line(competitionTitle)
-                        line(activityTitle)
+                    val titleLines = listOfNotNull(
+                        competitionTitle,
+                        activityTitle,
+                        scrambleXOfY.takeIf { totalAttemptsNum > 1 }
+                    )
 
-                        if (totalAttemptsNum > 1) {
-                            line(scrambleXOfY)
+                    val maxTitleBoxHeightIn = (infoSectionHeightIn - paddingBackoff(padding).pixelsToInch) / UPPER_RIGHT_INFO_BOX_RATIO
+
+                    evenParagraph {
+                        fontName = Font.SANS_SERIF
+                        leading = COMPETITION_TITLE_LEADING
+
+                        for (ln in titleLines) {
+                            optimalLine(ln, maxTitleBoxHeightIn / titleLines.size, columnWidthIn)
                         }
                     }
                 }
@@ -165,32 +174,34 @@ class FmcSolutionSheet(
         }
         row {
             cell {
-                padding = 3 * Drawing.Padding.DEFAULT
-                border = Drawing.Border.COLS_ONLY
+                padding = FILL_OUT_BOXES_PADDING
 
-                paragraph {
-                    fontSize = if (!drawScramble) 13f else 11f
-                    leading = 2.5f
+                evenParagraph {
+                    leading = FILL_OUT_BOXES_LEADING
 
-                    if (!drawScramble) {
-                        val competitionDesc = Translate("fmc.competition", locale) + LONG_FILL
-                        line(competitionDesc)
-
-                        val roundDesc = Translate("fmc.round", locale) + SHORT_FILL
-                        line(roundDesc)
-
-                        val attemptDesc = Translate("fmc.attempt", locale) + SHORT_FILL
-                        line(attemptDesc)
-                    }
+                    val competitionDesc = Translate("fmc.competition", locale) + LONG_FILL
+                    val roundDesc = Translate("fmc.round", locale) + SHORT_FILL
+                    val attemptDesc = Translate("fmc.attempt", locale) + SHORT_FILL
 
                     val competitorDesc = Translate("fmc.competitor", locale) + LONG_FILL
-                    line(competitorDesc)
-
-                    val wcaIdDesc = "WCA ID" + WCA_ID_FILL
-                    line(wcaIdDesc)
-
+                    val wcaIdDesc = "WCA ID" + WCA_ID_FILL // TODO i18n
                     val registrantIdDesc = Translate("fmc.registrantId", locale) + SHORT_FILL
-                    line(registrantIdDesc)
+
+                    val competitorInfoLines = listOfNotNull(
+                        competitionDesc.takeUnless { drawScramble },
+                        roundDesc.takeUnless { drawScramble },
+                        attemptDesc.takeUnless { drawScramble },
+                        competitorDesc,
+                        wcaIdDesc,
+                        registrantIdDesc
+                    )
+
+                    val maxTitleBoxHeightIn = (infoSectionHeightIn - paddingBackoff(padding).pixelsToInch) / UPPER_RIGHT_INFO_BOX_RATIO
+                    val maxTitleRowHeightIn = maxTitleBoxHeightIn / 3
+
+                    for (ln in competitorInfoLines) {
+                        optimalLine(ln, maxTitleRowHeightIn, columnWidthIn)
+                    }
                 }
             }
         }
@@ -198,17 +209,21 @@ class FmcSolutionSheet(
             cell {
                 horizontalAlignment = Alignment.Horizontal.CENTER
 
+                padding = FILL_OUT_BOXES_PADDING
+
                 paragraph {
-                    leading = 2f
+                    leading = GRADING_BOXES_LEADING
+
+                    val maxGradingBoxHeightIn = (infoSectionHeightIn - paddingBackoff(padding).pixelsToInch) / UPPER_RIGHT_INFO_BOX_RATIO
 
                     val warningText = Translate("fmc.warning", locale)
-                    line(warningText)
+                    optimalLine(warningText, maxGradingBoxHeightIn / 2, columnWidthIn)
 
                     val gradingTextGradedBy = Translate("fmc.graded", locale) + LONG_FILL
                     val gradingTextResult = Translate("fmc.result", locale) + SHORT_FILL
 
                     val gradingText = "$gradingTextGradedBy $gradingTextResult"
-                    line(gradingText)
+                    optimalLine(gradingText, maxGradingBoxHeightIn / 2, columnWidthIn)
                 }
             }
         }
@@ -217,69 +232,77 @@ class FmcSolutionSheet(
                 verticalAlignment = Alignment.Vertical.MIDDLE
                 horizontalAlignment = Alignment.Horizontal.CENTER
 
+                val columnWidthPx = columnWidthIn.inchesToPixel - paddingBackoff(padding)
+
                 if (drawScramble) {
-                    // when the scramble is provided, it won't be a cutout-style blank sheet
-                    // so we just take the scramble width as a heuristic for the height
-                    svgScrambleImage(scramble.scrambleString, scrambleImageWidthPx, scrambleImageWidthPx)
+                    val scrambleRowHeightPx = (3 * infoSectionHeightIn.inchesToPixelPrecise / UPPER_RIGHT_INFO_BOX_RATIO) - paddingBackoff(padding)
+
+                    svgScrambleImage(scramble.scrambleString, columnWidthPx, scrambleRowHeightPx.toInt())
                 } else {
+                    val scrambleAdviceHeightIn = (2 * infoSectionHeightIn / UPPER_RIGHT_INFO_BOX_RATIO) - paddingBackoff(padding).pixelsToInch
+
                     val separateSheetAdvice = Translate("fmc.scrambleOnSeparateSheet", locale)
-                    text(separateSheetAdvice)
+                    optimalText(separateSheetAdvice, columnWidthPx.pixelsToInch, scrambleAdviceHeightIn)
                 }
             }
         }
     }
 
     protected fun PageBuilder.addFmcSolutionSheet() {
-        val actualHeightIn = size.heightIn - (marginTop + marginBottom).pixelsToInch
-        val actualWidthIn = size.widthIn - (marginLeft + marginRight).pixelsToInch
+        val actualHeightIn = availableHeightIn
+        val actualWidthIn = availableWidthIn
 
-        val scrambleImageWidthPx = (actualWidthIn * 0.45f).inchesToPixel
+        val scrambleColumnWidthIn = (actualWidthIn * SCRAMBLE_IMAGE_WIDTH_PERCENT / 100f) -
+            paddingBackoff(FILL_OUT_BOXES_PADDING).pixelsToInch
+
+        val ruleColumnWidthIn = (actualWidthIn * (100 - SCRAMBLE_IMAGE_WIDTH_PERCENT) / 100f) -
+            paddingBackoff(FILL_OUT_BOXES_PADDING).pixelsToInch
+
+        val infoSectionHeightIn = actualHeightIn / 2
 
         table(2) {
             fontName = Font.fontForLocale(locale)
-            fontSize = 15f
 
-            relativeWidths = listOf(55f, 45f)
+            relativeWidths = listOf(100f - SCRAMBLE_IMAGE_WIDTH_PERCENT, SCRAMBLE_IMAGE_WIDTH_PERCENT.toFloat())
 
             row {
                 cell {
-                    rowSpan = 3 + (if (!drawScramble) 0 else 1)
+                    // 3 = competitor details, grading field, scramble field
+                    // (which will either contain the actual scramble or the "see separate sheet" notice)
+                    // The additional +1 is for when we print the title of the competition directly
+                    // instead of as a part of the "competitor details" self-fill-out
+                    rowSpan = 3 + (if (drawScramble) 1 else 0)
 
-                    addTopLeftRulesAndDescriptionTable()
+                    addTopLeftRulesAndDescriptionTable(ruleColumnWidthIn, infoSectionHeightIn)
                 }
 
                 // technically missing a row here, but as "row {}" is just a convenience wrapper anyways
                 // it doesn't matter for the rendering end result.
             }
 
-            addTopRightCompetitionInfoTable(scrambleImageWidthPx)
+            addTopRightCompetitionInfoTable(scrambleColumnWidthIn, infoSectionHeightIn)
 
             if (drawScramble) {
                 row(1) {
-                    border = Drawing.Border.COLS_ONLY
-
                     cell {
                         horizontalAlignment = Alignment.Horizontal.CENTER
+
                         padding = 2 * Drawing.Padding.DEFAULT
+                        leading = SCRAMBLE_FIELD_LEADING
 
                         paragraph {
                             val scramblePrefix = Translate("fmc.scramble", locale)
 
                             line(scramblePrefix) {
-                                fontSize = 7f
+                                fontSize = SCRAMBLE_FIELD_LABEL_FONT_SIZE
                             }
 
-                            val scramble = scramble.scrambleString
+                            val scrambleWidth = actualWidthIn - paddingBackoff(padding).pixelsToInch
 
-                            line(scramble) {
+                            // picking a height value that is much too large intentionally
+                            // to force scaling down by width instead.
+                            optimalLine(scramble.scrambleString, actualHeightIn, scrambleWidth) {
                                 fontName = Font.STANDARD
-
-                                // a bit of subtraction for padding
-                                val scrambleWidth = actualWidthIn - 20.pixelsToInch
-
-                                // picking a height value that is much too large intentionally
-                                // to force scaling down by width instead.
-                                setOptimalOneLineFontSize(actualHeightIn, scrambleWidth)
                             }
                         }
                     }
@@ -288,6 +311,7 @@ class FmcSolutionSheet(
 
             row(1) {
                 val writingLine = List(MOVE_BARS_PER_LINE) { "_" }.joinToString(" ")
+                val writingLnHeight = (actualHeightIn - infoSectionHeightIn) / MOVE_BAR_LINES
 
                 cell {
                     horizontalAlignment = Alignment.Horizontal.CENTER
@@ -296,9 +320,9 @@ class FmcSolutionSheet(
 
                     paragraph {
                         fontName = Font.MONO
-                        fontSize = 40f // TODO magic number. better calculate dynamically?
+                        fontSize = FontUtil.computeOneLineFontSize(writingLine, writingLnHeight, actualWidthIn, Font.MONO, leading = MOVE_BAR_LEADING)
 
-                        leading = 1.1f
+                        leading = MOVE_BAR_LEADING
 
                         repeat(MOVE_BAR_LINES) {
                             line(writingLine)
@@ -310,9 +334,29 @@ class FmcSolutionSheet(
     }
 
     companion object {
+        const val SCRAMBLE_IMAGE_WIDTH_PERCENT = 45
+
+        const val UPPER_RIGHT_INFO_BOX_RATIO = 8
+        const val UPPER_LEFT_TITLE_RATIO = 10
+        const val UPPER_LEFT_RULES_RATIO = 3
+
+        const val SCRAMBLE_FIELD_LABEL_FONT_SIZE = 9f
+        const val SCRAMBLE_FIELD_LEADING = 1f
+
+        const val COMPETITION_TITLE_LEADING = 1f
+
+        const val MOVE_BAR_LEADING = 1.1f
+
+        const val GRADING_BOXES_LEADING = 1.5f
+
+        const val FILL_OUT_BOXES_LEADING = 2f
+        const val FILL_OUT_BOXES_PADDING = 2 * Drawing.Padding.DEFAULT
+
         const val SHORT_FILL = ": ____"
         const val LONG_FILL = ": __________________"
         const val WCA_ID_FILL = ": __ __ __ __  __ __ __ __  __ __"
+
+        const val NUMBER_OF_RULES = 6
 
         val WCA_MOVES = arrayOf("R", "U", "F", "L", "D", "B")
         val WCA_ROTATIONS = arrayOf("x", "y", "z", "", "", "")

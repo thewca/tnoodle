@@ -5,11 +5,28 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Font
 
 sealed class ElementBuilder(val parent: ElementBuilder?) {
-    fun findParentProperties(): PropertiesElementBuilder? {
-        if (parent is PropertiesElementBuilder)
-            return parent
+    private fun computeHierarchy(accu: List<ElementBuilder> = emptyList()): List<ElementBuilder> {
+        if (parent == null)
+            return accu
 
-        return parent?.findParentProperties()
+        return parent.computeHierarchy(accu + parent)
+    }
+
+    fun findParentProperties(): PropertiesElementBuilder? {
+        return computeHierarchy()
+            .filterIsInstance<PropertiesElementBuilder>()
+            .firstOrNull()
+    }
+
+    private fun findPageBuilder(): PageBuilder? {
+        return computeHierarchy()
+            .filterIsInstance<PageBuilder>()
+            .reversed()
+            .firstOrNull()
+    }
+
+    fun debugCanvas(safeStroke: Boolean = true, fn: CanvasBuilder.() -> Unit) {
+        findPageBuilder()?.canvas(safeStroke, fn)
     }
 }
 

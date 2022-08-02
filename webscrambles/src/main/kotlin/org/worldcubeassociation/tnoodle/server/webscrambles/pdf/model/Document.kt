@@ -2,7 +2,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model
 
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.engine.IText7Engine
 
-class Document(
+data class Document(
     val title: String,
     val watermark: String? = null,
     val showPageNumbers: Boolean = false,

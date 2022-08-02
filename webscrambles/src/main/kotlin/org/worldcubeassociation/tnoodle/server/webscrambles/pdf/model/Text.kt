@@ -3,7 +3,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Font
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.RgbColor
 
-class Text(
+data class Text(
     val content: String,
     override val fontName: String? = Font.DEFAULT,
     override val fontSize: Float = Font.Size.DEFAULT,

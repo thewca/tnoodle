@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model
 
-class Table(
+data class Table(
     val relativeColWidths: List<Float>,
     val rows: List<Row>
 ) : ContainerElement<Row>(rows), CellElement {

@@ -28,6 +28,13 @@ class CanvasBuilder(val safeStroke: Boolean, val page: PageBuilder) : ElementBui
         moveTo(topLeftX, topLeftY)
     }
 
+    fun topRightCorner() {
+        val topRightX = page.size.widthIn.inchesToPixelPrecise - page.marginRight
+        val topRightY = page.size.heightIn.inchesToPixelPrecise - page.marginTop
+
+        moveTo(topRightX, topRightY)
+    }
+
     fun lineTo(x: Float, y: Float) {
         commands.add(TurtleCommand.LineTo(x, y))
         position = position.first + x to position.second + y

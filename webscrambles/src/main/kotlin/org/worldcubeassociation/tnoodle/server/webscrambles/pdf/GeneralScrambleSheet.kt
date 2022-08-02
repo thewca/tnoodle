@@ -243,16 +243,5 @@ class GeneralScrambleSheet(
 
         val SCRAMBLE_BACKGROUND_COLOR = RgbColor(192, 192, 192)
         val SCRAMBLE_HIGHLIGHTING_COLOR = RgbColor(230, 230, 230)
-
-        // fitting stuff into padded boxes doesn't work the way I thought it would.
-        private fun paddingBackoff(padding: Int): Int {
-            // `2 * padding` is the intuitive part. (horizontal: left AND right, vertical: top AND bottom)
-            // However, both text lines and also images seem to struggle with fitting *exactly* inside the padded box.
-            // Both need an additional backoff of at least 1px per direction.
-            //
-            // As of writing this comment, it is unclear whether this is due to human error on my part
-            // or an actual quirk in the iText 7 layout. Signed GB 2022-Aug-02
-            return 2 * padding + 2
-        }
     }
 }

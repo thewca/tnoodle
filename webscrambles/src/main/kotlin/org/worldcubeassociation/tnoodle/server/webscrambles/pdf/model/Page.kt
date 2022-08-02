@@ -3,7 +3,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Drawing
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Paper
 
-class Page(
+data class Page(
     val size: Paper.Size = Paper.Size.DEFAULT,
     val marginTop: Int = Drawing.Margin.DEFAULT_VERTICAL,
     val marginBottom: Int = Drawing.Margin.DEFAULT_VERTICAL,

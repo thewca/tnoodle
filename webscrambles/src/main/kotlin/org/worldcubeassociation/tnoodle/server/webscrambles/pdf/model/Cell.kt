@@ -4,7 +4,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Drawing
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.RgbColor
 
-class Cell<out T : CellElement>(
+data class Cell<out T : CellElement>(
     val content: T,
     val colSpan: Int,
     val rowSpan: Int,

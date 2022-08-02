@@ -11,6 +11,13 @@ class ParagraphBuilder(parent: ElementBuilder?) : PropertiesElementBuilder(paren
         lines.add(text)
     }
 
+    fun optimalLine(content: String, height: Float, width: Float, unitToInches: Float = 1f, fn: TextBuilder.() -> Unit = {}) {
+        return line(content) {
+            fn()
+            setOptimalOneLineFontSize(height, width, unitToInches)
+        }
+    }
+
     fun compile(): Paragraph {
         return Paragraph(leading, lines)
     }
