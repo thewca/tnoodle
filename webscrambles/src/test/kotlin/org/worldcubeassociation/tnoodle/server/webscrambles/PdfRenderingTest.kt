@@ -13,6 +13,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ActivityC
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Scramble
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ScrambleSet
 import java.time.LocalDateTime
+import java.util.*
 
 class PdfRenderingTest {
     @Test
@@ -117,13 +118,19 @@ class PdfRenderingTest {
         for (locale in Translate.TRANSLATED_LOCALES) {
             println("Rendering 333 scrambles in 5+2 layout in ${locale.toLanguageTag()}")
 
-            val sheet = getGenericScrambleSheet(EventData.THREE, 5, 2)
+            val sheet = getGenericScrambleSheet(EventData.THREE, 5, 2, locale)
             assertSheetPagesGetCorrectlyRendered(sheet)
         }
     }
 
+    @Test
+    fun `test that MBLD scrambles get rendered on several pages`() {
+        val sheet = getGenericScrambleSheet(EventData.THREE_MULTI_BLD, 42, 0)
+        assertSheetPagesGetCorrectlyRendered(sheet)
+    }
+
     companion object {
-        const val SCRAMBLE_REPETITIONS = 50
+        const val SCRAMBLE_REPETITIONS = 20
 
         private val ScrambleSheet.renderedNumberOfPages
             get(): Int {
@@ -138,7 +145,8 @@ class PdfRenderingTest {
         private fun getGenericScrambleSheet(
             event: EventData,
             numScrambles: Int,
-            numExtraScrambles: Int = 0
+            numExtraScrambles: Int = 0,
+            locale: Locale = Translate.DEFAULT_LOCALE
         ): GeneralScrambleSheet {
             val scrambleSet = ScrambleSet(
                 42,
@@ -152,7 +160,7 @@ class PdfRenderingTest {
                 "Test Competition ${LocalDateTime.now().year}",
                 ActivityCode.compile(event, 0, 0, 0),
                 false,
-                Translate.DEFAULT_LOCALE
+                locale
             )
         }
 
