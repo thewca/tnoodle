@@ -257,7 +257,8 @@ object IText7Engine {
         val itextTable = com.itextpdf.layout.element.Table(table.relativeColWidths.toFloatArray())
         itextTable.setFixedLayout()
         itextTable.useAllAvailableWidth()
-        itextTable.isKeepTogether = true
+        // FIXME temporarily disabled because this can run into an infinite loop in iText layout
+        //itextTable.isKeepTogether = true
 
         for (row in table.rows) {
             for (cell in row.cells) {

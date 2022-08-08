@@ -117,13 +117,11 @@ class FmcSolutionSheet(
             }
 
             val ruleBoxHeight = (infoSectionHeightIn - paddingBackoff(padding).pixelsToInch) / UPPER_LEFT_RULES_RATIO
-            val ruleLineHeight = ruleBoxHeight / NUMBER_OF_RULES
-            // TODO GB
-            val ruleFontHack = 10f * ruleLineHeight / (10f + NUMBER_OF_RULES)
+            val ruleLineHeight = ruleBoxHeight / RULES_MAX_NUMBER_OF_LINES
 
-            val ruleFontSize = rulesList.maxOf {
-                FontUtil.computeOneLineFontSize(it, ruleFontHack, columnWidthIn, fontName.orEmpty(), leading = 1f)
-            }
+            val ruleFontSize = rulesList.map {
+                FontUtil.computeOneLineFontSize(it, ruleLineHeight, columnWidthIn, fontName.orEmpty(), leading = 1f)
+            }.average().toFloat()
 
             row {
                 cell {
@@ -139,7 +137,7 @@ class FmcSolutionSheet(
             for ((moveType, moves) in moveTypes) {
                 row {
                     cell {
-                        fontSize = ruleFontSize
+                        fontSize = ruleFontSize * RULES_MOVE_TABLE_FONT_SCALE
 
                         addNotationTable(moveType, moves)
                     }
@@ -160,7 +158,7 @@ class FmcSolutionSheet(
                         scrambleXOfY.takeIf { totalAttemptsNum > 1 }
                     )
 
-                    val maxTitleBoxHeightIn = (infoSectionHeightIn - paddingBackoff(padding).pixelsToInch) / UPPER_RIGHT_INFO_BOX_RATIO
+                    val maxTitleBoxHeightIn = (infoSectionHeightIn - paddingBackoff(padding).pixelsToInch) / UPPER_RIGHT_INFO_BOX_RATIO_MEDIUM
 
                     evenParagraph {
                         fontName = Font.SANS_SERIF
@@ -197,7 +195,7 @@ class FmcSolutionSheet(
                         registrantIdDesc
                     )
 
-                    val maxTitleBoxHeightIn = (infoSectionHeightIn - paddingBackoff(padding).pixelsToInch) / UPPER_RIGHT_INFO_BOX_RATIO
+                    val maxTitleBoxHeightIn = (infoSectionHeightIn - paddingBackoff(padding).pixelsToInch) / UPPER_RIGHT_INFO_BOX_RATIO_LARGE
                     val maxTitleRowHeightIn = maxTitleBoxHeightIn / 3
 
                     for (ln in competitorInfoLines) {
@@ -212,10 +210,10 @@ class FmcSolutionSheet(
 
                 padding = FILL_OUT_BOXES_PADDING
 
-                paragraph {
+                evenParagraph {
                     leading = GRADING_BOXES_LEADING
 
-                    val maxGradingBoxHeightIn = (infoSectionHeightIn - paddingBackoff(padding).pixelsToInch) / UPPER_RIGHT_INFO_BOX_RATIO
+                    val maxGradingBoxHeightIn = (infoSectionHeightIn - paddingBackoff(padding).pixelsToInch) / UPPER_RIGHT_INFO_BOX_RATIO_SMALL
 
                     val warningText = Translate("fmc.warning", locale)
                     optimalLine(warningText, maxGradingBoxHeightIn / 2, columnWidthIn)
@@ -236,11 +234,11 @@ class FmcSolutionSheet(
                 val columnWidthPx = columnWidthIn.inchesToPixel - paddingBackoff(padding)
 
                 if (drawScramble) {
-                    val scrambleRowHeightPx = (3 * infoSectionHeightIn.inchesToPixelPrecise / UPPER_RIGHT_INFO_BOX_RATIO) - paddingBackoff(padding)
+                    val scrambleRowHeightPx = (3 * infoSectionHeightIn.inchesToPixelPrecise / UPPER_RIGHT_INFO_BOX_RATIO_LARGE) - paddingBackoff(padding)
 
                     svgScrambleImage(scramble.scrambleString, columnWidthPx, scrambleRowHeightPx.toInt())
                 } else {
-                    val scrambleAdviceHeightIn = (2 * infoSectionHeightIn / UPPER_RIGHT_INFO_BOX_RATIO) - paddingBackoff(padding).pixelsToInch
+                    val scrambleAdviceHeightIn = (2 * infoSectionHeightIn / UPPER_RIGHT_INFO_BOX_RATIO_LARGE) - paddingBackoff(padding).pixelsToInch
 
                     val separateSheetAdvice = Translate("fmc.scrambleOnSeparateSheet", locale)
                     optimalText(separateSheetAdvice, scrambleAdviceHeightIn, columnWidthPx.pixelsToInch)
@@ -298,7 +296,8 @@ class FmcSolutionSheet(
                                 fontSize = SCRAMBLE_FIELD_LABEL_FONT_SIZE
                             }
 
-                            val scrambleWidth = actualWidthIn - paddingBackoff(padding).pixelsToInch
+                            // hack to introudce horizontal padding without affecting vertical padding
+                            val scrambleWidth = actualWidthIn - paddingBackoff(2 * padding).pixelsToInch
 
                             // picking a height value that is much too large intentionally
                             // to force scaling down by width instead.
@@ -337,9 +336,15 @@ class FmcSolutionSheet(
     companion object {
         const val SCRAMBLE_IMAGE_WIDTH_PERCENT = 45
 
-        const val UPPER_RIGHT_INFO_BOX_RATIO = 8
+        const val UPPER_RIGHT_INFO_BOX_RATIO_LARGE = 8
+        const val UPPER_RIGHT_INFO_BOX_RATIO_MEDIUM = 10
+        const val UPPER_RIGHT_INFO_BOX_RATIO_SMALL = 12
+
         const val UPPER_LEFT_TITLE_RATIO = 10
         const val UPPER_LEFT_RULES_RATIO = 3
+
+        const val RULES_MAX_NUMBER_OF_LINES = 10
+        const val RULES_MOVE_TABLE_FONT_SCALE = 0.75f
 
         const val SCRAMBLE_FIELD_LABEL_FONT_SIZE = 9f
         const val SCRAMBLE_FIELD_LEADING = 1f
