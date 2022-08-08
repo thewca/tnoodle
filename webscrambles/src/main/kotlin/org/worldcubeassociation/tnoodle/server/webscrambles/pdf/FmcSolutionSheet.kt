@@ -161,7 +161,6 @@ class FmcSolutionSheet(
                     val maxTitleBoxHeightIn = (infoSectionHeightIn - paddingBackoff(padding).pixelsToInch) / UPPER_RIGHT_INFO_BOX_RATIO_MEDIUM
 
                     evenParagraph {
-                        fontName = Font.SANS_SERIF
                         leading = COMPETITION_TITLE_LEADING
 
                         for (ln in titleLines) {
