@@ -1,7 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles
 
 import kotlinx.coroutines.*
-import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.decodeFromString
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.ThrowingSupplier
@@ -22,7 +22,7 @@ class APIIntegrationTest {
     @Test
     fun `test that every upcoming competition produces some output without error`() = runBlocking {
         val upcomingRaw = withContext(Dispatchers.IO) { URL("https://www.worldcubeassociation.org/api/v0/competitions/").readText() }
-        val upcomingComps = JsonConfig.SERIALIZER.decodeFromString(ListSerializer(UpcomingCompetition.serializer()), upcomingRaw).shuffled()
+        val upcomingComps = JsonConfig.SERIALIZER.decodeFromString<List<UpcomingCompetition>>(upcomingRaw).shuffled()
 
         val generationDate = LocalDateTime.now()
 

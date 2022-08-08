@@ -87,8 +87,9 @@ class FmcSolutionSheet(
     protected fun CellBuilder.addTopLeftRulesAndDescriptionTable(columnWidthIn: Float, infoSectionHeightIn: Float): Table {
         val substitutions = mapOf("maxMoves" to WCA_MAX_MOVES_FMC.toString())
 
-        val rulesList = List(NUMBER_OF_RULES) {
-            Translate("fmc.rule${it + 1}", locale, substitutions)
+        val rulesList = List(NUMBER_OF_RULES) { ruleNum ->
+            val ruleSubstitutions = substitutions.takeIf { ruleNum == 3 }.orEmpty()
+            Translate("fmc.rule${ruleNum + 1}", locale, ruleSubstitutions)
         }.map { "• $it" }
 
         val pureMoves = DIRECTION_MODIFIERS.map { mod -> WCA_MOVES.map { mov -> "$mov$mod" } }
