@@ -5,6 +5,7 @@ import com.itextpdf.kernel.pdf.PdfReader
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.worldcubeassociation.tnoodle.server.model.EventData
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcCutoutSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcSolutionSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.GeneralScrambleSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.ScrambleSheet
@@ -15,7 +16,7 @@ import java.time.LocalDateTime
 
 class PdfRenderingTest {
     @Test
-    fun `test that all FMC translations fit on one page`() {
+    fun `test that all FMC translations fit on one page with scramble`() {
         val scramble = EventData.THREE_FM.scrambler.generateEfficientScrambles(1).single()
 
         for (locale in Translate.TRANSLATED_LOCALES) {
@@ -30,6 +31,46 @@ class PdfRenderingTest {
             )
 
             println("Rendering FMC solution sheet for $scramble in ${locale.toLanguageTag()}")
+
+            assertSheetPagesGetCorrectlyRendered(fmcSheet)
+        }
+    }
+
+    @Test
+    fun `test that all FMC translations fit on one page without scramble`() {
+        for (locale in Translate.TRANSLATED_LOCALES) {
+            val fmcSheet = FmcSolutionSheet(
+                Scramble(""),
+                3,
+                42,
+                "Test Competition ${LocalDateTime.now().year}",
+                ActivityCode.compile(EventData.THREE_FM, 0, 0, 0),
+                true,
+                locale
+            )
+
+            println("Rendering blank FMC solution sheet in ${locale.toLanguageTag()}")
+
+            assertSheetPagesGetCorrectlyRendered(fmcSheet)
+        }
+    }
+
+    @Test
+    fun `test that all FMC translations fit on one page as cutout`() {
+        val scramble = EventData.THREE_FM.scrambler.generateEfficientScrambles(1).single()
+
+        for (locale in Translate.TRANSLATED_LOCALES) {
+            val fmcSheet = FmcCutoutSheet(
+                Scramble(scramble),
+                3,
+                42,
+                "Test Competition ${LocalDateTime.now().year}",
+                ActivityCode.compile(EventData.THREE_FM, 0, 0, 0),
+                true,
+                locale
+            )
+
+            println("Rendering FMC cutout sheet for $scramble in ${locale.toLanguageTag()}")
 
             assertSheetPagesGetCorrectlyRendered(fmcSheet)
         }
