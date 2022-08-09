@@ -17,12 +17,12 @@ plugins {
 }
 
 dependencies {
-    api(libs.ktor.server.netty)
-    api(libs.ktor.server.content.negotiation)
+    api(libs.ktor.server.core)
     api(libs.kotlinx.serialization.json)
-    api(libs.kotlinx.coroutines.core)
     api(libs.tnoodle.scrambles)
 
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.server.host.common)
     implementation(libs.ktor.server.default.headers)

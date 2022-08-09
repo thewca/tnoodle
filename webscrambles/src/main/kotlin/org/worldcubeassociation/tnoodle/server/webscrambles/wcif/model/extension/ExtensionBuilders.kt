@@ -34,18 +34,6 @@ sealed class ExtensionBuilder {
 }
 
 @Serializable
-@SerialName(FmcExtension.ID)
-data class FmcExtension(val isFmc: Boolean) : ExtensionBuilder() {
-    override val id get() = ID
-    override val specUrl get() = SPEC_URL
-
-    companion object {
-        const val ID = "org.worldcubeassociation.tnoodle.FmcFlag"
-        const val SPEC_URL = "TODO"
-    }
-}
-
-@Serializable
 @SerialName(FmcLanguagesExtension.ID)
 data class FmcLanguagesExtension(val languageTags: List<String>) : ExtensionBuilder() {
     override val id get() = ID
@@ -53,18 +41,6 @@ data class FmcLanguagesExtension(val languageTags: List<String>) : ExtensionBuil
 
     companion object {
         const val ID = "org.worldcubeassociation.tnoodle.FmcLanguages"
-        const val SPEC_URL = "TODO"
-    }
-}
-
-@Serializable
-@SerialName(FmcAttemptCountExtension.ID)
-data class FmcAttemptCountExtension(val totalAttempts: Int) : ExtensionBuilder() {
-    override val id get() = ID
-    override val specUrl get() = SPEC_URL
-
-    companion object {
-        const val ID = "org.worldcubeassociation.tnoodle.FmcAttemptCount"
         const val SPEC_URL = "TODO"
     }
 }

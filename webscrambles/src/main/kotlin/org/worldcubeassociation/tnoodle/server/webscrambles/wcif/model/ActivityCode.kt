@@ -43,11 +43,11 @@ data class ActivityCode(val activityCodeString: String) : EventIdProvider {
         return compile(eventId, roundNumber, groupNumber, attemptNumber)
     }
 
-    fun compileTitleString(locale: Locale, includeEvent: Boolean = true, includeGroupID: Boolean = true): String {
+    fun compileTitleString(locale: Locale, includeEvent: Boolean = true, includeGroupId: Boolean = true): String {
         val parts = structureParts.mapNotNull { (k, v) ->
             getPrefixTranslation(locale, k, v).trim()
-                .takeUnless { k == WCIF_PREFIX_GROUP && !includeGroupID }
-        }.filterNot { it.isEmpty() }.joinToString(TRANSLATION_DELIMITER)
+                .takeUnless { k == WCIF_PREFIX_GROUP && !includeGroupId }
+        }.filter { it.isNotEmpty() }.joinToString(TRANSLATION_DELIMITER)
 
         if (!includeEvent) {
             return parts
@@ -70,7 +70,7 @@ data class ActivityCode(val activityCodeString: String) : EventIdProvider {
 
         val PREFIX_TRANSLATION_KEYS = mapOf(
             WCIF_PREFIX_ROUND to "round",
-            WCIF_PREFIX_GROUP to "Scramble Set", // FIXME Hack. Better idea how to handle!
+            WCIF_PREFIX_GROUP to "scrambleSet",
             WCIF_PREFIX_ATTEMPT to "attempt"
         )
 
@@ -82,10 +82,10 @@ data class ActivityCode(val activityCodeString: String) : EventIdProvider {
 
             if (prefix == WCIF_PREFIX_GROUP) {
                 val convertedLetter = value.toIntOrNull()?.toColumnIndexString()
-                return "$prefixKey $convertedLetter"
+                return "Scramble Set $convertedLetter" // TODO proper i18n via fmc.scrambleSet
             }
 
-            val translatedKey = Translate.translate("fmc.$prefixKey", locale)
+            val translatedKey = Translate("fmc.$prefixKey", locale)
             return "$translatedKey $value"
         }
 

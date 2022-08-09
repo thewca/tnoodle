@@ -42,11 +42,13 @@ dependencies {
     implementation(libs.zip4j)
     implementation(libs.markdownj.core)
     implementation(libs.itextpdf)
+    implementation(libs.itext7)
     implementation(libs.batik.transcoder)
     implementation(libs.snakeyaml)
     implementation(libs.kotlin.argparser)
     implementation(libs.system.tray)
     implementation(libs.apache.commons.lang3)
+    implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.websockets)
     implementation(libs.ktor.server.status.pages)
 

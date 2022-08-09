@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.provider
 
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.util.StringUtil.toFileSafeString
 
 interface SafeNameProvider {
     val name: String

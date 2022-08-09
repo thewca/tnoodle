@@ -16,6 +16,8 @@ object Translate {
     val TRANSLATED_LOCALES
         get() = TRANSLATIONS.keys
 
+    val LOCALES_BY_LANG_TAG = TRANSLATED_LOCALES.associateBy { it.toLanguageTag() }
+
     private fun loadTranslationResources(): Map<Locale, Map<String, *>> {
         val yaml = Yaml(Constructor(HashMap::class.java))
         val locales = Locale.getAvailableLocales() + DEFAULT_LOCALE
@@ -56,7 +58,11 @@ object Translate {
             ?: TranslationException.error("${locale.toLanguageTag()} translation key $key is of type ${translation.javaClass}, but we were expecting String.")
     }
 
-    private tailrec fun descendKeys(translationGroup: Map<*, *>, parts: List<String>, errorProvider: ((String) -> String)? = null): String? {
+    private tailrec fun descendKeys(
+        translationGroup: Map<*, *>,
+        parts: List<String>,
+        errorProvider: ((String) -> String)? = null
+    ): String? {
         if (parts.isEmpty()) {
             return null
         }
@@ -86,6 +92,9 @@ object Translate {
 
         return interpolate(translation, substitutions)
     }
+
+    operator fun invoke(key: String, locale: Locale, substitutions: Map<String, String> = mapOf()) =
+        translate(key, locale, substitutions)
 
     // Interpolate translation keys in the same way Ruby on Rails does.
     // See: http://guides.rubyonrails.org/i18n.html#passing-variables-to-translations
