@@ -1,4 +1,4 @@
-<img src="./tnoodle-server/src/main/resources/icons/tnoodle_logo_1024.png" alt="TNoodle Logo" height="128px"/>
+<img src="./core/src/main/resources/icons/tnoodle_logo_1024.png" alt="TNoodle Logo" height="128px"/>
 
 # TNoodle
 
@@ -42,11 +42,11 @@ Gradle automagically handles all dependencies for you. You just need an Internet
 
 When you're ready to develop, run the following and then visit <http://localhost:2014/scramble/>
 
-    ./gradlew :webscrambles:runShadow
+    ./gradlew :server:runShadow
 
 To build a distributable/executable `.jar` file, run:
 
-    ./gradlew :webscrambles:shadowJar
+    ./gradlew :server:shadowJar
 
 You can run the `.jar` from the commandline using: (replace the `$VERSION` tag accordingly)
 
