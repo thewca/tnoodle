@@ -1,25 +1,19 @@
 -allowaccessmodification
--dontskipnonpubliclibraryclassmembers
 
-# FIXME...? Routes currently don't work in the browser when code gets obfuscated or optimised
+# KTOR
+# cf. https://github.com/ktorio/ktor-samples/blob/main/proguard/build.gradle
 -dontobfuscate
 -dontoptimize
 
--dontnote kotlinx.serialization.AnnotationsKt
-
-# cf. https://github.com/ktorio/ktor-samples/tree/master/other/proguard
 -keep class org.worldcubeassociation.tnoodle.server.** { *; }
 -keep class io.ktor.server.netty.Netty { *; }
 -keep class kotlin.reflect.jvm.internal.** { *; }
 -keep class kotlin.text.RegexOption { *; }
 
-# CSS rendering uses reflection black magic, so static bytecode optimisers need a little help
--keep class org.apache.batik.css.parser.** { *; }
--keep class org.apache.batik.dom.** { *; }
--keep class com.itextpdf.text.ImgTemplate { *; }
-
+# Logging
 -keep class ch.qos.logback.core.** { *; }
 
+# SystenTray
 -keep class com.sun.jna.** { *; }
 -keep class dorkbox.jna.** { *; }
 -keep class dorkbox.systemTray.** { *; }
@@ -27,6 +21,9 @@
 -keep class sun.lwawt.macosx.** { *; }
 -keep class sun.awt.X11.** { *; }
 -keep class sun.awt.SunToolkit { *; }
+
+# KotlinX serialization
+-dontnote kotlinx.serialization.AnnotationsKt
 
 -keep,includedescriptorclasses class kotlinx.serialization.json.**$$serializer { *; }
 -keep,includedescriptorclasses class org.worldcubeassociation.tnoodle.**$$serializer { *; }
@@ -42,6 +39,7 @@
     *** Companion;
 }
 
+# various optimisations
 -keepclasseswithmembernames class * {
     native <methods>;
 }
