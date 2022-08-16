@@ -41,9 +41,7 @@ dependencies {
 
     implementation(libs.zip4j)
     implementation(libs.markdownj.core)
-    implementation(libs.itextpdf)
     implementation(libs.itext7)
-    implementation(libs.batik.transcoder)
     implementation(libs.snakeyaml)
     implementation(libs.kotlin.argparser)
     implementation(libs.system.tray)
@@ -55,8 +53,6 @@ dependencies {
     runtimeOnly(libs.bouncycastle)
 
     "deployable"(project(":ui"))
-
-    testImplementation(libs.mockk)
 }
 
 configureJUnit5()
