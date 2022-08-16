@@ -38,6 +38,7 @@ configurations {
 
 dependencies {
     implementation(project(":core"))
+    implementation(project(":build-tools"))
 
     implementation(libs.zip4j)
     implementation(libs.markdownj.core)

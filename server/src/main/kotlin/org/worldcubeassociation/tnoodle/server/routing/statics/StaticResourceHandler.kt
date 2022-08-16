@@ -3,11 +3,12 @@ package org.worldcubeassociation.tnoodle.server.routing.statics
 import io.ktor.server.http.content.*
 import io.ktor.server.routing.*
 import org.worldcubeassociation.tnoodle.core.RouteHandler
+import org.worldcubeassociation.tnoodle.core.util.FrontendUtil.FRONTEND_BINDING_PACKAGE
 
 object StaticResourceHandler : RouteHandler {
     override fun install(router: Route) {
         router.static {
-            resource("robots.txt", "wca/tnoodle-ui/robots.txt")
+            resource("robots.txt", "$FRONTEND_BINDING_PACKAGE/robots.txt")
         }
 
         router.static("css") {
@@ -15,15 +16,15 @@ object StaticResourceHandler : RouteHandler {
         }
 
         router.static("scramble") {
-            resources("wca/tnoodle-ui")
-            defaultResource("wca/tnoodle-ui/index.html")
+            resources(FRONTEND_BINDING_PACKAGE)
+            defaultResource("$FRONTEND_BINDING_PACKAGE/index.html")
 
             static("static") {
-                resources("wca/tnoodle-ui/static")
+                resources("$FRONTEND_BINDING_PACKAGE/static")
             }
 
             static("oauth") {
-                resource("*", "wca/tnoodle-ui/index.html")
+                resource("*", "$FRONTEND_BINDING_PACKAGE/index.html")
             }
         }
 

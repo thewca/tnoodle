@@ -22,6 +22,7 @@ dependencies {
     api(libs.tnoodle.scrambles)
 
     implementation(project(":build-tools"))
+
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)

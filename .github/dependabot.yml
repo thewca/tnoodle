@@ -6,7 +6,7 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
-    directory: "/tnoodle-ui"
+    directory: "/ui"
     schedule:
       interval: "monthly"
   - package-ecosystem: "github-actions"

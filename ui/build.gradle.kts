@@ -1,5 +1,7 @@
 import com.github.gradle.node.NodeExtension
 
+import org.worldcubeassociation.tnoodle.build.FrontendBindings.PACKAGE_ROOT
+
 description = "A web ui for TNoodle that uses modern technology"
 
 plugins {
@@ -60,7 +62,7 @@ tasks.create<Zip>("packageReactFrontend") {
         include("robots.txt")
         include("manifest.json")
 
-        into("wca/tnoodle-ui")
+        into(PACKAGE_ROOT)
     }
 }
 

@@ -43,5 +43,5 @@ jobs:
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: 'tnoodle-ui/coverage/lcov.info'
-        base-path: 'tnoodle-ui'
+        path-to-lcov: 'ui/coverage/lcov.info'
+        base-path: 'ui'
