@@ -5,3 +5,5 @@ dependencyResolutionManagement {
         }
     }
 }
+
+include("tools")

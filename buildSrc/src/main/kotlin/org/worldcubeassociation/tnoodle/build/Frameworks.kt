@@ -1,4 +1,4 @@
-package configurations
+package org.worldcubeassociation.tnoodle.build
 
 import org.gradle.accessors.dm.LibrariesForLibs
 import org.gradle.api.Project

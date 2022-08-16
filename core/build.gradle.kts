@@ -1,8 +1,8 @@
-import configurations.CompilerSettings.KOTLIN_JVM_TARGET
-import configurations.Languages.attachRemoteRepositories
+import org.worldcubeassociation.tnoodle.build.CompilerSettings.KOTLIN_JVM_TARGET
+import org.worldcubeassociation.tnoodle.build.Languages.attachRemoteRepositories
 
-import crypto.BuildVerification.SIGNATURE_PACKAGE
-import crypto.BuildVerification.SIGNATURE_SUFFIX
+import org.worldcubeassociation.tnoodle.build.BuildSignature.SIGNATURE_PACKAGE
+import org.worldcubeassociation.tnoodle.build.BuildSignature.SIGNATURE_SUFFIX
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -21,6 +21,7 @@ dependencies {
     api(libs.kotlinx.serialization.json)
     api(libs.tnoodle.scrambles)
 
+    implementation(project(":build-tools"))
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)

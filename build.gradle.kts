@@ -1,10 +1,10 @@
-import configurations.Languages.attachLocalRepositories
-import configurations.ProjectVersions.TNOODLE_SYMLINK
-import configurations.ProjectVersions.setTNoodleRelease
-import crypto.BuildVerification.SIGNATURE_PACKAGE
-import crypto.BuildVerification.SIGNATURE_SUFFIX
+import org.worldcubeassociation.tnoodle.build.Languages.attachLocalRepositories
+import org.worldcubeassociation.tnoodle.build.ProjectVersions.TNOODLE_SYMLINK
+import org.worldcubeassociation.tnoodle.build.ProjectVersions.setTNoodleRelease
+import org.worldcubeassociation.tnoodle.build.BuildSignature.SIGNATURE_PACKAGE
+import org.worldcubeassociation.tnoodle.build.BuildSignature.SIGNATURE_SUFFIX
 
-import crypto.BuildVerification.createBuildSignature
+import org.worldcubeassociation.tnoodle.build.BuildSignature.createBuildSignature
 
 import proguard.gradle.ProGuardTask
 

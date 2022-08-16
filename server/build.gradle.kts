@@ -1,11 +1,11 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import configurations.CompilerSettings.KOTLIN_JVM_TARGET
-import configurations.FileUtils.symlink
-import configurations.Frameworks.configureJUnit5
-import configurations.Languages.attachRemoteRepositories
-import configurations.ProjectVersions.TNOODLE_SYMLINK
-import configurations.ProjectVersions.tNoodleImplOrDefault
-import configurations.ProjectVersions.tNoodleVersionOrDefault
+import org.worldcubeassociation.tnoodle.build.CompilerSettings.KOTLIN_JVM_TARGET
+import org.worldcubeassociation.tnoodle.build.FileUtils.symlink
+import org.worldcubeassociation.tnoodle.build.Frameworks.configureJUnit5
+import org.worldcubeassociation.tnoodle.build.Languages.attachRemoteRepositories
+import org.worldcubeassociation.tnoodle.build.ProjectVersions.TNOODLE_SYMLINK
+import org.worldcubeassociation.tnoodle.build.ProjectVersions.tNoodleImplOrDefault
+import org.worldcubeassociation.tnoodle.build.ProjectVersions.tNoodleVersionOrDefault
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 

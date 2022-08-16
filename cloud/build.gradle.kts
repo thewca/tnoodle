@@ -1,7 +1,7 @@
-import configurations.CompilerSettings.KOTLIN_JVM_TARGET
-import configurations.Languages.attachRemoteRepositories
-import configurations.ProjectVersions.tNoodleImplOrDefault
-import configurations.ProjectVersions.tNoodleVersionOrDefault
+import org.worldcubeassociation.tnoodle.build.CompilerSettings.KOTLIN_JVM_TARGET
+import org.worldcubeassociation.tnoodle.build.Languages.attachRemoteRepositories
+import org.worldcubeassociation.tnoodle.build.ProjectVersions.tNoodleImplOrDefault
+import org.worldcubeassociation.tnoodle.build.ProjectVersions.tNoodleVersionOrDefault
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 description = "An extension over the core server to expose scrambles in a Google Cloud environment"
