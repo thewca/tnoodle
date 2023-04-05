@@ -6,7 +6,7 @@
     "dependencies": {
         "@cubing/icons": "^1.0.6",
         "@reduxjs/toolkit": "^1.9.3",
-        "axios": "^0.27.2",
+        "axios": "^1.3.5",
         "bootstrap": "^4.6.0",
         "lodash": "^4.17.21",
         "react": "^18.2.0",
