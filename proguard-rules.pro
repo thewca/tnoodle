@@ -19,6 +19,7 @@
 -keep class com.itextpdf.text.ImgTemplate { *; }
 
 -keep class ch.qos.logback.core.** { *; }
+-keep class ch.qos.logback.classic.** { *; }
 
 -keep class com.sun.jna.** { *; }
 -keep class dorkbox.jna.** { *; }
