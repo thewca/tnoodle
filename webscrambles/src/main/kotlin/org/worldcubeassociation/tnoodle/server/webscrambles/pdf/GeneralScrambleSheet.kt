@@ -76,7 +76,14 @@ class GeneralScrambleSheet(
                     background = SCRAMBLE_BACKGROUND_COLOR
                     padding = DEFAULT_CELL_PADDING
 
+                    horizontalAlignment = Alignment.Horizontal.CENTER
+                    verticalAlignment = Alignment.Vertical.MIDDLE
+
                     val paddingBackoff = paddingBackoff(DEFAULT_CELL_PADDING)
+
+                    // round DOWN the minHeight by coercing to float. Also, iText 7 does NOT count the padding to the
+                    // cell height, so we additionally have to subtract it (including the backoff) from the height ourselves.
+                    minHeight = (scrLineHeight * unitToInches).inchesToPixel.toFloat() - paddingBackoff
 
                     val scrImageWidthPx = (scrImageWidth * unitToInches).inchesToPixel - paddingBackoff
                     val scrLineHeightPx = (scrLineHeight * unitToInches).inchesToPixel - paddingBackoff
