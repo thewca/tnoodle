@@ -65,6 +65,11 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = KOTLIN_JVM_TARGET
 }
 
+tasks.withType<JavaCompile> {
+    targetCompatibility = KOTLIN_JVM_TARGET
+    sourceCompatibility = KOTLIN_JVM_TARGET
+}
+
 application {
     mainClass.set("org.worldcubeassociation.tnoodle.server.webscrambles.WebscramblesServer")
 }

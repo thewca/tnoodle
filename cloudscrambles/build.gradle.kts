@@ -30,6 +30,11 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = KOTLIN_JVM_TARGET
 }
 
+tasks.withType<JavaCompile> {
+    targetCompatibility = KOTLIN_JVM_TARGET
+    sourceCompatibility = KOTLIN_JVM_TARGET
+}
+
 appengine {
     run {
         projectId = "wca-scrambles-unofficial"
