@@ -25,6 +25,10 @@ allprojects {
     version = "1.1.3"
 
     attachLocalRepositories()
+
+    tasks.withType<Jar> {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
 }
 
 plugins {
