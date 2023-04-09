@@ -5,7 +5,7 @@ kotless = "0.1.6"
 junit-jupiter = "5.9.2"
 batik = "1.16"
 
-nodejs = "18.15.0"
+nodejs = "16.20.0"
 
 [libraries]
 markdownj-core = { module = "org.markdownj:markdownj-core", version = "0.4" }
