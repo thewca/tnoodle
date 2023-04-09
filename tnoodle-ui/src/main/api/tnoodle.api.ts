@@ -1,4 +1,4 @@
-import Axios from "axios";
+import axios from "axios";
 import BestMbld from "../model/BestMbld";
 import RunningVersion from "../model/RunningVersion";
 import Translation from "../model/Translation";
@@ -37,25 +37,25 @@ const fmcTranslationsHelper = (translations?: Translation[]) => {
 
 class TnoodleApi {
     fetchWcaEvents = () =>
-        Axios.get<WcaEvent[]>(tNoodleBackend + wcaEventsEndpoint);
+        axios.get<WcaEvent[]>(tNoodleBackend + wcaEventsEndpoint);
 
     fetchFormats = () =>
-        Axios.get<Record<string, WcaFormat>>(tNoodleBackend + formatsEndpoint);
+        axios.get<Record<string, WcaFormat>>(tNoodleBackend + formatsEndpoint);
 
     fetchSuggestedFmcTranslations = (wcif: Wcif) =>
-        Axios.post<string[]>(
+        axios.post<string[]>(
             tNoodleBackend + suggestedFmcTranslationsEndpoint,
             wcif
         );
 
     fetchBestMbldAttempt = (wcif: Wcif) =>
-        Axios.post<BestMbld>(tNoodleBackend + bestMbldAttemptEndpoint, wcif);
+        axios.post<BestMbld>(tNoodleBackend + bestMbldAttemptEndpoint, wcif);
 
     fetchRunningVersion = () =>
-        Axios.get<RunningVersion>(tNoodleBackend + versionEndpoint);
+        axios.get<RunningVersion>(tNoodleBackend + versionEndpoint);
 
     fetchAvailableFmcTranslations = () =>
-        Axios.get<Record<string, string>>(
+        axios.get<Record<string, string>>(
             tNoodleBackend + fmcTranslationsEndpoint
         );
 

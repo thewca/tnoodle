@@ -1,4 +1,4 @@
-import Axios from "axios";
+import axios from "axios";
 import { BASE_PATH } from "../../App";
 import ScrambleProgram from "../model/ScrambleProgram";
 import Competition from "../model/Competition";
@@ -81,7 +81,7 @@ class WcaApi {
     fetchMe = () => this.wcaApiFetch<{ me: Person }>("/me");
 
     fetchVersionInfo = () =>
-        Axios.get<ScrambleProgram>(toWcaUrl("/api/v0/scramble-program"));
+        axios.get<ScrambleProgram>(toWcaUrl("/api/v0/scramble-program"));
 
     getCompetitionJson = (competitionId: string) =>
         this.wcaApiFetch<Wcif>(`/competitions/${competitionId}/wcif`);
@@ -145,7 +145,7 @@ class WcaApi {
             },
         };
 
-        return Axios.get<T>(baseApiUrl + path, fetchOptions);
+        return axios.get<T>(baseApiUrl + path, fetchOptions);
     }
 }
 

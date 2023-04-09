@@ -5,12 +5,15 @@ import { informationSlice } from "../../main/redux/slice/InformationSlice";
 import { mbldSlice } from "../../main/redux/slice/MbldSlice";
 import { scramblingSlice } from "../../main/redux/slice/ScramblingSlice";
 import { wcifSlice } from "../../main/redux/slice/WcifSlice";
+import { AxiosHeaders } from "axios";
 
 export const axiosResponse = {
     status: 200,
     statusText: "OK",
-    config: {},
     headers: {},
+    config: {
+        headers: new AxiosHeaders(),
+    },
 };
 
 export const getNewStore = () =>
