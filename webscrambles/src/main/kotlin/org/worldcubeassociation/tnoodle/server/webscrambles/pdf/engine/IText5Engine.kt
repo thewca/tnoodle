@@ -250,6 +250,7 @@ object IText5Engine {
         itextCell.horizontalAlignment = convertAlignment(cell.horizontalAlignment)
         itextCell.border = convertBorder(cell.border)
         itextCell.setPadding(cell.padding.toFloat())
+        cell.minHeight?.let { itextCell.minimumHeight = it }
 
         val renderedContent = render(cell.content.innerElement, cb, fontIndex)
 

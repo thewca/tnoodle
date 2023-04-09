@@ -37,7 +37,7 @@ class CanvasBuilder(val safeStroke: Boolean, val page: PageBuilder) : ElementBui
 
     fun lineTo(x: Float, y: Float) {
         commands.add(TurtleCommand.LineTo(x, y))
-        position = position.first + x to position.second + y
+        position = x to y
     }
 
     fun lineInDirection(x: Float, y: Float) {

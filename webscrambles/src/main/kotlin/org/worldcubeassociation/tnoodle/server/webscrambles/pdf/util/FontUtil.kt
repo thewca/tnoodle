@@ -99,6 +99,10 @@ object FontUtil {
                 return listOf(currentPhraseAccu)
             }
 
+            if (currentPhraseAccu.isNotEmpty()) {
+                return accu + listOf(currentPhraseAccu)
+            }
+
             return accu
         }
 

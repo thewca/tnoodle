@@ -9,6 +9,7 @@ class CellBuilder(val colSpan: Int, parent: ElementBuilder?) : PropertiesElement
     var background: RgbColor? = RgbColor.DEFAULT
 
     var padding: Int = Drawing.Padding.DEFAULT
+    var minHeight: Float? = null
 
     var rowSpan: Int = 1
 
@@ -47,6 +48,6 @@ class CellBuilder(val colSpan: Int, parent: ElementBuilder?) : PropertiesElement
     }
 
     fun <T : CellElement> compile(content: T): Cell<T> {
-        return Cell(content, colSpan, rowSpan, background, border, stroke, padding, horizontalAlignment, verticalAlignment)
+        return Cell(content, colSpan, rowSpan, background, border, stroke, padding, minHeight, horizontalAlignment, verticalAlignment)
     }
 }

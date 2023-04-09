@@ -53,8 +53,6 @@ abstract class ScrambleSheet(
     }
 
     companion object {
-        val RENDERING_ENGINE = Document.DEFAULT_ENGINE
-
         // fitting stuff into padded boxes doesn't work the way I thought it would.
         fun paddingBackoff(padding: Int): Int {
             // `2 * padding` is the intuitive part. (horizontal: left AND right, vertical: top AND bottom)

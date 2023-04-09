@@ -291,6 +291,7 @@ object IText7Engine {
         itextCell.setBorderAround(borderType, cell.border)
         itextCell.setPadding(cell.padding.toFloat())
         itextCell.setTextAlignment(convertTextAlignment(cell.horizontalAlignment))
+        cell.minHeight?.let { itextCell.setMinHeight(it) }
 
         val innerElement = cell.content.innerElement
 

@@ -153,6 +153,6 @@ object WCIFDataBuilder {
     }
 
     fun compileOutlinePdfBytes(documents: List<Document>, password: String? = null): ByteArray {
-        return ScrambleSheet.RENDERING_ENGINE.renderWithOutline(documents, password)
+        return Document.DEFAULT_ENGINE.renderWithOutline(documents, password)
     }
 }
