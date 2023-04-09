@@ -2,7 +2,6 @@ import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.Languages.attachRemoteRepositories
 import configurations.ProjectVersions.tNoodleImplOrDefault
 import configurations.ProjectVersions.tNoodleVersionOrDefault
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 description = "An extension over the core server to expose scrambles in a Google Cloud environment"
 
@@ -26,13 +25,8 @@ dependencies {
     runtimeOnly(libs.batik.codec)
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = KOTLIN_JVM_TARGET
-}
-
-tasks.withType<JavaCompile> {
-    targetCompatibility = KOTLIN_JVM_TARGET
-    sourceCompatibility = KOTLIN_JVM_TARGET
+kotlin {
+    jvmToolchain(KOTLIN_JVM_TARGET)
 }
 
 appengine {

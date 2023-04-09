@@ -4,8 +4,6 @@ import configurations.Languages.attachRemoteRepositories
 import crypto.BuildVerification.SIGNATURE_PACKAGE
 import crypto.BuildVerification.SIGNATURE_SUFFIX
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 description = "Embeddable webserver built around the Kotlin ktor framework"
 
 attachRemoteRepositories()
@@ -33,13 +31,8 @@ dependencies {
     runtimeOnly(libs.logback.classic)
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = KOTLIN_JVM_TARGET
-}
-
-tasks.withType<JavaCompile> {
-    targetCompatibility = KOTLIN_JVM_TARGET
-    sourceCompatibility = KOTLIN_JVM_TARGET
+kotlin {
+    jvmToolchain(KOTLIN_JVM_TARGET)
 }
 
 tasks.create("deleteSignatures") {

@@ -7,8 +7,6 @@ import configurations.ProjectVersions.TNOODLE_SYMLINK
 import configurations.ProjectVersions.tNoodleImplOrDefault
 import configurations.ProjectVersions.tNoodleVersionOrDefault
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 description = "An extension over the core server to provide a user-friendly UI. Also draws PDFs."
 
 attachRemoteRepositories()
@@ -61,13 +59,8 @@ dependencies {
 
 configureJUnit5()
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = KOTLIN_JVM_TARGET
-}
-
-tasks.withType<JavaCompile> {
-    targetCompatibility = KOTLIN_JVM_TARGET
-    sourceCompatibility = KOTLIN_JVM_TARGET
+kotlin {
+    jvmToolchain(KOTLIN_JVM_TARGET)
 }
 
 application {
