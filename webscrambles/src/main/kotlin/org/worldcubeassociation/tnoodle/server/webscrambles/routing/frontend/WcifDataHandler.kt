@@ -27,6 +27,7 @@ object WcifDataHandler : RouteHandler {
                     val tagsWithNames = Translate.LOCALES_BY_LANG_TAG
                         .mapValues { it.value.displayName }
                         .toSortedMap()
+                        .toMap()
 
                     call.respond(tagsWithNames)
                 }

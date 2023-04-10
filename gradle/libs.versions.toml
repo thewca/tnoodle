@@ -15,7 +15,7 @@ itext7 = { module = "com.itextpdf:itext7-core", version = "7.2.5" }
 batik-transcoder = { module = "org.apache.xmlgraphics:batik-transcoder", version.ref = "batik" }
 batik-codec = { module = "org.apache.xmlgraphics:batik-codec", version.ref = "batik" }
 snakeyaml = { module = "org.yaml:snakeyaml", version = "1.30" }
-system-tray = { module = "com.dorkbox:SystemTray", version = "4.2.1" }
+system-tray = { module = "com.dorkbox:SystemTray", version = "4.1" }
 bouncycastle = { module = "org.bouncycastle:bcprov-jdk15on", version = "1.70" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter" }
