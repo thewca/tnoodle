@@ -46,52 +46,58 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     const [puzzleSvg, setPuzzleSvg] = useState<string>();
 
     const [colorScheme, setColorScheme] = useState<Record<string, string>>();
-    const [defaultColorScheme, setDefaultColorScheme] = useState<Record<string, string>>();
+    const [defaultColorScheme, setDefaultColorScheme] =
+        useState<Record<string, string>>();
 
-    const [displayScramble, setDisplayScramble] = useState<ScrambleAndImage>()
+    const [displayScramble, setDisplayScramble] = useState<ScrambleAndImage>();
 
-    useEffect(
-        () => {
-            let wcifRounds = wcifEvent?.rounds || [];
+    useEffect(() => {
+        let wcifRounds = wcifEvent?.rounds || [];
 
-            if (wcifRounds.length > 0) {
-                if (puzzleSvg === undefined) {
-                    tnoodleApi.fetchSolvedPuzzleSvg(wcaEvent.id).then((response) => {
+        if (wcifRounds.length > 0) {
+            if (puzzleSvg === undefined) {
+                tnoodleApi
+                    .fetchSolvedPuzzleSvg(wcaEvent.id)
+                    .then((response) => {
                         setPuzzleSvg(response.data);
                     });
-                }
+            }
 
-                if (colorScheme === undefined) {
-                    tnoodleApi.fetchPuzzleColorScheme(wcaEvent.id).then((response) => {
+            if (colorScheme === undefined) {
+                tnoodleApi
+                    .fetchPuzzleColorScheme(wcaEvent.id)
+                    .then((response) => {
                         setColorScheme(response.data);
                         setDefaultColorScheme(response.data);
                     });
-                }
             }
-        }, [wcaEvent, wcifEvent, puzzleSvg, colorScheme]
-    );
+        }
+    }, [wcaEvent, wcifEvent, puzzleSvg, colorScheme]);
 
     const fetchDisplayScramble = useCallback(
         (fetchNewScramble = true) => {
             // we need this additional boolean to make sure we can fetch only once
             // when the overlay is hidden, because its callback yields a `show` boolean.
             if (fetchNewScramble) {
-                tnoodleApi.fetchPuzzleRandomScramble(wcaEvent.id, colorScheme).then((response) => {
-                    setDisplayScramble(response.data);
-                });
+                tnoodleApi
+                    .fetchPuzzleRandomScramble(wcaEvent.id, colorScheme)
+                    .then((response) => {
+                        setDisplayScramble(response.data);
+                    });
             }
-        }, [wcaEvent, colorScheme]
+        },
+        [wcaEvent, colorScheme]
     );
 
-    useEffect(
-        () => {
-            tnoodleApi.fetchSolvedPuzzleSvg(wcaEvent.id, colorScheme).then((response) => {
+    useEffect(() => {
+        tnoodleApi
+            .fetchSolvedPuzzleSvg(wcaEvent.id, colorScheme)
+            .then((response) => {
                 setPuzzleSvg(response.data);
             });
 
-            fetchDisplayScramble();
-        }, [wcaEvent, colorScheme, fetchDisplayScramble]
-    );
+        fetchDisplayScramble();
+    }, [wcaEvent, colorScheme, fetchDisplayScramble]);
 
     const [showColorSchemeConfig, setShowColorSchemeConfig] = useState(false);
 
@@ -163,13 +169,10 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         );
     };
 
-    const handleColorSchemeChange = (
-        colorKey: string,
-        hexColor: string
-    ) => {
+    const handleColorSchemeChange = (colorKey: string, hexColor: string) => {
         let newColorScheme = {
             ...colorScheme,
-            [colorKey]: hexColor
+            [colorKey]: hexColor,
         };
 
         setColorScheme(newColorScheme);
@@ -188,7 +191,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         }
 
         const defaultColors = Object.values(defaultColorScheme).filter(
-            (key, i, arr) => arr.findIndex(t => t === key) === i
+            (key, i, arr) => arr.findIndex((t) => t === key) === i
         );
 
         return (
@@ -197,15 +200,24 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                     <table className={"table table-borderless"}>
                         <tbody>
                             <tr>
-                                {Object.keys(colorScheme).map(colorKey=> {
-                                    return <td key={colorKey}>
-                                        <SchemeColorPicker
-                                            defaultColors={defaultColors}
-                                            colorKey={colorKey}
-                                            colorValue={colorScheme[colorKey]}
-                                            onColorChange={(hexColor) => handleColorSchemeChange(colorKey, hexColor)}
-                                        />
-                                    </td>
+                                {Object.keys(colorScheme).map((colorKey) => {
+                                    return (
+                                        <td key={colorKey}>
+                                            <SchemeColorPicker
+                                                defaultColors={defaultColors}
+                                                colorKey={colorKey}
+                                                colorValue={
+                                                    colorScheme[colorKey]
+                                                }
+                                                onColorChange={(hexColor) =>
+                                                    handleColorSchemeChange(
+                                                        colorKey,
+                                                        hexColor
+                                                    )
+                                                }
+                                            />
+                                        </td>
+                                    );
                                 })}
                             </tr>
                             <tr>
@@ -213,7 +225,9 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                     <button
                                         type="button"
                                         className="btn btn-secondary"
-                                        onClick={() => setColorScheme(defaultColorScheme)}
+                                        onClick={() =>
+                                            setColorScheme(defaultColorScheme)
+                                        }
                                     >
                                         Reset to default
                                     </button>
@@ -224,7 +238,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                 </th>
             </tr>
         );
-    }
+    };
 
     const maybeShowTableTitles = (rounds: Round[]) => {
         if (rounds.length === 0) {
@@ -378,26 +392,42 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                         {maybeShowProgressBar(rounds)}
                     </th>
                     <th className="lastTwoColumns" scope="col">
-                        {rounds.length > 0 && puzzleSvg !== undefined && displayScramble !== undefined && (
-                            <div className={"mb-2"}>
-                                <OverlayTrigger
-                                    placement={"left"}
-                                    onToggle={fetchDisplayScramble}
-                                    overlay={
-                                        <Tooltip className={"fit-content"}>
-                                            <SVG src={displayScramble.svgImage} width={200} height={200}/>
-                                            <p>(click small preview to edit)</p>
-                                        </Tooltip>
-                                    }
-                                >
-                                    <SVG className={"lastTwoColumns"}
-                                         src={puzzleSvg}
-                                         height={50}
-                                         onClick={() => setShowColorSchemeConfig(!showColorSchemeConfig)}
-                                    />
-                                </OverlayTrigger>
-                            </div>
-                        )}
+                        {rounds.length > 0 &&
+                            puzzleSvg !== undefined &&
+                            displayScramble !== undefined && (
+                                <div className={"mb-2"}>
+                                    <OverlayTrigger
+                                        placement={"left"}
+                                        onToggle={fetchDisplayScramble}
+                                        overlay={
+                                            <Tooltip className={"fit-content"}>
+                                                <SVG
+                                                    src={
+                                                        displayScramble.svgImage
+                                                    }
+                                                    width={200}
+                                                    height={200}
+                                                />
+                                                <p>
+                                                    (click small preview to
+                                                    edit)
+                                                </p>
+                                            </Tooltip>
+                                        }
+                                    >
+                                        <SVG
+                                            className={"lastTwoColumns"}
+                                            src={puzzleSvg}
+                                            height={50}
+                                            onClick={() =>
+                                                setShowColorSchemeConfig(
+                                                    !showColorSchemeConfig
+                                                )
+                                            }
+                                        />
+                                    </OverlayTrigger>
+                                </div>
+                            )}
                         <label>Rounds</label>
                         <select
                             className="form-control"

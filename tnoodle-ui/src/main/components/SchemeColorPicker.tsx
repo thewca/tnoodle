@@ -1,18 +1,23 @@
 import "./SchemeColorPicker.css";
-import { ColorResult, SketchPicker } from 'react-color';
+import { ColorResult, SketchPicker } from "react-color";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 interface SchemeColorPickerProps {
     defaultColors: string[];
     colorKey: string;
-    colorValue: string,
+    colorValue: string;
     onColorChange(hexColor: string): void;
 }
 
-const SchemeColorPicker = ({defaultColors, colorKey, colorValue, onColorChange}: SchemeColorPickerProps) => {
+const SchemeColorPicker = ({
+    defaultColors,
+    colorKey,
+    colorValue,
+    onColorChange,
+}: SchemeColorPickerProps) => {
     const handleColorChange = (color: ColorResult) => {
-        onColorChange(color.hex)
-    }
+        onColorChange(color.hex);
+    };
 
     return (
         <OverlayTrigger
@@ -28,10 +33,11 @@ const SchemeColorPicker = ({defaultColors, colorKey, colorValue, onColorChange}:
                         onChangeComplete={handleColorChange}
                     />
                 </Tooltip>
-            }>
+            }
+        >
             <span
                 className={"color-bubble"}
-                style={{backgroundColor: colorValue}}
+                style={{ backgroundColor: colorValue }}
             >
                 {colorKey}
             </span>
