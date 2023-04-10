@@ -25,6 +25,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.ScheduleM
 import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.ScrambleMatchingException
 import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.TranslationException
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.frontend.ApplicationDataHandler
+import org.worldcubeassociation.tnoodle.server.webscrambles.routing.frontend.PuzzleDrawingHandler
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.frontend.WcifDataHandler
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.FrontendErrorMessage.Companion.frontendException
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.MainLauncher
@@ -44,6 +45,7 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
             route("frontend") {
                 ApplicationDataHandler.install(this)
                 WcifDataHandler.install(this)
+                PuzzleDrawingHandler.install(this)
             }
 
             route("jobs") {

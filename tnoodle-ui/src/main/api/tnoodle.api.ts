@@ -17,6 +17,8 @@ let versionEndpoint = "/version";
 let fmcTranslationsEndpoint = "/frontend/fmc/languages/available";
 let suggestedFmcTranslationsEndpoint = "/frontend/fmc/languages/competitors";
 let bestMbldAttemptEndpoint = "/frontend/mbld/best";
+let puzzleColorSchemeEndpoint = (eventId: string) => `/frontend/puzzle/${eventId}/colors`;
+let solvedPuzzleSvgEndpoint = (eventId: string) => `/frontend/puzzle/${eventId}/svg`;
 let wcaEventsEndpoint = "/frontend/data/events";
 let formatsEndpoint = "/frontend/data/formats";
 
@@ -50,6 +52,12 @@ class TnoodleApi {
 
     fetchBestMbldAttempt = (wcif: Wcif) =>
         axios.post<BestMbld>(tNoodleBackend + bestMbldAttemptEndpoint, wcif);
+
+    fetchPuzzleColorScheme = (eventId: string) =>
+        axios.get<Record<string, string>>(tNoodleBackend + puzzleColorSchemeEndpoint(eventId));
+
+    fetchSolvedPuzzleSvg = (eventId: string, colorScheme: Record<string, string>) =>
+        axios.post<string>(tNoodleBackend + solvedPuzzleSvgEndpoint(eventId), colorScheme);
 
     fetchRunningVersion = () =>
         axios.get<RunningVersion>(tNoodleBackend + versionEndpoint);
