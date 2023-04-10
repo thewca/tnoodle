@@ -18,6 +18,7 @@ import MbldDetail from "./MbldDetail";
 import "@cubing/icons";
 import { useEffect, useState} from "react";
 import SVG from "react-inlinesvg";
+import SchemeColorPicker from "./SchemeColorPicker";
 
 interface EventPickerProps {
     wcaEvent: WcaEvent;
@@ -41,19 +42,41 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         (state: RootState) => state.scramblingSlice.scramblingProgressTarget
     );
 
-    const [puzzleSvg, setPuzzleSvg] = useState<string | null>(null);
+    const [puzzleSvg, setPuzzleSvg] = useState<string>();
+
+    const [colorScheme, setColorScheme] = useState<Record<string, string>>();
+    const [defaultColorScheme, setDefaultColorScheme] = useState<Record<string, string>>();
 
     useEffect(
         () => {
             let wcifRounds = wcifEvent?.rounds || [];
 
-            if (wcifRounds.length > 0 && puzzleSvg === null) {
-                tnoodleApi.fetchSolvedPuzzleSvg(wcaEvent.id).then((response) => {
-                    setPuzzleSvg(response.data);
-                });
+            if (wcifRounds.length > 0) {
+                if (puzzleSvg === undefined) {
+                    tnoodleApi.fetchSolvedPuzzleSvg(wcaEvent.id).then((response) => {
+                        setPuzzleSvg(response.data);
+                    });
+                }
+
+                if (colorScheme === undefined) {
+                    tnoodleApi.fetchPuzzleColorScheme(wcaEvent.id).then((response) => {
+                        setColorScheme(response.data);
+                        setDefaultColorScheme(response.data);
+                    });
+                }
             }
-        }, [wcaEvent, wcifEvent, puzzleSvg]
+        }, [wcaEvent, wcifEvent, puzzleSvg, colorScheme]
     );
+
+    useEffect(
+        () => {
+            tnoodleApi.fetchSolvedPuzzleSvg(wcaEvent.id, colorScheme).then((response) => {
+                setPuzzleSvg(response.data);
+            });
+        }, [wcaEvent, colorScheme]
+    );
+
+    const [showColorSchemeConfig, setShowColorSchemeConfig] = useState(false);
 
     const dispatch = useDispatch();
 
@@ -83,6 +106,10 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             });
         }
         updateEvent(newRounds);
+
+        if (numberOfRounds === 0) {
+            setShowColorSchemeConfig(false);
+        }
     };
 
     const handleGeneralRoundChange = (
@@ -119,12 +146,59 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         );
     };
 
+    const handleColorSchemeChange = (
+        colorKey: string,
+        hexColor: string
+    ) => {
+        let newColorScheme = {
+            ...colorScheme,
+            [colorKey]: hexColor
+        };
+
+        setColorScheme(newColorScheme);
+    };
+
     const abbreviate = (str: string) =>
         !!wcaFormats ? wcaFormats[str].shortName : "-";
 
+    const maybeShowColorPicker = (rounds: Round[]) => {
+        if (!showColorSchemeConfig || rounds.length === 0) {
+            return;
+        }
+
+        if (colorScheme === undefined || defaultColorScheme === undefined) {
+            return;
+        }
+
+        const defaultColors = Object.values(defaultColorScheme);
+
+        return (
+            <tr className="thead-light">
+                <th scope="col" colSpan={4}>
+                    <table className={"table table-borderless"}>
+                        <tbody>
+                            <tr>
+                                {Object.keys(colorScheme).map((colorKey, i) => {
+                                    return <td key={i}>
+                                        <SchemeColorPicker
+                                            defaultColors={defaultColors}
+                                            colorKey={colorKey}
+                                            colorValue={colorScheme[colorKey]}
+                                            onColorChange={(hexColor) => handleColorSchemeChange(colorKey, hexColor)}
+                                        />
+                                    </td>
+                                })}
+                            </tr>
+                        </tbody>
+                    </table>
+                </th>
+            </tr>
+        );
+    }
+
     const maybeShowTableTitles = (rounds: Round[]) => {
         if (rounds.length === 0) {
-            return null;
+            return;
         }
         return (
             <tr className="thead-light">
@@ -274,12 +348,12 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                         {maybeShowProgressBar(rounds)}
                     </th>
                     <th className="lastTwoColumns" scope="col">
-                        {rounds.length > 0 && puzzleSvg !== null && (
+                        {rounds.length > 0 && puzzleSvg !== undefined && (
                             <div>
                                 <SVG className={"lastTwoColumns"}
                                      src={puzzleSvg}
                                      height={50}
-                                     onClick={() => console.log(wcaEvent.id)}
+                                     onClick={() => setShowColorSchemeConfig(!showColorSchemeConfig)}
                                 />
                             </div>
                         )}
@@ -306,6 +380,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                         </select>
                     </th>
                 </tr>
+                {maybeShowColorPicker(rounds)}
                 {maybeShowTableTitles(rounds)}
             </thead>
             {maybeShowTableBody(rounds)}

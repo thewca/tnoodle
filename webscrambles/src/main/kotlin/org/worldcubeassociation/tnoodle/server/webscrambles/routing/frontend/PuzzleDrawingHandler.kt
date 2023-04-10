@@ -19,7 +19,7 @@ object PuzzleDrawingHandler : RouteHandler {
                     val event = EventData.WCA_EVENTS[eventId]
                         ?: return@get call.respond(HttpStatusCode.NotFound)
 
-                    val defaultColorScheme = event.scrambler.scrambler.defaultColorScheme.mapValues { it.value.toHex() }
+                    val defaultColorScheme = event.scrambler.scrambler.defaultColorScheme.mapValues { "#${it.value.toHex()}" }
 
                     call.respond(defaultColorScheme)
                 }
