@@ -13,3 +13,7 @@
 .cubing-icon {
     font-size: 6em;
 }
+
+.fit-content .tooltip-inner {
+    max-width: fit-content;
+}

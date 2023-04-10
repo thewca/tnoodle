@@ -3,6 +3,6 @@
     border-radius: 5px;
 }
 
-.tooltip-inner {
+.bg-transparent .tooltip-inner {
     background-color: transparent;
 }

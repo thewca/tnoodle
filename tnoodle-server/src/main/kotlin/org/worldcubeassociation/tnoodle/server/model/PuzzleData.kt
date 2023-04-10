@@ -43,6 +43,10 @@ enum class PuzzleData(private val registry: PuzzleRegistry) {
             .toList()
     }
 
+    fun generateScramble(action: (String) -> Unit = {}): String {
+        return yieldScramble().also(action)
+    }
+
     private fun yieldScramble() = SCRAMBLE_CACHERS[this.key]
         ?.takeIf { it.available > 0 }?.getScramble()
         ?: this.scramblerWithCache.generateScramble()

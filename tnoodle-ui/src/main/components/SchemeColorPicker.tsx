@@ -20,7 +20,7 @@ const SchemeColorPicker = ({defaultColors, colorKey, colorValue, onColorChange}:
             rootClose
             placement={"bottom"}
             overlay={
-                <Tooltip>
+                <Tooltip className={"bg-transparent"}>
                     <SketchPicker
                         disableAlpha={true}
                         color={colorValue}

@@ -1,4 +1,4 @@
-import { ProgressBar } from "react-bootstrap";
+import { OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { MAX_WCA_ROUNDS } from "../constants/wca.constants";
 import RootState from "../model/RootState";
@@ -16,9 +16,10 @@ import "./EventPicker.css";
 import FmcTranslationsDetail from "./FmcTranslationsDetail";
 import MbldDetail from "./MbldDetail";
 import "@cubing/icons";
-import { useEffect, useState} from "react";
+import { useCallback, useEffect, useState } from "react";
 import SVG from "react-inlinesvg";
 import SchemeColorPicker from "./SchemeColorPicker";
+import ScrambleAndImage from "../model/ScrambleAndImage";
 
 interface EventPickerProps {
     wcaEvent: WcaEvent;
@@ -47,6 +48,8 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     const [colorScheme, setColorScheme] = useState<Record<string, string>>();
     const [defaultColorScheme, setDefaultColorScheme] = useState<Record<string, string>>();
 
+    const [displayScramble, setDisplayScramble] = useState<ScrambleAndImage>()
+
     useEffect(
         () => {
             let wcifRounds = wcifEvent?.rounds || [];
@@ -68,12 +71,26 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         }, [wcaEvent, wcifEvent, puzzleSvg, colorScheme]
     );
 
+    const fetchDisplayScramble = useCallback(
+        (fetchNewScramble = true) => {
+            // we need this additional boolean to make sure we can fetch only once
+            // when the overlay is hidden, because its callback yields a `show` boolean.
+            if (fetchNewScramble) {
+                tnoodleApi.fetchPuzzleRandomScramble(wcaEvent.id, colorScheme).then((response) => {
+                    setDisplayScramble(response.data);
+                });
+            }
+        }, [wcaEvent, colorScheme]
+    );
+
     useEffect(
         () => {
             tnoodleApi.fetchSolvedPuzzleSvg(wcaEvent.id, colorScheme).then((response) => {
                 setPuzzleSvg(response.data);
             });
-        }, [wcaEvent, colorScheme]
+
+            fetchDisplayScramble();
+        }, [wcaEvent, colorScheme, fetchDisplayScramble]
     );
 
     const [showColorSchemeConfig, setShowColorSchemeConfig] = useState(false);
@@ -361,13 +378,24 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                         {maybeShowProgressBar(rounds)}
                     </th>
                     <th className="lastTwoColumns" scope="col">
-                        {rounds.length > 0 && puzzleSvg !== undefined && (
-                            <div>
-                                <SVG className={"lastTwoColumns"}
-                                     src={puzzleSvg}
-                                     height={50}
-                                     onClick={() => setShowColorSchemeConfig(!showColorSchemeConfig)}
-                                />
+                        {rounds.length > 0 && puzzleSvg !== undefined && displayScramble !== undefined && (
+                            <div className={"mb-2"}>
+                                <OverlayTrigger
+                                    placement={"left"}
+                                    onToggle={fetchDisplayScramble}
+                                    overlay={
+                                        <Tooltip className={"fit-content"}>
+                                            <SVG src={displayScramble.svgImage} width={200} height={200}/>
+                                            <p>(click small preview to edit)</p>
+                                        </Tooltip>
+                                    }
+                                >
+                                    <SVG className={"lastTwoColumns"}
+                                         src={puzzleSvg}
+                                         height={50}
+                                         onClick={() => setShowColorSchemeConfig(!showColorSchemeConfig)}
+                                    />
+                                </OverlayTrigger>
                             </div>
                         )}
                         <label>Rounds</label>

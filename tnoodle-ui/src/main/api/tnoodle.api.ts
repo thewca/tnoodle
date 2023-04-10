@@ -8,6 +8,7 @@ import Wcif from "../model/Wcif";
 import { ScrambleClient } from "./tnoodle.socket";
 import WebsocketBlobResult from "../model/WebsocketBlobResult";
 import FrontendStatus from "../model/FrontendStatus";
+import ScrambleAndImage from "../model/ScrambleAndImage";
 
 let backendUrl = new URL("http://localhost:2014");
 export const tNoodleBackend = backendUrl.toString().replace(/\/$/g, "");
@@ -18,6 +19,7 @@ let fmcTranslationsEndpoint = "/frontend/fmc/languages/available";
 let suggestedFmcTranslationsEndpoint = "/frontend/fmc/languages/competitors";
 let bestMbldAttemptEndpoint = "/frontend/mbld/best";
 let puzzleColorSchemeEndpoint = (eventId: string) => `/frontend/puzzle/${eventId}/colors`;
+let puzzleRandomScrambleEndpoint = (eventId: string) => `/frontend/puzzle/${eventId}/scramble`;
 let solvedPuzzleSvgEndpoint = (eventId: string) => `/frontend/puzzle/${eventId}/svg`;
 let wcaEventsEndpoint = "/frontend/data/events";
 let formatsEndpoint = "/frontend/data/formats";
@@ -55,6 +57,9 @@ class TnoodleApi {
 
     fetchPuzzleColorScheme = (eventId: string) =>
         axios.get<Record<string, string>>(tNoodleBackend + puzzleColorSchemeEndpoint(eventId));
+
+    fetchPuzzleRandomScramble = (eventId: string, colorScheme: Record<string, string> = {}) =>
+        axios.post<ScrambleAndImage>(tNoodleBackend + puzzleRandomScrambleEndpoint(eventId), colorScheme);
 
     fetchSolvedPuzzleSvg = (eventId: string, colorScheme: Record<string, string> = {}) =>
         axios.post<string>(tNoodleBackend + solvedPuzzleSvgEndpoint(eventId), colorScheme);
