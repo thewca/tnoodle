@@ -170,7 +170,9 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             return;
         }
 
-        const defaultColors = Object.values(defaultColorScheme);
+        const defaultColors = Object.values(defaultColorScheme).filter(
+            (key, i, arr) => arr.findIndex(t => t === key) === i
+        );
 
         return (
             <tr className="thead-light">
@@ -178,8 +180,8 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                     <table className={"table table-borderless"}>
                         <tbody>
                             <tr>
-                                {Object.keys(colorScheme).map((colorKey, i) => {
-                                    return <td key={i}>
+                                {Object.keys(colorScheme).map(colorKey=> {
+                                    return <td key={colorKey}>
                                         <SchemeColorPicker
                                             defaultColors={defaultColors}
                                             colorKey={colorKey}
@@ -188,6 +190,17 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                         />
                                     </td>
                                 })}
+                            </tr>
+                            <tr>
+                                <td colSpan={defaultColors.length}>
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary"
+                                        onClick={() => setColorScheme(defaultColorScheme)}
+                                    >
+                                        Reset to default
+                                    </button>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
