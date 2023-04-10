@@ -35,7 +35,7 @@ object PuzzleDrawingHandler : RouteHandler {
 
                     val solvedPuzzleSvg = event.scrambler.scrambler.drawScramble(null, HashMap(colorScheme))
 
-                    call.respond(solvedPuzzleSvg.toString())
+                    call.respondText(solvedPuzzleSvg.toString(), ContentType.Image.SVG)
                 }
             }
         }

@@ -11,10 +11,13 @@ import {
     copiesExtensionId,
     getDefaultCopiesExtension,
 } from "../util/wcif.util";
+import tnoodleApi from "../api/tnoodle.api";
 import "./EventPicker.css";
 import FmcTranslationsDetail from "./FmcTranslationsDetail";
 import MbldDetail from "./MbldDetail";
 import "@cubing/icons";
+import { useEffect, useState} from "react";
+import SVG from "react-inlinesvg";
 
 interface EventPickerProps {
     wcaEvent: WcaEvent;
@@ -36,6 +39,20 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     );
     const scramblingProgressTarget = useSelector(
         (state: RootState) => state.scramblingSlice.scramblingProgressTarget
+    );
+
+    const [puzzleSvg, setPuzzleSvg] = useState<string | null>(null);
+
+    useEffect(
+        () => {
+            let wcifRounds = wcifEvent?.rounds || [];
+
+            if (wcifRounds.length > 0 && puzzleSvg === null) {
+                tnoodleApi.fetchSolvedPuzzleSvg(wcaEvent.id).then((response) => {
+                    setPuzzleSvg(response.data);
+                });
+            }
+        }, [wcaEvent, wcifEvent, puzzleSvg]
     );
 
     const dispatch = useDispatch();
@@ -257,6 +274,15 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                         {maybeShowProgressBar(rounds)}
                     </th>
                     <th className="lastTwoColumns" scope="col">
+                        {rounds.length > 0 && puzzleSvg !== null && (
+                            <div>
+                                <SVG className={"lastTwoColumns"}
+                                     src={puzzleSvg}
+                                     height={50}
+                                     onClick={() => console.log(wcaEvent.id)}
+                                />
+                            </div>
+                        )}
                         <label>Rounds</label>
                         <select
                             className="form-control"

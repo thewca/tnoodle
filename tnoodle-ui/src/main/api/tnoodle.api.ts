@@ -56,7 +56,7 @@ class TnoodleApi {
     fetchPuzzleColorScheme = (eventId: string) =>
         axios.get<Record<string, string>>(tNoodleBackend + puzzleColorSchemeEndpoint(eventId));
 
-    fetchSolvedPuzzleSvg = (eventId: string, colorScheme: Record<string, string>) =>
+    fetchSolvedPuzzleSvg = (eventId: string, colorScheme: Record<string, string> = {}) =>
         axios.post<string>(tNoodleBackend + solvedPuzzleSvgEndpoint(eventId), colorScheme);
 
     fetchRunningVersion = () =>
