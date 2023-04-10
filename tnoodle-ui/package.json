@@ -52,7 +52,10 @@
             "!src/main/api/**.ts",
             "!src/main/model/**.ts",
             "!**/Interceptor.tsx"
-        ]
+        ],
+        "moduleNameMapper": {
+            "^axios$": "axios/dist/axios.js"
+        }
     },
     "devDependencies": {
         "@testing-library/jest-dom": "^5.16.5",
