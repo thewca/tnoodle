@@ -6,34 +6,32 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.worldcubeassociation.tnoodle.server.RouteHandler
-import org.worldcubeassociation.tnoodle.server.model.EventData
+import org.worldcubeassociation.tnoodle.server.model.PuzzleData
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.FrontendScrambleAndImage
 import org.worldcubeassociation.tnoodle.svglite.Color
 
 object PuzzleDrawingHandler : RouteHandler {
     override fun install(router: Route) {
         router.route("puzzle") {
-            route("{eventId}") {
+            route("{puzzleId}") {
                 get("colors") {
-                    val eventId = call.parameters["eventId"]
-
-                    val event = EventData.WCA_EVENTS[eventId]
+                    val puzzle = call.puzzleData
                         ?: return@get call.respond(HttpStatusCode.NotFound)
 
                     val defaultColorScheme =
-                        event.scrambler.scrambler.defaultColorScheme.mapValues { "#${it.value.toHex()}" }
+                        puzzle.scrambler.defaultColorScheme.mapValues { "#${it.value.toHex()}" }
 
                     call.respond(defaultColorScheme)
                 }
 
                 post("scramble") {
-                    val event = call.eventData
+                    val puzzle = call.puzzleData
                         ?: return@post call.respond(HttpStatusCode.NotFound)
 
                     val colorScheme = call.receiveColorScheme()
 
-                    val randomScramble = event.scrambler.generateScramble()
-                    val scrambledPuzzleSvg = event.scrambler.scramblerWithCache.drawScramble(randomScramble, colorScheme)
+                    val randomScramble = puzzle.generateScramble()
+                    val scrambledPuzzleSvg = puzzle.scramblerWithCache.drawScramble(randomScramble, colorScheme)
 
                     val frontendData = FrontendScrambleAndImage(randomScramble, scrambledPuzzleSvg.toString())
 
@@ -41,11 +39,11 @@ object PuzzleDrawingHandler : RouteHandler {
                 }
 
                 post("svg") {
-                    val event = call.eventData
+                    val puzzle = call.puzzleData
                         ?: return@post call.respond(HttpStatusCode.NotFound)
 
                     val colorScheme = call.receiveColorScheme()
-                    val solvedPuzzleSvg = event.scrambler.scramblerWithCache.drawScramble(null, colorScheme)
+                    val solvedPuzzleSvg = puzzle.scramblerWithCache.drawScramble(null, colorScheme)
 
                     call.respondText(solvedPuzzleSvg.toString(), ContentType.Image.SVG)
                 }
@@ -53,11 +51,11 @@ object PuzzleDrawingHandler : RouteHandler {
         }
     }
 
-    private val ApplicationCall.eventData
-        get(): EventData? {
-            val eventId = parameters["eventId"]
+    private val ApplicationCall.puzzleData
+        get(): PuzzleData? {
+            val puzzleId = parameters["puzzleId"]
 
-            return EventData.WCA_EVENTS[eventId]
+            return PuzzleData.WCA_PUZZLES[puzzleId]
         }
 
     private suspend fun ApplicationCall.receiveColorScheme(): HashMap<String, Color> {

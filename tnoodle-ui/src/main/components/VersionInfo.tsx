@@ -4,9 +4,9 @@ import tnoodleApi from "../api/tnoodle.api";
 import wcaApi, { isUsingStaging } from "../api/wca.api";
 import CurrentTnoodle from "../model/CurrentTnoodle";
 import { setWcif } from "../redux/slice/WcifSlice";
-import { frontentStatusExtensionId } from "../util/wcif.util";
+import { frontendStatusExtensionId } from "../util/wcif.util";
 import RootState from "../model/RootState";
-import { useWriteEffect } from "../util/extension.util";
+import { setExtensionLazily } from "../util/extension.util";
 
 const VersionInfo = () => {
     const wcif = useSelector(
@@ -74,7 +74,7 @@ const VersionInfo = () => {
     const buildFrontendStatusExtension = useCallback(
         () => {
             return {
-                id: frontentStatusExtensionId,
+                id: frontendStatusExtensionId,
                 specUrl: "",
                 data: {
                     isStaging: isUsingStaging(),
@@ -86,13 +86,11 @@ const VersionInfo = () => {
         }, [competitionId, signatureValid, versionAllowed]
     );
 
-    useWriteEffect(
-        wcif,
-        frontentStatusExtensionId,
-        dispatch,
-        setWcif,
-        buildFrontendStatusExtension
-    );
+    useEffect(() => {
+        setExtensionLazily(wcif, frontendStatusExtensionId, buildFrontendStatusExtension, (wcif) => {
+            dispatch(setWcif(wcif));
+        });
+    }, [dispatch, wcif, buildFrontendStatusExtension]);
 
     // We cannot analyze TNoodle version here. We do not bother the user.
     if (!runningVersion || !allowedTnoodleVersions || !currentTnoodle) {

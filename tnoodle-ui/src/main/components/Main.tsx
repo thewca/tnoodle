@@ -17,7 +17,7 @@ import Interceptor from "./Interceptor";
 import "./Main.css";
 import VersionInfo from "./VersionInfo";
 import WebsocketBlobResult from "../model/WebsocketBlobResult";
-import { frontentStatusExtensionId } from "../util/wcif.util";
+import { frontendStatusExtensionId } from "../util/wcif.util";
 
 const Main = () => {
     const [competitionNameFileZip, setCompetitionNameFileZip] = useState("");
@@ -90,7 +90,7 @@ const Main = () => {
         // We use the unofficialZip to stamp .zip in order to prevent delegates / organizers mistakes.
         // If TNoodle version is not official (as per VersionInfo) or if we generate scrambles using
         // a competition from staging, add a [Unofficial]
-        let frontendStatusExtension = wcif.extensions.find((ext) => ext.id === frontentStatusExtensionId);
+        let frontendStatusExtension = wcif.extensions.find((ext) => ext.id === frontendStatusExtensionId);
 
         let isValidSignedBuild = frontendStatusExtension?.data.isSignedBuild;
         let isAllowedVersion = frontendStatusExtension?.data.isAllowedVersion;

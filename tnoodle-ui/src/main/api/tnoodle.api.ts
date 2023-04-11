@@ -16,12 +16,12 @@ let versionEndpoint = "/version";
 let fmcTranslationsEndpoint = "/frontend/fmc/languages/available";
 let suggestedFmcTranslationsEndpoint = "/frontend/fmc/languages/competitors";
 let bestMbldAttemptEndpoint = "/frontend/mbld/best";
-let puzzleColorSchemeEndpoint = (eventId: string) =>
-    `/frontend/puzzle/${eventId}/colors`;
-let puzzleRandomScrambleEndpoint = (eventId: string) =>
-    `/frontend/puzzle/${eventId}/scramble`;
-let solvedPuzzleSvgEndpoint = (eventId: string) =>
-    `/frontend/puzzle/${eventId}/svg`;
+let puzzleColorSchemeEndpoint = (puzzleId: string) =>
+    `/frontend/puzzle/${puzzleId}/colors`;
+let puzzleRandomScrambleEndpoint = (puzzleId: string) =>
+    `/frontend/puzzle/${puzzleId}/scramble`;
+let solvedPuzzleSvgEndpoint = (puzzleId: string) =>
+    `/frontend/puzzle/${puzzleId}/svg`;
 let wcaEventsEndpoint = "/frontend/data/events";
 let formatsEndpoint = "/frontend/data/formats";
 
@@ -41,26 +41,26 @@ class TnoodleApi {
     fetchBestMbldAttempt = (wcif: Wcif) =>
         axios.post<BestMbld>(tNoodleBackend + bestMbldAttemptEndpoint, wcif);
 
-    fetchPuzzleColorScheme = (eventId: string) =>
+    fetchPuzzleColorScheme = (puzzleId: string) =>
         axios.get<Record<string, string>>(
-            tNoodleBackend + puzzleColorSchemeEndpoint(eventId)
+            tNoodleBackend + puzzleColorSchemeEndpoint(puzzleId)
         );
 
     fetchPuzzleRandomScramble = (
-        eventId: string,
+        puzzleId: string,
         colorScheme: Record<string, string> = {}
     ) =>
         axios.post<ScrambleAndImage>(
-            tNoodleBackend + puzzleRandomScrambleEndpoint(eventId),
+            tNoodleBackend + puzzleRandomScrambleEndpoint(puzzleId),
             colorScheme
         );
 
-    fetchSolvedPuzzleSvg = (
-        eventId: string,
+    fetchPuzzleSolvedSvg = (
+        puzzleId: string,
         colorScheme: Record<string, string> = {}
     ) =>
         axios.post<string>(
-            tNoodleBackend + solvedPuzzleSvgEndpoint(eventId),
+            tNoodleBackend + solvedPuzzleSvgEndpoint(puzzleId),
             colorScheme
         );
 

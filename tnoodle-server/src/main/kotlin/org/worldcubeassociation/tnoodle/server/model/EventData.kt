@@ -19,7 +19,7 @@ enum class EventData(val id: String, val description: String, val scrambler: Puz
     FIVE_BLD("555bf", "5x5x5 Blindfolded", PuzzleData.FIVE_BLD, FormatData.BLD_SPECIAL_FORMATS),
     THREE_MULTI_BLD("333mbf", "3x3x3 Multiple Blindfolded", PuzzleData.THREE_BLD, FormatData.BLD_SPECIAL_FORMATS);
 
-    constructor(scrambler: PuzzleData, legalFormats: Set<FormatData>) : this(scrambler.key, scrambler.description, scrambler, legalFormats)
+    constructor(scrambler: PuzzleData, legalFormats: Set<FormatData>) : this(scrambler.id, scrambler.description, scrambler, legalFormats)
 
     companion object {
         val WCA_EVENTS = values().associateBy { it.id }.toSortedMap()

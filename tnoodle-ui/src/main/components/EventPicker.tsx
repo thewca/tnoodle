@@ -22,7 +22,7 @@ import SVG from "react-inlinesvg";
 import SchemeColorPicker from "./SchemeColorPicker";
 import ScrambleAndImage from "../model/ScrambleAndImage";
 import _ from "lodash";
-import { useWriteEffect } from "../util/extension.util";
+import { setExtensionLazily, findExtension } from "../util/extension.util";
 
 interface EventPickerProps {
     wcaEvent: WcaEvent;
@@ -32,6 +32,12 @@ interface EventPickerProps {
 const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     const wcaFormats = useSelector(
         (state: RootState) => state.wcifSlice.wcaFormats
+    );
+    const wcaEvents = useSelector(
+        (state: RootState) => state.wcifSlice.wcaEvents
+    );
+    const wcifEvents = useSelector(
+        (state: RootState) => state.wcifSlice.wcif.events
     );
     const editingStatus = useSelector(
         (state: RootState) => state.wcifSlice.editingStatus
@@ -47,15 +53,10 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     );
 
     const [puzzleSvg, setPuzzleSvg] = useState<string>();
+    const [randomSampleScramble, setRandomSampleScramble] = useState<ScrambleAndImage>();
 
     const [defaultColorScheme, setDefaultColorScheme] = useState<Record<string, string>>();
-    const [colorScheme, setColorScheme] = useState<Record<string, string>>(
-        wcifEvent.extensions.find(
-            (it) => it.id === colorSchemeExtensionId
-        )?.data?.colorScheme ?? undefined
-    );
-
-    const [randomSampleScramble, setRandomSampleScramble] = useState<ScrambleAndImage>();
+    const [colorScheme, setColorScheme] = useState<Record<string, string>>();
 
     const [showColorSchemeConfig, setShowColorSchemeConfig] = useState<boolean>(false);
 
@@ -65,57 +66,74 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             // when the overlay is hidden, because its callback yields a `show` boolean.
             if (fetchNewScramble && colorScheme !== undefined) {
                 tnoodleApi
-                    .fetchPuzzleRandomScramble(wcaEvent.id, colorScheme)
+                    .fetchPuzzleRandomScramble(wcaEvent.puzzle_id, colorScheme)
                     .then((response) => {
                         setRandomSampleScramble(response.data);
                     });
             }
-        }, [wcaEvent.id, colorScheme]
+        }, [wcaEvent.puzzle_id, colorScheme]
     );
 
     useEffect(() => {
         if (colorScheme !== undefined) {
             tnoodleApi
-                .fetchSolvedPuzzleSvg(wcaEvent.id, colorScheme)
+                .fetchPuzzleSolvedSvg(wcaEvent.puzzle_id, colorScheme)
                 .then((response) => {
                     setPuzzleSvg(response.data);
                 });
 
             fetchDisplayScramble();
         }
-    }, [wcaEvent.id, colorScheme, fetchDisplayScramble]);
+    }, [wcaEvent.puzzle_id, colorScheme, fetchDisplayScramble]);
+
+    useEffect(() => {
+        let colorSchemeExtension = findExtension(wcifEvent, colorSchemeExtensionId);
+
+        if (colorSchemeExtension !== undefined) {
+            setColorScheme(colorSchemeExtension.data.colorScheme);
+        } else if (defaultColorScheme !== undefined) {
+            setColorScheme(defaultColorScheme);
+        }
+    }, [wcifEvent, defaultColorScheme]);
 
     const dispatch = useDispatch();
 
     useEffect(() => {
         if (wcifEvent.rounds.length > 0) {
-            if (colorScheme === undefined || defaultColorScheme === undefined) {
+            if (defaultColorScheme === undefined) {
                 tnoodleApi
-                    .fetchPuzzleColorScheme(wcaEvent.id)
+                    .fetchPuzzleColorScheme(wcaEvent.puzzle_id)
                     .then((response) => {
-                        if (colorScheme === undefined) {
-                            setColorScheme(response.data);
-                        }
-
                         setDefaultColorScheme(response.data);
                     });
             }
         }
-    }, [dispatch, wcaEvent.id, wcifEvent.rounds, colorScheme, defaultColorScheme]);
+    }, [wcaEvent.puzzle_id, wcifEvent.rounds, defaultColorScheme]);
+
+    const dispatchWcifEvent = useCallback(
+        (newWcifEvent: WcifEvent) => {
+            dispatch(setWcifEvent(newWcifEvent));
+            dispatch(setFileZip());
+        }, [dispatch]
+    );
 
     const updateEventRounds = (rounds: Round[]) => {
         let event = {
-            id: wcaEvent.id,
+            ...wcifEvent,
             rounds,
-            extensions: wcifEvent.extensions
         };
 
-        dispatch(setFileZip());
-        dispatch(setWcifEvent(event));
+        dispatchWcifEvent(event);
+    };
+
+    const updateEventColorScheme = (colorScheme: Record<string, string>) => {
+        setExtensionLazily(wcifEvent, colorSchemeExtensionId, () => {
+            return buildColorSchemeExtension(colorScheme);
+        }, dispatchWcifEvent);
     };
 
     const buildColorSchemeExtension = useCallback(
-        () => {
+        (colorScheme: Record<string, string>) => {
             let isDefaultColorScheme = _.isEqual(colorScheme, defaultColorScheme);
 
             if (isDefaultColorScheme) {
@@ -127,18 +145,8 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                 specUrl: '',
                 data: { colorScheme }
             };
-        }, [colorScheme, defaultColorScheme]
+        }, [defaultColorScheme]
     );
-
-    useWriteEffect(
-        wcifEvent,
-        colorSchemeExtensionId,
-        dispatch,
-        setWcifEvent,
-        buildColorSchemeExtension,
-    );
-
-    useEffect(() => { dispatch(setFileZip()) }, [dispatch, buildColorSchemeExtension]);
 
     const handleNumberOfRoundsChange = (
         numberOfRounds: number,
@@ -206,11 +214,21 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             [colorKey]: hexColor,
         };
 
-        setColorScheme(newColorScheme);
+        updateEventColorScheme(newColorScheme);
     };
 
     const abbreviate = (str: string) =>
         !!wcaFormats ? wcaFormats[str].shortName : "-";
+
+    const updateForeignColorScheme = (wcaEvent: WcaEvent) => {
+        let wcifEvent = wcifEvents.find((wcifEvent) => wcifEvent.id === wcaEvent.id);
+
+        if (wcifEvent !== undefined && colorScheme !== undefined) {
+            setExtensionLazily(wcifEvent, colorSchemeExtensionId, () => {
+                return buildColorSchemeExtension(colorScheme);
+            }, dispatchWcifEvent);
+        }
+    };
 
     const maybeShowColorPicker = () => {
         if (!showColorSchemeConfig || wcifEvent.rounds.length === 0) {
@@ -222,6 +240,14 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         }
 
         const defaultColors = _.uniq(Object.values(defaultColorScheme));
+
+        const samePuzzleEvents = wcaEvents?.filter((event) => {
+            return event.id !== wcaEvent.id && event.puzzle_id === wcaEvent.puzzle_id;
+        }) ?? [];
+
+        const samePuzzleGroupEvents = wcaEvents?.filter((event) => {
+            return wcaEvent.puzzle_group_id !== null && event.id !== wcaEvent.id && event.puzzle_group_id === wcaEvent.puzzle_group_id;
+        }) ?? [];
 
         return (
             <tr className="thead-light">
@@ -253,11 +279,29 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                 <td colSpan={defaultColors.length}>
                                     <button
                                         type="button"
-                                        className="btn btn-secondary"
-                                        onClick={() => setColorScheme(defaultColorScheme)}
+                                        className="btn btn-warning mr-4"
+                                        onClick={() => updateEventColorScheme(defaultColorScheme)}
                                     >
                                         Reset to default
                                     </button>
+                                    {samePuzzleEvents.length > 0 && (
+                                        <button
+                                            type="button"
+                                            className="btn btn-secondary mr-1"
+                                            onClick={() => samePuzzleEvents.forEach((wcaEvent) => updateForeignColorScheme(wcaEvent))}
+                                        >
+                                            Propagate to puzzle
+                                        </button>
+                                    )}
+                                    {samePuzzleGroupEvents.length > 0 && (
+                                        <button
+                                            type="button"
+                                            className="btn btn-secondary mr-1"
+                                            onClick={() => samePuzzleGroupEvents.forEach((wcaEvent) => updateForeignColorScheme(wcaEvent))}
+                                        >
+                                            Propagate to group
+                                        </button>
+                                    )}
                                 </td>
                             </tr>
                         </tbody>

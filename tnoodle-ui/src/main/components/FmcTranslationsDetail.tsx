@@ -1,5 +1,5 @@
 import { chunk } from "lodash";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import RootState from "../model/RootState";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
@@ -8,7 +8,7 @@ import tnoodleApi from "../api/tnoodle.api";
 import WcifEvent from "../model/WcifEvent";
 import { fmcTranslationsExtensionId } from "../util/wcif.util";
 import { setWcifEvent } from "../redux/slice/WcifSlice";
-import { useWriteEffect } from "../util/extension.util";
+import { findExtension, setExtensionLazily } from "../util/extension.util";
 
 const TRANSLATIONS_PER_LINE = 3;
 
@@ -25,14 +25,19 @@ const FmcTranslationsDetail = ({ fmcWcifEvent } : FmcTranslationsDetailProps) =>
     );
 
     const [availableTranslations, setAvailableTranslations] = useState<Record<string, string>>({});
-
-    const [selectedTranslations, setSelectedTranslations] = useState<string[]>(
-        fmcWcifEvent.extensions.find(
-            (it) => it.id === fmcTranslationsExtensionId
-        )?.data?.languageTags ?? []
-    );
+    const [selectedTranslations, setSelectedTranslations] = useState<string[]>([]);
 
     const [showTranslations, setShowTranslations] = useState(false);
+
+    useEffect(() => {
+        let fmcTranslationsExtension = findExtension(fmcWcifEvent, fmcTranslationsExtensionId);
+
+        if (fmcTranslationsExtension !== undefined) {
+            setSelectedTranslations(fmcTranslationsExtension.data.languageTags);
+        } else if (availableTranslations !== undefined) {
+            setSelectedTranslations(Object.keys(availableTranslations));
+        }
+    }, [fmcWcifEvent, availableTranslations]);
 
     const dispatch = useDispatch();
 
@@ -47,25 +52,22 @@ const FmcTranslationsDetail = ({ fmcWcifEvent } : FmcTranslationsDetailProps) =>
         }, [dispatch, availableTranslations]
     );
 
-    const buildFmcExtension = useCallback(
-        () => {
-            return {
-                id: fmcTranslationsExtensionId,
-                specUrl: '',
-                data: { languageTags: selectedTranslations }
-            };
-        }, [selectedTranslations]
-    );
+    const buildFmcExtension = (selectedTranslations: string[]) => {
+        return {
+            id: fmcTranslationsExtensionId,
+            specUrl: '',
+            data: { languageTags: selectedTranslations }
+        }
+    };
 
-    useWriteEffect(
-        fmcWcifEvent,
-        fmcTranslationsExtensionId,
-        dispatch,
-        setWcifEvent,
-        buildFmcExtension
-    );
-
-    useEffect(() => { dispatch(setFileZip()) }, [dispatch, buildFmcExtension]);
+    const updateEventSelectedTranslations = (selectedTranslations: string[]) => {
+        setExtensionLazily(fmcWcifEvent, fmcTranslationsExtensionId, () => {
+            return buildFmcExtension(selectedTranslations);
+        }, (fmcWcifEvent) => {
+            dispatch(setWcifEvent(fmcWcifEvent));
+            dispatch(setFileZip());
+        })
+    };
 
     const handleTranslation = (id: string, status: boolean) => {
         let newSelectedTranslations = selectedTranslations.filter(
@@ -76,19 +78,19 @@ const FmcTranslationsDetail = ({ fmcWcifEvent } : FmcTranslationsDetailProps) =>
             newSelectedTranslations.push(id);
         }
 
-        setSelectedTranslations(newSelectedTranslations);
+        updateEventSelectedTranslations(newSelectedTranslations);
     };
 
     const handleSelectAllTranslations = () => {
-        setSelectedTranslations(Object.keys(availableTranslations));
+        updateEventSelectedTranslations(Object.keys(availableTranslations));
     };
 
     const selectNoneTranslation = () => {
-        setSelectedTranslations([]);
+        updateEventSelectedTranslations([]);
     };
 
     const selectSuggestedTranslations = () => {
-        setSelectedTranslations(suggestedFmcTranslations || []);
+        updateEventSelectedTranslations(suggestedFmcTranslations || []);
     };
 
     const translationsDetail = () => {

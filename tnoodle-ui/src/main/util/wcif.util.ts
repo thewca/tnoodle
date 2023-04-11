@@ -6,7 +6,7 @@ export const copiesExtensionId =
     "org.worldcubeassociation.tnoodle.SheetCopyCount";
 export const colorSchemeExtensionId =
     "org.worldcubeassociation.tnoodle.ColorScheme";
-export const frontentStatusExtensionId =
+export const frontendStatusExtensionId =
     "org.worldcubeassociation.tnoodle.CompetitionStatus";
 export const fmcTranslationsExtensionId =
     "org.worldcubeassociation.tnoodle.FmcLanguages";
