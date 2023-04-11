@@ -5,10 +5,8 @@ import { Provider } from "react-redux";
 import App from "../App";
 import tnoodleApi from "../main/api/tnoodle.api";
 import wcaApi from "../main/api/wca.api";
-import Translation from "../main/model/Translation";
-import FrontendStatus from "../main/model/FrontendStatus";
 import Wcif from "../main/model/Wcif";
-import { defaultWcif } from "../main/util/wcif.util";
+import { defaultWcif, mbldCubesExtensionId } from "../main/util/wcif.util";
 import {
     bestMbldAttempt,
     defaultStatus,
@@ -31,8 +29,6 @@ let container = document.createElement("div");
 let wcif: Wcif | null = null;
 let mbld: string | null = null;
 let password: string | null = null;
-let status: FrontendStatus | null = null;
-let translations: Translation[] | undefined;
 beforeEach(() => {
     // setup a DOM element as a render target
     container = document.createElement("div");
@@ -59,12 +55,9 @@ beforeEach(() => {
     );
 
     jest.spyOn(tnoodleApi, "fetchZip").mockImplementation(
-        (scrambleClient, _wcif, _mbld, _password, _status, _translations) => {
+        (scrambleClient, _wcif, _password) => {
             wcif = _wcif;
-            mbld = _mbld;
             password = _password;
-            status = _status;
-            translations = _translations;
 
             return Promise.resolve(plainZip);
         }
@@ -95,7 +88,6 @@ afterEach(() => {
     wcif = null;
     mbld = null;
     password = null;
-    translations = undefined;
 
     // Clear mock
     jest.spyOn(tnoodleApi, "fetchWcaEvents").mockRestore();
@@ -135,7 +127,6 @@ it("Just generate scrambles", async () => {
     expect(wcif!.events.length).toBe(1);
 
     expect(password).toBe("");
-    expect(status).toEqual(defaultStatus);
 });
 
 it("Changes on 333, scramble", async () => {
@@ -301,27 +292,6 @@ it("Remove 333, add FMC and MBLD", async () => {
     });
 
     expect(wcif!.events.length).toBe(events.length);
-
-    expect(mbld).toBe(mbldCubes);
-
-    let selected = translations!
-        .filter((translation) => translation.status)
-        .map((translation) => translation.id);
-
-    let deselected = translations!
-        .filter((translation) => !translation.status)
-        .map((translation) => translation.id)
-        .sort();
-
-    // Deselected should be with status false
-    expect(deselected).toEqual(
-        languagesIndexToDelesect.map((index) => laguageKeys[index]).sort()
-    );
-
-    // Selected and deselected should cover every languages
-    expect([...selected, ...deselected].sort()).toStrictEqual(
-        laguageKeys.sort()
-    );
 });
 
 it("Logged user", async () => {
@@ -392,13 +362,15 @@ it("Logged user", async () => {
             );
         });
 
+        let mbldWcifEvent = store.getState().wcifSlice.wcif.events.find((event) => event.id === "333mbf")
+        let mbldExtensionCubesCount = mbldWcifEvent?.extensions?.find((extension) => extension.id === mbldCubesExtensionId)?.data['requestedScrambles']
+
         // We should warn in case of mbld
         if (
-            !!store
-                .getState()
-                .wcifSlice.wcif.events.find((event) => event.id === "333mbf") &&
-            store.getState().mbldSlice.bestMbldAttempt! >
-                Number(store.getState().mbldSlice.mbld)
+            !!mbldWcifEvent &&
+            !!mbldExtensionCubesCount &&
+            store.getState().eventDataSlice.bestMbldAttempt! >
+                Number(mbldExtensionCubesCount)
         ) {
             let items = container.querySelectorAll("tfoot tr th[colspan]");
             expect(items[items.length - 1].innerHTML).toContain(

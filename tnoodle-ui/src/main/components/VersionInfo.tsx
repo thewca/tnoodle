@@ -1,30 +1,34 @@
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useCallback, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import tnoodleApi from "../api/tnoodle.api";
-import wcaApi from "../api/wca.api";
+import wcaApi, { isUsingStaging } from "../api/wca.api";
 import CurrentTnoodle from "../model/CurrentTnoodle";
-import {
-    setAllowedVersion,
-    setValidSignedBuild,
-} from "../redux/slice/ScramblingSlice";
+import { setWcif } from "../redux/slice/WcifSlice";
+import { frontentStatusExtensionId } from "../util/wcif.util";
+import RootState from "../model/RootState";
+import { useWriteEffect } from "../util/extension.util";
 
 const VersionInfo = () => {
+    const wcif = useSelector(
+        (state: RootState) => state.wcifSlice.wcif
+    );
+    const competitionId = useSelector(
+        (state: RootState) => state.competitionSlice.competitionId
+    );
+
+    // WCA API response
     const [currentTnoodle, setCurrentTnoodle] = useState<CurrentTnoodle>();
-    const [allowedTnoodleVersions, setAllowedTnoodleVersions] =
-        useState<string[]>();
+    const [allowedTnoodleVersions, setAllowedTnoodleVersions] = useState<string[]>();
+    const [wcaPublicKeyBytes, setWcaPublicKeyBytes] = useState<string>();
+
+    // TNoodle backend API response
     const [runningVersion, setRunningVersion] = useState<string>();
     const [signedBuild, setSignedBuild] = useState<boolean>();
     const [signatureKeyBytes, setSignatureKeyBytes] = useState<string>();
-    const [wcaPublicKeyBytes, setWcaPublicKeyBytes] = useState<string>();
-    const [signatureValid, setSignatureValid] = useState(true);
 
-    useEffect(
-        () =>
-            setSignatureValid(
-                !!signedBuild && signatureKeyBytes === wcaPublicKeyBytes
-            ),
-        [signedBuild, signatureKeyBytes, wcaPublicKeyBytes]
-    );
+    // what we make of it
+    const [signatureValid, setSignatureValid] = useState<boolean>(false);
+    const [versionAllowed, setVersionAllowed] = useState<boolean>(false);
 
     const dispatch = useDispatch();
 
@@ -37,49 +41,73 @@ const VersionInfo = () => {
         });
 
         tnoodleApi.fetchRunningVersion().then((response) => {
-            setRunningVersion(
-                !!response.data.projectName && !!response.data.projectVersion
-                    ? `${response.data.projectName}-${response.data.projectVersion}`
-                    : ""
-            );
+            let versionString = !!response.data.projectName && !!response.data.projectVersion
+                ? `${response.data.projectName}-${response.data.projectVersion}`
+                : "";
+
+            setRunningVersion(versionString);
             setSignedBuild(response.data.signedBuild);
             setSignatureKeyBytes(response.data.signatureKeyBytes);
         });
     }, [dispatch]);
 
-    // This avoids global state update while rendering
-    const analyzeVersion = () => {
-        // We wait until both wca and tnoodle answers
-        if (!allowedTnoodleVersions || !runningVersion) {
+    useEffect(() => {
+        if (signedBuild === undefined || signatureKeyBytes === undefined || wcaPublicKeyBytes === undefined) {
             return;
         }
 
-        dispatch(
-            setAllowedVersion(allowedTnoodleVersions.includes(runningVersion))
+        setSignatureValid(
+            signedBuild && signatureKeyBytes === wcaPublicKeyBytes
         );
-        dispatch(setValidSignedBuild(signatureValid));
-    };
-    useEffect(analyzeVersion, [
-        allowedTnoodleVersions,
+    }, [signedBuild, signatureKeyBytes, wcaPublicKeyBytes]);
+
+    useEffect(() => {
+        if (allowedTnoodleVersions === undefined || runningVersion === undefined) {
+            return;
+        }
+
+        setVersionAllowed(
+            allowedTnoodleVersions.includes(runningVersion)
+        );
+    }, [allowedTnoodleVersions, runningVersion]);
+
+    const buildFrontendStatusExtension = useCallback(
+        () => {
+            return {
+                id: frontentStatusExtensionId,
+                specUrl: "",
+                data: {
+                    isStaging: isUsingStaging(),
+                    isManual: competitionId == null,
+                    isSignedBuild: signatureValid,
+                    isAllowedVersion: versionAllowed
+                }
+            };
+        }, [competitionId, signatureValid, versionAllowed]
+    );
+
+    useWriteEffect(
+        wcif,
+        frontentStatusExtensionId,
         dispatch,
-        runningVersion,
-        signatureValid,
-    ]);
+        setWcif,
+        buildFrontendStatusExtension
+    );
 
     // We cannot analyze TNoodle version here. We do not bother the user.
-    if (!runningVersion || !allowedTnoodleVersions) {
+    if (!runningVersion || !allowedTnoodleVersions || !currentTnoodle) {
         return null;
     }
 
     // Running version is not the most recent release
-    if (runningVersion !== currentTnoodle?.name) {
+    if (runningVersion !== currentTnoodle.name) {
         // Running version is allowed, but not the latest.
-        if (allowedTnoodleVersions.includes(runningVersion)) {
+        if (versionAllowed) {
             return (
                 <div className="alert alert-info m-0">
                     You are running {runningVersion}, which is still allowed,
-                    but you should upgrade to {currentTnoodle?.name} available{" "}
-                    <a href={currentTnoodle?.download}>here</a> as soon as
+                    but you should upgrade to {currentTnoodle.name} available{" "}
+                    <a href={currentTnoodle.download}>here</a> as soon as
                     possible.
                 </div>
             );
@@ -90,7 +118,7 @@ const VersionInfo = () => {
                 You are running {runningVersion}, which is not allowed. Do not
                 use scrambles generated in any official competition and consider
                 downloading the latest version{" "}
-                <a href={currentTnoodle?.download}>here</a>.
+                <a href={currentTnoodle.download}>here</a>.
             </div>
         );
     }

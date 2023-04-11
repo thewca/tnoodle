@@ -1,6 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
 import org.worldcubeassociation.tnoodle.server.model.EventData
+import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcSolutionSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.GeneralScrambleSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.ScrambleSheet
@@ -133,7 +134,6 @@ object WCIFDataBuilder {
         pdfPassword: String?,
         versionTag: String,
         locale: Locale,
-        fmcTranslations: List<Locale>,
         generationDate: LocalDateTime,
         generationUrl: String
     ): ZipArchive {
@@ -142,6 +142,11 @@ object WCIFDataBuilder {
 
         val frontendStatus = wcif.findExtension<TNoodleStatusExtension>()
         val frontendWatermark = frontendStatus?.pickWatermarkPhrase()
+
+        val fmcTranslations = wcif.events.find { it.id == EventData.THREE_FM.id }
+            ?.findExtension<FmcLanguagesExtension>()
+            ?.languageTags.orEmpty()
+            .mapNotNull { Translate.LOCALES_BY_LANG_TAG[it] }
 
         val scrambleZip = ScrambleZip(wcif, namedSheets, fmcTranslations, frontendWatermark)
 

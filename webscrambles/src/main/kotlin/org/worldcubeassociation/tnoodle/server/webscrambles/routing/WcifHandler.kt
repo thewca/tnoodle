@@ -8,6 +8,7 @@ import io.ktor.websocket.*
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 import org.worldcubeassociation.tnoodle.server.ServerEnvironmentConfig
+import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.BadWcifParameterException
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.job.JobSchedulingHandler.registerJobPaths
@@ -17,6 +18,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.serial.WcifScrambleR
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFScrambleMatcher
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.MultiScrambleCountExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.SheetCopyCountExtension
 import java.time.LocalDateTime
 
@@ -49,15 +51,15 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
         }
 
         override suspend fun ScramblingJobData.compute(statusBackend: StatusBackend): Pair<ContentType, ByteArray> {
-            val wcif = WCIFScrambleMatcher.fillScrambleSetsAsync(request.extendedWcif) { evt, _ ->
-                statusBackend.onProgress(evt.key)
+            val wcif = WCIFScrambleMatcher.fillScrambleSetsAsync(request.wcif) { evt, _ ->
+                statusBackend.onProgress(evt.id)
             }
 
             return scrambledToResult(this, wcif, statusBackend)
         }
 
         override fun getTargetState(data: ScramblingJobData) =
-            WCIFScrambleMatcher.getScrambleCountsPerEvent(data.request.extendedWcif) + extraTargetData
+            WCIFScrambleMatcher.getScrambleCountsPerEvent(data.request.wcif) + extraTargetData
 
         override fun getResultMarker(data: ScramblingJobData) =
             data.request.wcif.id
@@ -78,7 +80,8 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
             const val MAX_SCRAMBLE_SET_COUNT = 26
 
             fun validateRequest(req: WcifScrambleRequest): Boolean {
-                val checkMultiCubes = req.multiCubes?.requestedScrambles ?: 0
+                val multiCubesExtension = req.wcif.events.find { it.id == EventData.THREE_MULTI_BLD.id }?.findExtension<MultiScrambleCountExtension>()
+                val checkMultiCubes = multiCubesExtension?.requestedScrambles ?: 0
 
                 if (checkMultiCubes > MAX_MULTI_CUBES) {
                     BadWcifParameterException.error("The maximum amount of MBLD cubes is $MAX_MULTI_CUBES")
@@ -129,11 +132,8 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
                     val pdfPassword = req.request.pdfPassword
                     val zipPassword = req.request.zipPassword
 
-                    val fmcTranslations = req.request.fmcLanguages?.languageTags.orEmpty()
-                        .mapNotNull { Translate.LOCALES_BY_LANG_TAG[it] }
-
                     // TODO GB allow building ZIPs in languages other than English?
-                    val zip = WCIFDataBuilder.wcifToZip(wcif, pdfPassword, versionTag, Translate.DEFAULT_LOCALE, fmcTranslations, generationDate, generationUrl)
+                    val zip = WCIFDataBuilder.wcifToZip(wcif, pdfPassword, versionTag, Translate.DEFAULT_LOCALE, generationDate, generationUrl)
                     val bytes = zip.compress(zipPassword)
 
                     backend.onProgress(WORKER_PDF)

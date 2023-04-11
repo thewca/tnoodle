@@ -1,7 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles
 
 import kotlinx.coroutines.*
-import kotlinx.serialization.decodeFromString
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.ThrowingSupplier
@@ -46,7 +45,7 @@ class APIIntegrationTest {
 
                 val computationTime = measureTimeMillis {
                     println("[$it] Single PDF rendered successfully. On to compiling the ZIP…")
-                    val completeZip = WCIFDataBuilder.wcifToZip(scrambledWcif, null, "JUnit-Test", Translate.DEFAULT_LOCALE, emptyList(), generationDate, "https://test.local")
+                    val completeZip = WCIFDataBuilder.wcifToZip(scrambledWcif, null, "JUnit-Test", Translate.DEFAULT_LOCALE, generationDate, "https://test.local")
                     Assertions.assertTrue(completeZip.allFiles.isNotEmpty())
                     val compiledZip = Assertions.assertDoesNotThrow(ThrowingSupplier { completeZip.compress() })
                     Assertions.assertTrue(compiledZip.isNotEmpty())

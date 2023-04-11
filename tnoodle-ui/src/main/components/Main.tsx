@@ -17,28 +17,21 @@ import Interceptor from "./Interceptor";
 import "./Main.css";
 import VersionInfo from "./VersionInfo";
 import WebsocketBlobResult from "../model/WebsocketBlobResult";
+import { frontentStatusExtensionId } from "../util/wcif.util";
 
 const Main = () => {
     const [competitionNameFileZip, setCompetitionNameFileZip] = useState("");
-    const mbld = useSelector((state: RootState) => state.mbldSlice.mbld);
     const password = useSelector(
         (state: RootState) => state.scramblingSlice.password
     );
-    const translations = useSelector(
-        (state: RootState) => state.fmcSlice.translations
+    const wcif = useSelector(
+        (state: RootState) => state.wcifSlice.wcif
     );
-    const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
     const competitionId = useSelector(
         (state: RootState) => state.competitionSlice.competitionId
     );
     const generatingScrambles = useSelector(
         (state: RootState) => state.scramblingSlice.generatingScrambles
-    );
-    const isValidSignedBuild = useSelector(
-        (state: RootState) => state.scramblingSlice.isValidSignedBuild
-    );
-    const isAllowedVersion = useSelector(
-        (state: RootState) => state.scramblingSlice.isAllowedVersion
     );
     const fileZip = useSelector(
         (state: RootState) => state.scramblingSlice.fileZip
@@ -76,21 +69,11 @@ const Main = () => {
             onScrambleProgress
         );
 
-        let frontendStatus = {
-            isStaging: isUsingStaging(),
-            isManual: competitionId == null,
-            isSignedBuild: isValidSignedBuild,
-            isAllowedVersion: isAllowedVersion,
-        };
-
         tnoodleApi
             .fetchZip(
                 scrambleClient,
                 wcif,
-                mbld,
                 password,
-                frontendStatus,
-                translations
             )
             .then((plainZip: WebsocketBlobResult) =>
                 dispatch(setFileZip(plainZip))
@@ -107,6 +90,10 @@ const Main = () => {
         // We use the unofficialZip to stamp .zip in order to prevent delegates / organizers mistakes.
         // If TNoodle version is not official (as per VersionInfo) or if we generate scrambles using
         // a competition from staging, add a [Unofficial]
+        let frontendStatusExtension = wcif.extensions.find((ext) => ext.id === frontentStatusExtensionId);
+
+        let isValidSignedBuild = frontendStatusExtension?.data.isSignedBuild;
+        let isAllowedVersion = frontendStatusExtension?.data.isAllowedVersion;
 
         let officialZipStatus = isValidSignedBuild && isAllowedVersion;
 

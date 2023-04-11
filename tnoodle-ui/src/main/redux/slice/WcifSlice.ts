@@ -6,6 +6,8 @@ import WcifEvent from "../../model/WcifEvent";
 import { competitionName2Id } from "../../util/competition.name.util";
 import {
     copiesExtensionId,
+    fmcTranslationsExtensionId,
+    mbldCubesExtensionId,
     defaultWcif,
     getDefaultCopiesExtension,
 } from "../../util/wcif.util";
@@ -41,7 +43,7 @@ export const wcifSlice = createSlice({
         setEditingStatus: (state, action: PayloadAction<boolean>) => {
             state.editingStatus = action.payload;
         },
-        setWcaEvent: (state, action: PayloadAction<WcifEvent>) => {
+        setWcifEvent: (state, action: PayloadAction<WcifEvent>) => {
             state.wcif = {
                 ...state.wcif,
                 events: [
@@ -75,6 +77,11 @@ export const wcifSlice = createSlice({
                             getDefaultCopiesExtension(),
                         ],
                     })),
+                    extensions: [
+                        ...event.extensions.filter(
+                            (it) => it.id !== fmcTranslationsExtensionId && it.id !== mbldCubesExtensionId
+                        )
+                    ]
                 })),
             };
         },
@@ -84,7 +91,7 @@ export const wcifSlice = createSlice({
 export const {
     setCompetitionName,
     setEditingStatus,
-    setWcaEvent,
+    setWcifEvent,
     setWcaEvents,
     setWcaFormats,
     setWcif,

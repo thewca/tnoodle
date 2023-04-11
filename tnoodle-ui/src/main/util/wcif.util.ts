@@ -1,9 +1,18 @@
 import Wcif from "../model/Wcif";
 import WcifEvent from "../model/WcifEvent";
-import { getDefaultCompetitionName } from "../util/competition.name.util";
+import { getDefaultCompetitionName } from "./competition.name.util";
 
 export const copiesExtensionId =
     "org.worldcubeassociation.tnoodle.SheetCopyCount";
+export const colorSchemeExtensionId =
+    "org.worldcubeassociation.tnoodle.ColorScheme";
+export const frontentStatusExtensionId =
+    "org.worldcubeassociation.tnoodle.CompetitionStatus";
+export const fmcTranslationsExtensionId =
+    "org.worldcubeassociation.tnoodle.FmcLanguages";
+export const mbldCubesExtensionId =
+    "org.worldcubeassociation.tnoodle.MultiScrambleCount";
+
 /**
  * This is the default extension object the backend expects
  * @param {} copies
@@ -29,6 +38,7 @@ let default333: WcifEvent = {
             extensions: [getDefaultCopiesExtension()],
         },
     ],
+    extensions: [],
 };
 
 let name = getDefaultCompetitionName();
@@ -40,4 +50,5 @@ export const defaultWcif: Wcif = {
     events: [default333],
     persons: [],
     schedule: { numberOfDays: 0, venues: [] },
+    extensions: [],
 };

@@ -9,9 +9,11 @@ import {
     setCompetitionId,
     setCompetitions,
 } from "../redux/slice/CompetitionSlice";
-import { setSuggestedFmcTranslations } from "../redux/slice/FmcSlice";
 import { addCachedObject, setMe } from "../redux/slice/InformationSlice";
-import { setBestMbldAttempt } from "../redux/slice/MbldSlice";
+import {
+    setBestMbldAttempt,
+    setSuggestedFmcTranslations
+} from "../redux/slice/EventDataSlice";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
 import {
     setCompetitionName,
@@ -34,7 +36,9 @@ const SideBar = () => {
     const [loadingCompetitions, setLoadingCompetitions] = useState(false);
     const [loadingCompetitionInfo, setLoadingCompetitionInfo] = useState(false);
 
-    const me = useSelector((state: RootState) => state.informationSlice.me);
+    const me = useSelector(
+        (state: RootState) => state.informationSlice.me
+    );
     const competitions = useSelector(
         (state: RootState) => state.competitionSlice.competitions
     );
@@ -44,9 +48,10 @@ const SideBar = () => {
     const generatingScrambles = useSelector(
         (state: RootState) => state.scramblingSlice.generatingScrambles
     );
-    const [isOpen, setIsOpen] = useState(true);
 
     const dispatch = useDispatch();
+
+    const [isOpen, setIsOpen] = useState(true);
 
     const handleIsOpen = () => setIsOpen(window.innerWidth > 992);
 
@@ -56,6 +61,7 @@ const SideBar = () => {
         if (!wcaApi.isLogged()) {
             return;
         }
+
         if (!me) {
             setLoadingUser(true);
             wcaApi

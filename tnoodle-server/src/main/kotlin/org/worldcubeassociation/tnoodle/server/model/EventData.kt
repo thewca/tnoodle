@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.model
 
-enum class EventData(val key: String, val description: String, val scrambler: PuzzleData, val legalFormats: Set<FormatData>) {
+enum class EventData(val id: String, val description: String, val scrambler: PuzzleData, val legalFormats: Set<FormatData>) {
     THREE(PuzzleData.THREE, FormatData.BIG_AVERAGE_FORMATS),
     TWO(PuzzleData.TWO, FormatData.BIG_AVERAGE_FORMATS),
     FOUR(PuzzleData.FOUR, FormatData.BIG_AVERAGE_FORMATS),
@@ -22,7 +22,7 @@ enum class EventData(val key: String, val description: String, val scrambler: Pu
     constructor(scrambler: PuzzleData, legalFormats: Set<FormatData>) : this(scrambler.key, scrambler.description, scrambler, legalFormats)
 
     companion object {
-        val WCA_EVENTS = values().associateBy { it.key }.toSortedMap()
+        val WCA_EVENTS = values().associateBy { it.id }.toSortedMap()
 
         val ONE_HOUR_EVENTS = setOf(THREE_FM, THREE_MULTI_BLD)
         val ATTEMPT_BASED_EVENTS = setOf(THREE_FM, THREE_MULTI_BLD)

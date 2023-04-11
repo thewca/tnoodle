@@ -113,7 +113,7 @@ data class ActivityCode(val activityCodeString: String) : EventIdProvider {
         }
 
         fun compile(event: EventData, round: Int? = null, group: Int? = null, attempt: Int? = null) =
-            compile(event.key, round, group, attempt)
+            compile(event.id, round, group, attempt)
 
         override fun encodeInstance(instance: ActivityCode) = instance.activityCodeString
         override fun makeInstance(deserialized: String) = ActivityCode(deserialized)

@@ -1,24 +1,52 @@
 import { useDispatch, useSelector } from "react-redux";
-import { MBLD_MIN } from "../constants/wca.constants";
+import { MBLD_DEFAULT, MBLD_MIN } from "../constants/wca.constants";
 import RootState from "../model/RootState";
-import { setMbld } from "../redux/slice/MbldSlice";
+import { setWcifEvent } from "../redux/slice/WcifSlice";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
+import WcifEvent from "../model/WcifEvent";
+import { mbldCubesExtensionId } from "../util/wcif.util";
+import { useCallback, useEffect, useState } from "react";
+import { useWriteEffect } from "../util/extension.util";
 
-const MbldDetail = () => {
-    const mbld = useSelector((state: RootState) => state.mbldSlice.mbld);
+interface MbldDetailProps {
+    mbldWcifEvent: WcifEvent;
+}
+
+const MbldDetail = ({ mbldWcifEvent } : MbldDetailProps) => {
     const bestMbldAttempt = useSelector(
-        (state: RootState) => state.mbldSlice.bestMbldAttempt
+        (state: RootState) => state.eventDataSlice.bestMbldAttempt
     );
     const generatingScrambles = useSelector(
         (state: RootState) => state.scramblingSlice.generatingScrambles
     );
 
+    const [mbld, setMbld] = useState<string>(
+        mbldWcifEvent.extensions.find(
+            (it) => it.id === mbldCubesExtensionId
+        )?.data?.requestedScrambles ?? MBLD_DEFAULT
+    );
+
     const dispatch = useDispatch();
 
-    const handleMbldChange = (newMbld: string) => {
-        dispatch(setMbld(newMbld));
-        dispatch(setFileZip());
-    };
+    const buildMbldExtension = useCallback(
+        () => {
+            return {
+                id: mbldCubesExtensionId,
+                specUrl: '',
+                data: { requestedScrambles: mbld }
+            };
+        }, [mbld]
+    )
+
+    useWriteEffect(
+        mbldWcifEvent,
+        mbldCubesExtensionId,
+        dispatch,
+        setWcifEvent,
+        buildMbldExtension
+    );
+
+    useEffect(() => { dispatch(setFileZip()) }, [dispatch, buildMbldExtension]);
 
     return (
         <tfoot>
@@ -31,7 +59,7 @@ const MbldDetail = () => {
                         className="form-control bg-dark text-white"
                         type="number"
                         value={mbld}
-                        onChange={(e) => handleMbldChange(e.target.value)}
+                        onChange={(e) => setMbld(e.target.value)}
                         min={MBLD_MIN}
                         required
                         disabled={generatingScrambles}

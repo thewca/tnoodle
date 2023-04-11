@@ -1,13 +1,11 @@
 import axios from "axios";
 import BestMbld from "../model/BestMbld";
 import RunningVersion from "../model/RunningVersion";
-import Translation from "../model/Translation";
 import WcaEvent from "../model/WcaEvent";
 import WcaFormat from "../model/WcaFormat";
 import Wcif from "../model/Wcif";
 import { ScrambleClient } from "./tnoodle.socket";
 import WebsocketBlobResult from "../model/WebsocketBlobResult";
-import FrontendStatus from "../model/FrontendStatus";
 import ScrambleAndImage from "../model/ScrambleAndImage";
 
 let backendUrl = new URL("http://localhost:2014");
@@ -26,21 +24,6 @@ let solvedPuzzleSvgEndpoint = (eventId: string) =>
     `/frontend/puzzle/${eventId}/svg`;
 let wcaEventsEndpoint = "/frontend/data/events";
 let formatsEndpoint = "/frontend/data/formats";
-
-/**
- * Builds the object expected for FMC translations
- * @param {array} translations e.g. ["de", "da", "pt-BR"]
- */
-const fmcTranslationsHelper = (translations?: Translation[]) => {
-    if (!translations) {
-        return null;
-    }
-    return {
-        languageTags: translations
-            .filter((translation) => translation.status)
-            .map((translation) => translation.id),
-    };
-};
 
 class TnoodleApi {
     fetchWcaEvents = () =>
@@ -92,17 +75,11 @@ class TnoodleApi {
     fetchZip = (
         scrambleClient: ScrambleClient,
         wcif: Wcif,
-        mbld: string,
         password: string,
-        status: FrontendStatus,
-        translations?: Translation[]
     ) => {
         let payload = {
             wcif,
-            multiCubes: { requestedScrambles: mbld },
-            fmcLanguages: fmcTranslationsHelper(translations),
             zipPassword: !password ? null : password,
-            frontendStatus: status,
         };
 
         return scrambleClient.loadScrambles(zipEndpoint, payload, wcif.id);

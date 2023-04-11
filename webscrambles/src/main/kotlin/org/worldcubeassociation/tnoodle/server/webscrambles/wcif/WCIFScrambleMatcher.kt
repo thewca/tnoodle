@@ -188,9 +188,6 @@ object WCIFScrambleMatcher {
 
     // EXTENSION HANDLING -----
 
-    fun installExtensions(wcif: Competition, ext: Map<ExtensionBuilder, EventData>) =
-        ext.entries.fold(wcif) { acc, e -> installExtensionForEvents(acc, e.key, e.value) }
-
     fun installExtensionForEvents(wcif: Competition, ext: ExtensionBuilder, event: EventData): Competition {
         fun installRoundExtension(e: Event): Event {
             val extendedRounds = e.rounds.map { r ->
@@ -201,7 +198,7 @@ object WCIFScrambleMatcher {
         }
 
         val extendedEvents = wcif.events.map { e ->
-            e.takeUnless { it.id == event.key }
+            e.takeUnless { it.id == event.id }
                 ?: installRoundExtension(e)
         }
 

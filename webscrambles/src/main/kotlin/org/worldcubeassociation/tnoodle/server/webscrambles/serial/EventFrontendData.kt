@@ -17,7 +17,7 @@ data class EventFrontendData(
     companion object {
         fun fromDataModel(event: EventData): EventFrontendData {
             return EventFrontendData(
-                event.key,
+                event.id,
                 event.description,
                 event.legalFormats.map { it.key },
                 event !in EventData.ONE_HOUR_EVENTS,

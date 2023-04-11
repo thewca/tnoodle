@@ -1,9 +1,8 @@
-import Extension from "./Extension";
+import { Extendable } from "./Extension";
 
-export default interface Round {
+export default interface Round extends Extendable {
     format: string;
     id: string;
     scrambleSetCount: string;
-    extensions: Extension[];
     timeLimit?: number | null;
 }
