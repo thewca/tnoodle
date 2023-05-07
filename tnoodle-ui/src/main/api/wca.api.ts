@@ -87,9 +87,13 @@ class WcaApi {
         this.wcaApiFetch<Wcif>(`/competitions/${competitionId}/wcif`);
 
     getUpcomingManageableCompetitions = () => {
-        let oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        const params = new URLSearchParams({
+            managed_by_me: true.toString(),
+            start: oneWeekAgo.toISOString(),
+        });
         return this.wcaApiFetch<Competition[]>(
-            `/competitions?managed_by_me=true&start=${oneWeekAgo.toISOString()}`
+            `/competitions?${params.toString()}`
         );
     };
 
