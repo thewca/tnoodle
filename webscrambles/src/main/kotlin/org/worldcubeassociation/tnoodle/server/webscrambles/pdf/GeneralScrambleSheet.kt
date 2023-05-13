@@ -9,6 +9,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.ScramblePhrase
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.ScrambleRow
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
+import org.worldcubeassociation.tnoodle.svglite.Color
 import java.util.*
 import kotlin.math.ceil
 import kotlin.math.max
@@ -20,8 +21,9 @@ class GeneralScrambleSheet(
     activityCode: ActivityCode,
     hasGroupId: Boolean,
     locale: Locale,
-    watermark: String? = null
-) : ScrambleSheet(competitionTitle, activityCode, hasGroupId, locale, watermark) {
+    watermark: String? = null,
+    colorScheme: Map<String, Color>? = null,
+) : ScrambleSheet(competitionTitle, activityCode, hasGroupId, locale, watermark, colorScheme) {
     override val scrambles: List<Scramble>
         get() = scrambleSet.allScrambles
 

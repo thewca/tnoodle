@@ -6,11 +6,13 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcSolutionSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.GeneralScrambleSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.ScrambleSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.Document
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder.pickWatermarkPhrase
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.ScrambleZip
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.util.StringUtil.withUniqueTitles
+import org.worldcubeassociation.tnoodle.svglite.Color
 import java.time.LocalDateTime
 import java.util.*
 
@@ -24,14 +26,11 @@ object WCIFDataBuilder {
         versionTag: String,
         locale: Locale
     ): List<ScrambleSheet> {
-        val frontendStatus = findExtension<TNoodleStatusExtension>()
-        val frontendWatermark = frontendStatus?.pickWatermarkPhrase()
-
         return events.flatMap { e ->
             e.rounds.flatMap { r ->
                 r.scrambleSets.withIndex()
                     .flatMap { (groupNum, scrSet) ->
-                        scrambleSetToDocuments(this, e, r, groupNum, scrSet, versionTag, locale, frontendWatermark)
+                        scrambleSetToDocuments(this, e, r, groupNum, scrSet, versionTag, locale)
                     }
             }
         }
@@ -45,8 +44,13 @@ object WCIFDataBuilder {
         scrambleSet: ScrambleSet,
         versionTag: String,
         locale: Locale,
-        watermark: String? = null
     ): List<ScrambleSheet> {
+        val frontendStatus = comp.findExtension<TNoodleStatusExtension>()
+        val watermark = frontendStatus?.pickWatermarkPhrase()
+
+        val frontendColorScheme = event.findExtension<ColorSchemeExtension>()
+        val colorScheme = frontendColorScheme?.colorScheme
+
         val baseCode = round.idCode.copyParts(groupNumber = group)
 
         when (event.eventModel) {
@@ -60,7 +64,16 @@ object WCIFDataBuilder {
                         extraScrambles = listOf()
                     )
 
-                    makeGenericSheet(comp, round, attemptScrambles, attemptCode, versionTag, locale, watermark)
+                    makeGenericSheet(
+                        comp,
+                        round,
+                        attemptScrambles,
+                        attemptCode,
+                        versionTag,
+                        locale,
+                        watermark,
+                        colorScheme
+                    )
                 }
             }
 
@@ -77,13 +90,14 @@ object WCIFDataBuilder {
                         attemptCode,
                         hasGroupId,
                         locale,
-                        watermark
+                        watermark,
+                        colorScheme
                     )
                 }
             }
 
             else -> {
-                val genericSheet = makeGenericSheet(comp, round, scrambleSet, baseCode, versionTag, locale, watermark)
+                val genericSheet = makeGenericSheet(comp, round, scrambleSet, baseCode, versionTag, locale, watermark, colorScheme)
                 return listOf(genericSheet)
             }
         }
@@ -103,9 +117,11 @@ object WCIFDataBuilder {
         activityCode: ActivityCode,
         versionTag: String,
         locale: Locale,
-        watermark: String?
+        watermark: String?,
+        colorScheme: Map<String, Color>?,
     ): GeneralScrambleSheet {
         val hasGroupId = round.scrambleSetCount > 1
+
         return GeneralScrambleSheet(
             scrambleSet,
             versionTag,
@@ -113,7 +129,8 @@ object WCIFDataBuilder {
             activityCode,
             hasGroupId,
             locale,
-            watermark
+            watermark,
+            colorScheme
         )
     }
 

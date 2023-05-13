@@ -2,6 +2,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.pdf
 
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
+import org.worldcubeassociation.tnoodle.svglite.Color
 import java.util.Locale
 
 abstract class FewestMovesSheet(
@@ -12,8 +13,9 @@ abstract class FewestMovesSheet(
     activityCode: ActivityCode,
     hasGroupId: Boolean,
     locale: Locale,
-    watermark: String?
-) : ScrambleSheet(competitionTitle, activityCode, hasGroupId, locale, watermark) {
+    watermark: String?,
+    colorScheme: Map<String, Color>?,
+) : ScrambleSheet(competitionTitle, activityCode, hasGroupId, locale, watermark, colorScheme) {
     override val scrambles: List<Scramble>
         get() = listOfNotNull(scramble)
 

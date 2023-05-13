@@ -13,6 +13,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFScrambleMatcher
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
+import org.worldcubeassociation.tnoodle.svglite.Color
 import java.util.*
 
 class FmcSolutionSheet(
@@ -23,8 +24,9 @@ class FmcSolutionSheet(
     activityCode: ActivityCode,
     hasGroupId: Boolean,
     locale: Locale,
-    watermark: String? = null
-) : FewestMovesSheet(scramble, totalAttemptsNum, scrambleSetId, competitionTitle, activityCode, hasGroupId, locale, watermark) {
+    watermark: String? = null,
+    colorScheme: Map<String, Color>? = null,
+) : FewestMovesSheet(scramble, totalAttemptsNum, scrambleSetId, competitionTitle, activityCode, hasGroupId, locale, watermark, colorScheme) {
     private val drawScramble: Boolean
         get() = scramble.scrambleString.isNotEmpty()
 
