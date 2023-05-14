@@ -8,13 +8,15 @@ import {
     setSuggestedFmcTranslations
 } from "../main/redux/slice/EventDataSlice";
 import {
+    colorScheme, emptySvg,
     events,
     formats,
-    languages,
-    version,
+    languages, scrambleAndImage,
+    version
 } from "./mock/tnoodle.api.test.mock";
 import { axiosResponse, getNewStore } from "./mock/util.test.mock";
 import { scrambleProgram } from "./mock/wca.api.test.mock";
+import { getFmcLanguageTags } from "./util/extension.test.util";
 
 let container = document.createElement("div");
 beforeEach(() => {
@@ -38,6 +40,9 @@ afterEach(() => {
 
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
     jest.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
+    jest.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockRestore();
+    jest.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockRestore();
+    jest.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockRestore();
 });
 
 it("There should be only 1 button of type submit, check FMC changes", async () => {
@@ -55,12 +60,24 @@ it("There should be only 1 button of type submit, check FMC changes", async () =
         Promise.resolve({ data: formats, ...axiosResponse })
     );
 
-    jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockImplementation(
-        () => Promise.resolve({ data: languages, ...axiosResponse })
+    jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockImplementation(() =>
+        Promise.resolve({ data: languages, ...axiosResponse })
     );
 
-    const suggestedFmcTranslations = ["de", "en", "pt-BR"];
+    jest.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockImplementation(() =>
+        Promise.resolve({ data: colorScheme, ...axiosResponse })
+    );
 
+    jest.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockImplementation(() =>
+        Promise.resolve({ data: scrambleAndImage, ...axiosResponse })
+    );
+
+    jest.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockImplementation(() =>
+        Promise.resolve({ data: emptySvg, ...axiosResponse })
+    );
+
+    // We add suggested FMC so the button Select Suggested appears as well
+    const suggestedFmcTranslations = ["de", "en", "pt-BR"];
     store.dispatch(setSuggestedFmcTranslations(suggestedFmcTranslations));
 
     // Render component
@@ -120,49 +137,48 @@ it("There should be only 1 button of type submit, check FMC changes", async () =
     expect(buttonsTypeSubmit[0].innerHTML).toBe("Generate Scrambles");
 
     // At first, all translations should be selected
-    // TODO expect(translation.status).toEqual(true);
+    expect(getFmcLanguageTags(store)).toEqual(Object.keys(languages));
 
     // Select suggested
     await act(async () => {
         fireEvent.click(completeButtons[completeButtons.length - 1]);
     });
 
-    // TODO
-    //expect(translation.status).toEqual(
-    //    suggestedFmcTranslations.indexOf(translation.id) >= 0
-    //);
+    expect(getFmcLanguageTags(store)).toEqual(suggestedFmcTranslations);
 
     // Select None
     await act(async () => {
         fireEvent.click(completeButtons[completeButtons.length - 2]);
     });
-    // TODO expect(translation.status).toEqual(false);
+
+    expect(getFmcLanguageTags(store)).toEqual([]);
 
     // Select All
     await act(async () => {
         fireEvent.click(completeButtons[completeButtons.length - 3]);
     });
 
-    // TODO expect(translation.status).toEqual(true);
+    expect(getFmcLanguageTags(store)).toEqual(Object.keys(languages));
 
     // Here, we test just a single random language toggle
     let index = Math.floor(Math.random() * Object.keys(languages).length);
+    let language = Object.keys(languages)[index];
     const checkbox = Array.from(
         container.querySelectorAll("input[type=checkbox]")
     )[index] as HTMLInputElement;
     expect(checkbox.id).toBe(
-        "fmc-" + Object.keys(languages)[index]
+        "fmc-" + language
     );
 
     // Check toggle behavior and its value in the store
     expect(checkbox.checked).toBe(true);
-    // TODO expect(store.getState().fmcSlice.translations![index].status).toBe(true);
+    expect(getFmcLanguageTags(store)).toContain(language);
     fireEvent.click(checkbox);
     expect(checkbox.checked).toBe(false);
-    // TODO expect(store.getState().fmcSlice.translations![index].status).toBe(false);
+    expect(getFmcLanguageTags(store)).not.toContain(language);
     fireEvent.click(checkbox);
     expect(checkbox.checked).toBe(true);
-    // TODO expect(store.getState().fmcSlice.translations![index].status).toBe(true);
+    expect(getFmcLanguageTags(store)).toContain(language);
 
     // Clear mock fetchWcaEvents
     // Clear mock

@@ -4,9 +4,22 @@ import { Provider } from "react-redux";
 import tnoodleApi from "../main/api/tnoodle.api";
 import EventPickerTable from "../main/components/EventPickerTable";
 import { setCompetitionId } from "../main/redux/slice/CompetitionSlice";
-import { setEditingStatus, setWcifEvent } from "../main/redux/slice/WcifSlice";
-import { getDefaultCopiesExtension, mbldCubesExtensionId } from "../main/util/wcif.util";
-import { events, formats, languages } from "./mock/tnoodle.api.test.mock";
+import {
+    setEditingStatus,
+    setWcifEvent,
+} from "../main/redux/slice/WcifSlice";
+import {
+    getDefaultCopiesExtension,
+    mbldCubesExtensionId,
+} from "../main/util/wcif.util";
+import {
+    colorScheme,
+    emptySvg,
+    events,
+    formats,
+    languages,
+    scrambleAndImage,
+} from "./mock/tnoodle.api.test.mock";
 import { axiosResponse, getNewStore } from "./mock/util.test.mock";
 import { competitions } from "./mock/wca.api.test.mock";
 
@@ -30,6 +43,18 @@ beforeEach(() => {
     jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockImplementation(
         () => Promise.resolve({ data: languages, ...axiosResponse })
     );
+
+    jest.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockImplementation(() =>
+        Promise.resolve({ data: colorScheme, ...axiosResponse })
+    );
+
+    jest.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockImplementation(() =>
+        Promise.resolve({ data: scrambleAndImage, ...axiosResponse })
+    );
+
+    jest.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockImplementation(() =>
+        Promise.resolve({ data: emptySvg, ...axiosResponse })
+    );
 });
 
 afterEach(() => {
@@ -41,6 +66,9 @@ afterEach(() => {
     jest.spyOn(tnoodleApi, "fetchWcaEvents").mockRestore();
     jest.spyOn(tnoodleApi, "fetchFormats").mockRestore();
     jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockRestore();
+    jest.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockRestore();
+    jest.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockRestore();
+    jest.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockRestore();
 });
 
 it("Show editing warn if case of competition selected", async () => {

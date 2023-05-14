@@ -245,3 +245,19 @@ export const bestMbldAttempt = {
     attempted: 60,
     time: 3012,
 };
+
+export const emptySvg = "<svg></svg>"
+
+export const colorScheme = {
+    'U': '#FFFFFF',
+    'F': '#00FF00',
+    'R': '#FF0000',
+    'D': '#FFFF00',
+    'B': '#0000FF',
+    'L': '#FF8000',
+}
+
+export const scrambleAndImage = {
+    scramble: "R U R' U' R' F R2 U' R' U' R U R' F'",
+    svgImage: emptySvg
+}
