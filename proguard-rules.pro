@@ -10,6 +10,8 @@
 # cf. https://github.com/ktorio/ktor-samples/tree/master/other/proguard
 -keep class org.worldcubeassociation.tnoodle.server.** { *; }
 -keep class io.ktor.server.netty.Netty { *; }
+-keep class io.ktor.server.config.** { *; }
+-keep class io.ktor.serialization.** { *; }
 -keep class kotlin.reflect.jvm.internal.** { *; }
 -keep class kotlin.text.RegexOption { *; }
 

@@ -1,6 +1,6 @@
 [versions]
-kotlin = "1.8.20"
-ktor = "2.2.4"
+kotlin = "1.8.21"
+ktor = "2.3.0"
 kotless = "0.1.6"
 junit-jupiter = "5.9.2"
 batik = "1.16"
@@ -19,9 +19,9 @@ system-tray = { module = "com.dorkbox:SystemTray", version = "4.2.1" }
 bouncycastle = { module = "org.bouncycastle:bcprov-jdk15on", version = "1.70" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter" }
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.5.0" }
-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.6.4" }
-kotlinx-atomicfu-gradle = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version = "0.20.1" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.5.1" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.7.1" }
+kotlinx-atomicfu-gradle = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version = "0.20.2" }
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-server-servlet = { module = "io.ktor:ktor-server-servlet", version.ref = "ktor" }
@@ -32,16 +32,16 @@ ktor-server-status-pages = { module = "io.ktor:ktor-server-status-pages", versio
 ktor-server-cors = { module = "io.ktor:ktor-server-cors", version.ref = "ktor" }
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
-logback-classic = { module = "ch.qos.logback:logback-classic", version = "1.4.6" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version = "1.4.7" }
 kotlin-argparser = { module = "com.xenomachina:kotlin-argparser", version = "2.0.7" }
 proguard-gradle = { module = "com.guardsquare:proguard-gradle", version = "7.3.2" }
 wca-i18n = { module = "com.github.thewca:wca_i18n", version = "0.4.3" }
 google-appengine-gradle = { module = "com.google.cloud.tools:appengine-gradle-plugin", version = "2.4.5" }
-google-cloud-storage = { module = "com.google.cloud:google-cloud-storage", version = "2.21.0" }
+google-cloud-storage = { module = "com.google.cloud:google-cloud-storage", version = "2.22.2" }
 tnoodle-scrambles = { module = "org.worldcubeassociation.tnoodle:lib-scrambles", version = "0.18.1" }
 apache-commons-lang3 = { module = "org.apache.commons:commons-lang3", version = "3.12.0" }
 kotless-ktor = { module = "io.kotless:ktor-lang", version.ref = "kotless" }
-mockk = { module = "io.mockk:mockk", version = "1.13.4" }
+mockk = { module = "io.mockk:mockk", version = "1.13.5" }
 eclipse-jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version = "6.2.0.202206071550-r" }
 
 [bundles]
