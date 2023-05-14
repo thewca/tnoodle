@@ -16,36 +16,31 @@ export const findAndProcessExtension = <T extends Extendable>(
     if (extension !== undefined) {
         processExtension(extension);
     }
-}
+};
 
 export const removeExtension = <T extends Extendable>(
     extendable: T,
-    extensionId: string,
+    extensionId: string
 ) => {
     return {
         ...extendable,
         extensions: [
-            ...extendable.extensions.filter(
-                (it) => it.id !== extensionId
-            )
-        ]
+            ...extendable.extensions.filter((it) => it.id !== extensionId),
+        ],
     };
 };
 
 export const upsertExtension = <T extends Extendable>(
     extendable: T,
-    extension: Extension,
+    extension: Extension
 ) => {
     let withoutExtension = removeExtension(extendable, extension.id);
 
     return {
         ...withoutExtension,
-        extensions: [
-            ...withoutExtension.extensions,
-            extension
-        ]
+        extensions: [...withoutExtension.extensions, extension],
     };
-}
+};
 
 export const setExtensionLazily = <T extends Extendable>(
     extendable: T,
@@ -64,7 +59,10 @@ export const setExtensionLazily = <T extends Extendable>(
             handleOnChange(removedExtendable);
         }
     } else {
-        let extensionDataEqual = _.isEqual(oldExtension?.data, newExtension.data);
+        let extensionDataEqual = _.isEqual(
+            oldExtension?.data,
+            newExtension.data
+        );
 
         // did the extension data update?
         if (!extensionDataEqual) {
@@ -72,4 +70,4 @@ export const setExtensionLazily = <T extends Extendable>(
             handleOnChange(newExtendable);
         }
     }
-}
+};

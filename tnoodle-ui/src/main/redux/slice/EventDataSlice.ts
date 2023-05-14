@@ -29,7 +29,5 @@ export const eventDataSlice = createSlice({
     },
 });
 
-export const {
-    setSuggestedFmcTranslations,
-    setBestMbldAttempt
-} = eventDataSlice.actions;
+export const { setSuggestedFmcTranslations, setBestMbldAttempt } =
+    eventDataSlice.actions;

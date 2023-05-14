@@ -4,15 +4,15 @@ import { Provider } from "react-redux";
 import tnoodleApi from "../main/api/tnoodle.api";
 import wcaApi from "../main/api/wca.api";
 import Main from "../main/components/Main";
+import { setSuggestedFmcTranslations } from "../main/redux/slice/EventDataSlice";
 import {
-    setSuggestedFmcTranslations
-} from "../main/redux/slice/EventDataSlice";
-import {
-    colorScheme, emptySvg,
+    colorScheme,
+    emptySvg,
     events,
     formats,
-    languages, scrambleAndImage,
-    version
+    languages,
+    scrambleAndImage,
+    version,
 } from "./mock/tnoodle.api.test.mock";
 import { axiosResponse, getNewStore } from "./mock/util.test.mock";
 import { scrambleProgram } from "./mock/wca.api.test.mock";
@@ -60,8 +60,8 @@ it("There should be only 1 button of type submit, check FMC changes", async () =
         Promise.resolve({ data: formats, ...axiosResponse })
     );
 
-    jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockImplementation(() =>
-        Promise.resolve({ data: languages, ...axiosResponse })
+    jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockImplementation(
+        () => Promise.resolve({ data: languages, ...axiosResponse })
     );
 
     jest.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockImplementation(() =>
@@ -166,9 +166,7 @@ it("There should be only 1 button of type submit, check FMC changes", async () =
     const checkbox = Array.from(
         container.querySelectorAll("input[type=checkbox]")
     )[index] as HTMLInputElement;
-    expect(checkbox.id).toBe(
-        "fmc-" + language
-    );
+    expect(checkbox.id).toBe("fmc-" + language);
 
     // Check toggle behavior and its value in the store
     expect(checkbox.checked).toBe(true);

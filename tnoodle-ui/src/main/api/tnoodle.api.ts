@@ -75,7 +75,7 @@ class TnoodleApi {
     fetchZip = (
         scrambleClient: ScrambleClient,
         wcif: Wcif,
-        password: string,
+        password: string
     ) => {
         let payload = {
             wcif,

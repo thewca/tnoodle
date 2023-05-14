@@ -9,16 +9,15 @@ import RootState from "../model/RootState";
 import { setExtensionLazily } from "../util/extension.util";
 
 const VersionInfo = () => {
-    const wcif = useSelector(
-        (state: RootState) => state.wcifSlice.wcif
-    );
+    const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
     const competitionId = useSelector(
         (state: RootState) => state.competitionSlice.competitionId
     );
 
     // WCA API response
     const [currentTnoodle, setCurrentTnoodle] = useState<CurrentTnoodle>();
-    const [allowedTnoodleVersions, setAllowedTnoodleVersions] = useState<string[]>();
+    const [allowedTnoodleVersions, setAllowedTnoodleVersions] =
+        useState<string[]>();
     const [wcaPublicKeyBytes, setWcaPublicKeyBytes] = useState<string>();
 
     // TNoodle backend API response
@@ -41,9 +40,10 @@ const VersionInfo = () => {
         });
 
         tnoodleApi.fetchRunningVersion().then((response) => {
-            let versionString = !!response.data.projectName && !!response.data.projectVersion
-                ? `${response.data.projectName}-${response.data.projectVersion}`
-                : "";
+            let versionString =
+                !!response.data.projectName && !!response.data.projectVersion
+                    ? `${response.data.projectName}-${response.data.projectVersion}`
+                    : "";
 
             setRunningVersion(versionString);
             setSignedBuild(response.data.signedBuild);
@@ -52,7 +52,11 @@ const VersionInfo = () => {
     }, [dispatch]);
 
     useEffect(() => {
-        if (signedBuild === undefined || signatureKeyBytes === undefined || wcaPublicKeyBytes === undefined) {
+        if (
+            signedBuild === undefined ||
+            signatureKeyBytes === undefined ||
+            wcaPublicKeyBytes === undefined
+        ) {
             return;
         }
 
@@ -62,34 +66,38 @@ const VersionInfo = () => {
     }, [signedBuild, signatureKeyBytes, wcaPublicKeyBytes]);
 
     useEffect(() => {
-        if (allowedTnoodleVersions === undefined || runningVersion === undefined) {
+        if (
+            allowedTnoodleVersions === undefined ||
+            runningVersion === undefined
+        ) {
             return;
         }
 
-        setVersionAllowed(
-            allowedTnoodleVersions.includes(runningVersion)
-        );
+        setVersionAllowed(allowedTnoodleVersions.includes(runningVersion));
     }, [allowedTnoodleVersions, runningVersion]);
 
-    const buildFrontendStatusExtension = useCallback(
-        () => {
-            return {
-                id: frontendStatusExtensionId,
-                specUrl: "",
-                data: {
-                    isStaging: isUsingStaging(),
-                    isManual: competitionId == null,
-                    isSignedBuild: signatureValid,
-                    isAllowedVersion: versionAllowed
-                }
-            };
-        }, [competitionId, signatureValid, versionAllowed]
-    );
+    const buildFrontendStatusExtension = useCallback(() => {
+        return {
+            id: frontendStatusExtensionId,
+            specUrl: "",
+            data: {
+                isStaging: isUsingStaging(),
+                isManual: competitionId == null,
+                isSignedBuild: signatureValid,
+                isAllowedVersion: versionAllowed,
+            },
+        };
+    }, [competitionId, signatureValid, versionAllowed]);
 
     useEffect(() => {
-        setExtensionLazily(wcif, frontendStatusExtensionId, buildFrontendStatusExtension, (wcif) => {
-            dispatch(setWcif(wcif));
-        });
+        setExtensionLazily(
+            wcif,
+            frontendStatusExtensionId,
+            buildFrontendStatusExtension,
+            (wcif) => {
+                dispatch(setWcif(wcif));
+            }
+        );
     }, [dispatch, wcif, buildFrontendStatusExtension]);
 
     // We cannot analyze TNoodle version here. We do not bother the user.

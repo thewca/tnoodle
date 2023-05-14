@@ -79,9 +79,11 @@ export const wcifSlice = createSlice({
                     })),
                     extensions: [
                         ...event.extensions.filter(
-                            (it) => it.id !== fmcTranslationsExtensionId && it.id !== mbldCubesExtensionId
-                        )
-                    ]
+                            (it) =>
+                                it.id !== fmcTranslationsExtensionId &&
+                                it.id !== mbldCubesExtensionId
+                        ),
+                    ],
                 })),
             };
         },

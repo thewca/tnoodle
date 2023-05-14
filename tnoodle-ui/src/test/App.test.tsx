@@ -17,7 +17,7 @@ import {
     languages,
     plainZip,
     scrambleAndImage,
-    version
+    version,
 } from "./mock/tnoodle.api.test.mock";
 import { axiosResponse, getNewStore } from "./mock/util.test.mock";
 import {
@@ -26,7 +26,10 @@ import {
     scrambleProgram,
     wcifs,
 } from "./mock/wca.api.test.mock";
-import { getFmcLanguageTags, getMbldCubesCount } from "./util/extension.test.util";
+import {
+    getFmcLanguageTags,
+    getMbldCubesCount,
+} from "./util/extension.test.util";
 
 let container = document.createElement("div");
 
@@ -398,7 +401,7 @@ it("Logged user", async () => {
             );
         });
 
-        let mbldExtensionCubesCount = getMbldCubesCount(store)
+        let mbldExtensionCubesCount = getMbldCubesCount(store);
 
         // We should warn in case of mbld
         if (

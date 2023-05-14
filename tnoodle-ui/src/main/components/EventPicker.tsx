@@ -10,7 +10,7 @@ import { setWcifEvent } from "../redux/slice/WcifSlice";
 import {
     colorSchemeExtensionId,
     copiesExtensionId,
-    getDefaultCopiesExtension
+    getDefaultCopiesExtension,
 } from "../util/wcif.util";
 import tnoodleApi from "../api/tnoodle.api";
 import "./EventPicker.css";
@@ -53,12 +53,15 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     );
 
     const [puzzleSvg, setPuzzleSvg] = useState<string>();
-    const [randomSampleScramble, setRandomSampleScramble] = useState<ScrambleAndImage>();
+    const [randomSampleScramble, setRandomSampleScramble] =
+        useState<ScrambleAndImage>();
 
-    const [defaultColorScheme, setDefaultColorScheme] = useState<Record<string, string>>();
+    const [defaultColorScheme, setDefaultColorScheme] =
+        useState<Record<string, string>>();
     const [colorScheme, setColorScheme] = useState<Record<string, string>>();
 
-    const [showColorSchemeConfig, setShowColorSchemeConfig] = useState<boolean>(false);
+    const [showColorSchemeConfig, setShowColorSchemeConfig] =
+        useState<boolean>(false);
 
     const fetchDisplayScramble = useCallback(
         (fetchNewScramble = true) => {
@@ -71,7 +74,8 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                         setRandomSampleScramble(response.data);
                     });
             }
-        }, [wcaEvent.puzzle_id, colorScheme]
+        },
+        [wcaEvent.puzzle_id, colorScheme]
     );
 
     useEffect(() => {
@@ -87,7 +91,10 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     }, [wcaEvent.puzzle_id, colorScheme, fetchDisplayScramble]);
 
     useEffect(() => {
-        let colorSchemeExtension = findExtension(wcifEvent, colorSchemeExtensionId);
+        let colorSchemeExtension = findExtension(
+            wcifEvent,
+            colorSchemeExtensionId
+        );
 
         if (colorSchemeExtension !== undefined) {
             setColorScheme(colorSchemeExtension.data.colorScheme);
@@ -114,7 +121,8 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         (newWcifEvent: WcifEvent) => {
             dispatch(setWcifEvent(newWcifEvent));
             dispatch(setFileZip());
-        }, [dispatch]
+        },
+        [dispatch]
     );
 
     const updateEventRounds = (rounds: Round[]) => {
@@ -127,14 +135,22 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     };
 
     const updateEventColorScheme = (colorScheme: Record<string, string>) => {
-        setExtensionLazily(wcifEvent, colorSchemeExtensionId, () => {
-            return buildColorSchemeExtension(colorScheme);
-        }, dispatchWcifEvent);
+        setExtensionLazily(
+            wcifEvent,
+            colorSchemeExtensionId,
+            () => {
+                return buildColorSchemeExtension(colorScheme);
+            },
+            dispatchWcifEvent
+        );
     };
 
     const buildColorSchemeExtension = useCallback(
         (colorScheme: Record<string, string>) => {
-            let isDefaultColorScheme = _.isEqual(colorScheme, defaultColorScheme);
+            let isDefaultColorScheme = _.isEqual(
+                colorScheme,
+                defaultColorScheme
+            );
 
             if (isDefaultColorScheme) {
                 return null;
@@ -142,10 +158,11 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
 
             return {
                 id: colorSchemeExtensionId,
-                specUrl: '',
-                data: { colorScheme }
+                specUrl: "",
+                data: { colorScheme },
             };
-        }, [defaultColorScheme]
+        },
+        [defaultColorScheme]
     );
 
     const handleNumberOfRoundsChange = (
@@ -221,12 +238,19 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         !!wcaFormats ? wcaFormats[str].shortName : "-";
 
     const updateForeignColorScheme = (wcaEvent: WcaEvent) => {
-        let wcifEvent = wcifEvents.find((wcifEvent) => wcifEvent.id === wcaEvent.id);
+        let wcifEvent = wcifEvents.find(
+            (wcifEvent) => wcifEvent.id === wcaEvent.id
+        );
 
         if (wcifEvent !== undefined && colorScheme !== undefined) {
-            setExtensionLazily(wcifEvent, colorSchemeExtensionId, () => {
-                return buildColorSchemeExtension(colorScheme);
-            }, dispatchWcifEvent);
+            setExtensionLazily(
+                wcifEvent,
+                colorSchemeExtensionId,
+                () => {
+                    return buildColorSchemeExtension(colorScheme);
+                },
+                dispatchWcifEvent
+            );
         }
     };
 
@@ -241,13 +265,22 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
 
         const defaultColors = _.uniq(Object.values(defaultColorScheme));
 
-        const samePuzzleEvents = wcaEvents?.filter((event) => {
-            return event.id !== wcaEvent.id && event.puzzle_id === wcaEvent.puzzle_id;
-        }) ?? [];
+        const samePuzzleEvents =
+            wcaEvents?.filter((event) => {
+                return (
+                    event.id !== wcaEvent.id &&
+                    event.puzzle_id === wcaEvent.puzzle_id
+                );
+            }) ?? [];
 
-        const samePuzzleGroupEvents = wcaEvents?.filter((event) => {
-            return wcaEvent.puzzle_group_id !== null && event.id !== wcaEvent.id && event.puzzle_group_id === wcaEvent.puzzle_group_id;
-        }) ?? [];
+        const samePuzzleGroupEvents =
+            wcaEvents?.filter((event) => {
+                return (
+                    wcaEvent.puzzle_group_id !== null &&
+                    event.id !== wcaEvent.id &&
+                    event.puzzle_group_id === wcaEvent.puzzle_group_id
+                );
+            }) ?? [];
 
         return (
             <tr className="thead-light">
@@ -280,7 +313,11 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                     <button
                                         type="button"
                                         className="btn btn-warning mr-4"
-                                        onClick={() => updateEventColorScheme(defaultColorScheme)}
+                                        onClick={() =>
+                                            updateEventColorScheme(
+                                                defaultColorScheme
+                                            )
+                                        }
                                     >
                                         Reset to default
                                     </button>
@@ -288,7 +325,14 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                         <button
                                             type="button"
                                             className="btn btn-secondary mr-1"
-                                            onClick={() => samePuzzleEvents.forEach((wcaEvent) => updateForeignColorScheme(wcaEvent))}
+                                            onClick={() =>
+                                                samePuzzleEvents.forEach(
+                                                    (wcaEvent) =>
+                                                        updateForeignColorScheme(
+                                                            wcaEvent
+                                                        )
+                                                )
+                                            }
                                         >
                                             Propagate to puzzle
                                         </button>
@@ -297,7 +341,14 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                         <button
                                             type="button"
                                             className="btn btn-secondary mr-1"
-                                            onClick={() => samePuzzleGroupEvents.forEach((wcaEvent) => updateForeignColorScheme(wcaEvent))}
+                                            onClick={() =>
+                                                samePuzzleGroupEvents.forEach(
+                                                    (wcaEvent) =>
+                                                        updateForeignColorScheme(
+                                                            wcaEvent
+                                                        )
+                                                )
+                                            }
                                         >
                                             Propagate to group
                                         </button>
@@ -525,9 +576,10 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                 {maybeShowTableTitles()}
             </thead>
             {maybeShowTableBody()}
-            {wcaEvent.is_multiple_blindfolded && wcifEvent.rounds.length > 0 && (
-                <MbldDetail mbldWcifEvent={wcifEvent} />
-            )}
+            {wcaEvent.is_multiple_blindfolded &&
+                wcifEvent.rounds.length > 0 && (
+                    <MbldDetail mbldWcifEvent={wcifEvent} />
+                )}
             {wcaEvent.is_fewest_moves && wcifEvent.rounds.length > 0 && (
                 <FmcTranslationsDetail fmcWcifEvent={wcifEvent} />
             )}

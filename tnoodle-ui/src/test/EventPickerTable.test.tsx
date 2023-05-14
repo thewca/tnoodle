@@ -4,10 +4,7 @@ import { Provider } from "react-redux";
 import tnoodleApi from "../main/api/tnoodle.api";
 import EventPickerTable from "../main/components/EventPickerTable";
 import { setCompetitionId } from "../main/redux/slice/CompetitionSlice";
-import {
-    setEditingStatus,
-    setWcifEvent,
-} from "../main/redux/slice/WcifSlice";
+import { setEditingStatus, setWcifEvent } from "../main/redux/slice/WcifSlice";
 import {
     getDefaultCopiesExtension,
     mbldCubesExtensionId,
@@ -92,7 +89,7 @@ it("Show editing warn if case of competition selected", async () => {
                 extensions: [getDefaultCopiesExtension()],
             },
         ],
-        extensions: []
+        extensions: [],
     };
     store.dispatch(setWcifEvent(newEvent));
 
@@ -188,8 +185,12 @@ it("Changes in MBLD should go to the store", async () => {
         });
     });
 
-    let mbldWcifEvent = store.getState().wcifSlice.wcif.events.find((event) => event.id === "333mbf")
-    let mbldExtensionCubesCount = mbldWcifEvent?.extensions?.find((extension) => extension.id === mbldCubesExtensionId)?.data['requestedScrambles']
+    let mbldWcifEvent = store
+        .getState()
+        .wcifSlice.wcif.events.find((event) => event.id === "333mbf");
+    let mbldExtensionCubesCount = mbldWcifEvent?.extensions?.find(
+        (extension) => extension.id === mbldCubesExtensionId
+    )?.data["requestedScrambles"];
 
     // It should go to the store
     expect(mbldExtensionCubesCount).toBe(newMbldScrambles);

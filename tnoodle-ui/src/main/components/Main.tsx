@@ -24,9 +24,7 @@ const Main = () => {
     const password = useSelector(
         (state: RootState) => state.scramblingSlice.password
     );
-    const wcif = useSelector(
-        (state: RootState) => state.wcifSlice.wcif
-    );
+    const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
     const competitionId = useSelector(
         (state: RootState) => state.competitionSlice.competitionId
     );
@@ -70,11 +68,7 @@ const Main = () => {
         );
 
         tnoodleApi
-            .fetchZip(
-                scrambleClient,
-                wcif,
-                password,
-            )
+            .fetchZip(scrambleClient, wcif, password)
             .then((plainZip: WebsocketBlobResult) =>
                 dispatch(setFileZip(plainZip))
             )
@@ -90,7 +84,9 @@ const Main = () => {
         // We use the unofficialZip to stamp .zip in order to prevent delegates / organizers mistakes.
         // If TNoodle version is not official (as per VersionInfo) or if we generate scrambles using
         // a competition from staging, add a [Unofficial]
-        let frontendStatusExtension = wcif.extensions.find((ext) => ext.id === frontendStatusExtensionId);
+        let frontendStatusExtension = wcif.extensions.find(
+            (ext) => ext.id === frontendStatusExtensionId
+        );
 
         let isValidSignedBuild = frontendStatusExtension?.data.isSignedBuild;
         let isAllowedVersion = frontendStatusExtension?.data.isAllowedVersion;

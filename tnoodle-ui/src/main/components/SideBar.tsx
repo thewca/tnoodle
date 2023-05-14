@@ -12,7 +12,7 @@ import {
 import { addCachedObject, setMe } from "../redux/slice/InformationSlice";
 import {
     setBestMbldAttempt,
-    setSuggestedFmcTranslations
+    setSuggestedFmcTranslations,
 } from "../redux/slice/EventDataSlice";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
 import {
@@ -36,9 +36,7 @@ const SideBar = () => {
     const [loadingCompetitions, setLoadingCompetitions] = useState(false);
     const [loadingCompetitionInfo, setLoadingCompetitionInfo] = useState(false);
 
-    const me = useSelector(
-        (state: RootState) => state.informationSlice.me
-    );
+    const me = useSelector((state: RootState) => state.informationSlice.me);
     const competitions = useSelector(
         (state: RootState) => state.competitionSlice.competitions
     );

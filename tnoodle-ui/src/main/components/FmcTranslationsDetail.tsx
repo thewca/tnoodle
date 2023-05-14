@@ -16,7 +16,9 @@ interface FmcTranslationsDetailProps {
     fmcWcifEvent: WcifEvent;
 }
 
-const FmcTranslationsDetail = ({ fmcWcifEvent } : FmcTranslationsDetailProps) => {
+const FmcTranslationsDetail = ({
+    fmcWcifEvent,
+}: FmcTranslationsDetailProps) => {
     const suggestedFmcTranslations = useSelector(
         (state: RootState) => state.eventDataSlice.suggestedFmcTranslations
     );
@@ -24,13 +26,20 @@ const FmcTranslationsDetail = ({ fmcWcifEvent } : FmcTranslationsDetailProps) =>
         (state: RootState) => state.scramblingSlice.generatingScrambles
     );
 
-    const [availableTranslations, setAvailableTranslations] = useState<Record<string, string>>({});
-    const [selectedTranslations, setSelectedTranslations] = useState<string[]>([]);
+    const [availableTranslations, setAvailableTranslations] = useState<
+        Record<string, string>
+    >({});
+    const [selectedTranslations, setSelectedTranslations] = useState<string[]>(
+        []
+    );
 
     const [showTranslations, setShowTranslations] = useState(false);
 
     useEffect(() => {
-        let fmcTranslationsExtension = findExtension(fmcWcifEvent, fmcTranslationsExtensionId);
+        let fmcTranslationsExtension = findExtension(
+            fmcWcifEvent,
+            fmcTranslationsExtensionId
+        );
 
         if (fmcTranslationsExtension !== undefined) {
             setSelectedTranslations(fmcTranslationsExtension.data.languageTags);
@@ -41,32 +50,37 @@ const FmcTranslationsDetail = ({ fmcWcifEvent } : FmcTranslationsDetailProps) =>
 
     const dispatch = useDispatch();
 
-    useEffect(
-        () => {
-            if (Object.entries(availableTranslations).length === 0) {
-                tnoodleApi.fetchAvailableFmcTranslations().then((response) => {
-                    setAvailableTranslations(response.data);
-                    setSelectedTranslations(Object.keys(response.data));
-                });
-            }
-        }, [dispatch, availableTranslations]
-    );
+    useEffect(() => {
+        if (Object.entries(availableTranslations).length === 0) {
+            tnoodleApi.fetchAvailableFmcTranslations().then((response) => {
+                setAvailableTranslations(response.data);
+                setSelectedTranslations(Object.keys(response.data));
+            });
+        }
+    }, [dispatch, availableTranslations]);
 
     const buildFmcExtension = (selectedTranslations: string[]) => {
         return {
             id: fmcTranslationsExtensionId,
-            specUrl: '',
-            data: { languageTags: selectedTranslations }
-        }
+            specUrl: "",
+            data: { languageTags: selectedTranslations },
+        };
     };
 
-    const updateEventSelectedTranslations = (selectedTranslations: string[]) => {
-        setExtensionLazily(fmcWcifEvent, fmcTranslationsExtensionId, () => {
-            return buildFmcExtension(selectedTranslations);
-        }, (fmcWcifEvent) => {
-            dispatch(setWcifEvent(fmcWcifEvent));
-            dispatch(setFileZip());
-        })
+    const updateEventSelectedTranslations = (
+        selectedTranslations: string[]
+    ) => {
+        setExtensionLazily(
+            fmcWcifEvent,
+            fmcTranslationsExtensionId,
+            () => {
+                return buildFmcExtension(selectedTranslations);
+            },
+            (fmcWcifEvent) => {
+                dispatch(setWcifEvent(fmcWcifEvent));
+                dispatch(setFileZip());
+            }
+        );
     };
 
     const handleTranslation = (id: string, status: boolean) => {
@@ -95,13 +109,17 @@ const FmcTranslationsDetail = ({ fmcWcifEvent } : FmcTranslationsDetailProps) =>
 
     const translationsDetail = () => {
         let availableTranslationKeys = Object.keys(availableTranslations);
-        let translationsChunks = chunk(availableTranslationKeys, TRANSLATIONS_PER_LINE);
+        let translationsChunks = chunk(
+            availableTranslationKeys,
+            TRANSLATIONS_PER_LINE
+        );
 
         return translationsChunks.map((translationsChunk, i) => (
             <tr key={i}>
                 {translationsChunk.map((translation, j) => {
                     let checkboxId = `fmc-${translation}`;
-                    let translationStatus = selectedTranslations.includes(translation)
+                    let translationStatus =
+                        selectedTranslations.includes(translation);
 
                     return (
                         <React.Fragment key={j}>

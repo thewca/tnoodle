@@ -13,9 +13,7 @@ const EventPickerTable = () => {
     const competitionId = useSelector(
         (state: RootState) => state.competitionSlice.competitionId
     );
-    const wcif = useSelector(
-        (state: RootState) => state.wcifSlice.wcif
-    );
+    const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
     const wcaEvents = useSelector(
         (state: RootState) => state.wcifSlice.wcaEvents
     );
@@ -25,16 +23,14 @@ const EventPickerTable = () => {
 
     const dispatch = useDispatch();
 
-    useEffect(
-        () => {
-            tnoodleApi.fetchFormats().then((response) => {
-                dispatch(setWcaFormats(response.data));
-            });
-            tnoodleApi.fetchWcaEvents().then((response) => {
-                dispatch(setWcaEvents(response.data));
-            });
-        }, [dispatch]
-    );
+    useEffect(() => {
+        tnoodleApi.fetchFormats().then((response) => {
+            dispatch(setWcaFormats(response.data));
+        });
+        tnoodleApi.fetchWcaEvents().then((response) => {
+            dispatch(setWcaEvents(response.data));
+        });
+    }, [dispatch]);
 
     const maybeShowEditWarning = () => {
         if (!competitionId) {
@@ -96,7 +92,7 @@ const EventPickerTable = () => {
                                 wcifEvent = {
                                     id: wcaEvent.id,
                                     rounds: [],
-                                    extensions: []
+                                    extensions: [],
                                 };
                             }
 

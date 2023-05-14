@@ -6,13 +6,16 @@ import { setFileZip } from "../redux/slice/ScramblingSlice";
 import WcifEvent from "../model/WcifEvent";
 import { mbldCubesExtensionId } from "../util/wcif.util";
 import { useEffect, useState } from "react";
-import { findAndProcessExtension, setExtensionLazily } from "../util/extension.util";
+import {
+    findAndProcessExtension,
+    setExtensionLazily,
+} from "../util/extension.util";
 
 interface MbldDetailProps {
     mbldWcifEvent: WcifEvent;
 }
 
-const MbldDetail = ({ mbldWcifEvent } : MbldDetailProps) => {
+const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
     const bestMbldAttempt = useSelector(
         (state: RootState) => state.eventDataSlice.bestMbldAttempt
     );
@@ -33,18 +36,23 @@ const MbldDetail = ({ mbldWcifEvent } : MbldDetailProps) => {
     const buildMbldExtension = (mbld: string) => {
         return {
             id: mbldCubesExtensionId,
-            specUrl: '',
-            data: { requestedScrambles: mbld }
+            specUrl: "",
+            data: { requestedScrambles: mbld },
         };
     };
 
     const updateEventMbld = (mbld: string) => {
-        setExtensionLazily(mbldWcifEvent, mbldCubesExtensionId, () => {
-            return buildMbldExtension(mbld);
-        }, (mbldWcifEvent) => {
-            dispatch(setWcifEvent(mbldWcifEvent));
-            dispatch(setFileZip());
-        })
+        setExtensionLazily(
+            mbldWcifEvent,
+            mbldCubesExtensionId,
+            () => {
+                return buildMbldExtension(mbld);
+            },
+            (mbldWcifEvent) => {
+                dispatch(setWcifEvent(mbldWcifEvent));
+                dispatch(setFileZip());
+            }
+        );
     };
 
     return (
