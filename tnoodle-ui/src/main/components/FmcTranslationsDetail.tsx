@@ -8,7 +8,10 @@ import tnoodleApi from "../api/tnoodle.api";
 import WcifEvent from "../model/WcifEvent";
 import { fmcTranslationsExtensionId } from "../util/wcif.util";
 import { setWcifEvent } from "../redux/slice/WcifSlice";
-import { findExtension, setExtensionLazily } from "../util/extension.util";
+import {
+    findAndProcessExtension,
+    setExtensionLazily,
+} from "../util/extension.util";
 
 const TRANSLATIONS_PER_LINE = 3;
 
@@ -26,9 +29,8 @@ const FmcTranslationsDetail = ({
         (state: RootState) => state.scramblingSlice.generatingScrambles
     );
 
-    const [availableTranslations, setAvailableTranslations] = useState<
-        Record<string, string>
-    >({});
+    const [availableTranslations, setAvailableTranslations] =
+        useState<Record<string, string>>();
     const [selectedTranslations, setSelectedTranslations] = useState<string[]>(
         []
     );
@@ -36,30 +38,30 @@ const FmcTranslationsDetail = ({
     const [showTranslations, setShowTranslations] = useState(false);
 
     useEffect(() => {
-        let fmcTranslationsExtension = findExtension(
+        findAndProcessExtension(
             fmcWcifEvent,
-            fmcTranslationsExtensionId
+            fmcTranslationsExtensionId,
+            (ext) => {
+                setSelectedTranslations(ext.data.languageTags);
+            }
         );
-
-        if (fmcTranslationsExtension !== undefined) {
-            setSelectedTranslations(fmcTranslationsExtension.data.languageTags);
-        } else if (availableTranslations !== undefined) {
-            setSelectedTranslations(Object.keys(availableTranslations));
-        }
-    }, [fmcWcifEvent, availableTranslations]);
+    }, [fmcWcifEvent]);
 
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (Object.entries(availableTranslations).length === 0) {
+        if (availableTranslations === undefined) {
             tnoodleApi.fetchAvailableFmcTranslations().then((response) => {
                 setAvailableTranslations(response.data);
-                setSelectedTranslations(Object.keys(response.data));
             });
         }
     }, [dispatch, availableTranslations]);
 
     const buildFmcExtension = (selectedTranslations: string[]) => {
+        if (selectedTranslations.length === 0) {
+            return null;
+        }
+
         return {
             id: fmcTranslationsExtensionId,
             specUrl: "",
@@ -96,7 +98,11 @@ const FmcTranslationsDetail = ({
     };
 
     const handleSelectAllTranslations = () => {
-        updateEventSelectedTranslations(Object.keys(availableTranslations));
+        if (availableTranslations === undefined) {
+            selectNoneTranslation();
+        } else {
+            updateEventSelectedTranslations(Object.keys(availableTranslations));
+        }
     };
 
     const selectNoneTranslation = () => {
@@ -108,7 +114,12 @@ const FmcTranslationsDetail = ({
     };
 
     const translationsDetail = () => {
+        if (availableTranslations === undefined) {
+            return;
+        }
+
         let availableTranslationKeys = Object.keys(availableTranslations);
+
         let translationsChunks = chunk(
             availableTranslationKeys,
             TRANSLATIONS_PER_LINE

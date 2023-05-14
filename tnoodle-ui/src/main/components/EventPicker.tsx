@@ -145,25 +145,19 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         );
     };
 
-    const buildColorSchemeExtension = useCallback(
-        (colorScheme: Record<string, string>) => {
-            let isDefaultColorScheme = _.isEqual(
-                colorScheme,
-                defaultColorScheme
-            );
+    const buildColorSchemeExtension = (colorScheme: Record<string, string>) => {
+        let isDefaultColorScheme = _.isEqual(colorScheme, defaultColorScheme);
 
-            if (isDefaultColorScheme) {
-                return null;
-            }
+        if (isDefaultColorScheme) {
+            return null;
+        }
 
-            return {
-                id: colorSchemeExtensionId,
-                specUrl: "",
-                data: { colorScheme },
-            };
-        },
-        [defaultColorScheme]
-    );
+        return {
+            id: colorSchemeExtensionId,
+            specUrl: "",
+            data: { colorScheme },
+        };
+    };
 
     const handleNumberOfRoundsChange = (
         numberOfRounds: number,

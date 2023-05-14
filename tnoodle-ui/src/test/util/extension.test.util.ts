@@ -22,9 +22,9 @@ export const getExtensionFromStore = (
 };
 
 export const getMbldCubesCount = (testStore: typeof store) =>
-    getExtensionFromStore(testStore, "333mbf", mbldCubesExtensionId)!.data
-        .requestedScrambles;
+    getExtensionFromStore(testStore, "333mbf", mbldCubesExtensionId)?.data
+        ?.requestedScrambles;
 
 export const getFmcLanguageTags = (testStore: typeof store) =>
-    getExtensionFromStore(testStore, "333fm", fmcTranslationsExtensionId)!.data
-        .languageTags;
+    getExtensionFromStore(testStore, "333fm", fmcTranslationsExtensionId)?.data
+        ?.languageTags;

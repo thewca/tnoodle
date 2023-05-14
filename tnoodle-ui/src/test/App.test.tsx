@@ -6,7 +6,7 @@ import App from "../App";
 import tnoodleApi from "../main/api/tnoodle.api";
 import wcaApi from "../main/api/wca.api";
 import Wcif from "../main/model/Wcif";
-import { defaultWcif } from "../main/util/wcif.util";
+import { defaultWcif, frontendStatusExtensionId } from "../main/util/wcif.util";
 import {
     bestMbldAttempt,
     colorScheme,
@@ -30,6 +30,7 @@ import {
     getFmcLanguageTags,
     getMbldCubesCount,
 } from "./util/extension.test.util";
+import { findExtension } from "../main/util/extension.util";
 
 let container = document.createElement("div");
 
@@ -147,7 +148,12 @@ it("Just generate scrambles", async () => {
     expect(wcif!.events.length).toBe(1);
 
     expect(password).toBe("");
-    expect(status).toEqual(defaultStatus);
+
+    let wcifStatus = findExtension(
+        store.getState().wcifSlice.wcif,
+        frontendStatusExtensionId
+    );
+    expect(wcifStatus!.data).toEqual(defaultStatus);
 });
 
 it("Changes on 333, scramble", async () => {
@@ -254,7 +260,7 @@ it("Remove 333, add FMC and MBLD", async () => {
     let languagesToDeselect =
         Math.floor(Math.random() * numberOfLanguages - 2) + 1;
 
-    let languagesIndexToDelesect = shuffle([
+    let languagesIndexToSelect = shuffle([
         ...Array.from(Array(numberOfLanguages).keys()),
     ]).slice(languagesToDeselect);
 
@@ -294,13 +300,11 @@ it("Remove 333, add FMC and MBLD", async () => {
 
             for (
                 let index = 0;
-                index < languagesIndexToDelesect.length;
+                index < languagesIndexToSelect.length;
                 index++
             ) {
                 await act(async () => {
-                    fireEvent.click(
-                        checkboxes[languagesIndexToDelesect[index]]
-                    );
+                    fireEvent.click(checkboxes[languagesIndexToSelect[index]]);
                 });
             }
         }
@@ -319,13 +323,14 @@ it("Remove 333, add FMC and MBLD", async () => {
 
     let fmcExtensionLanguageTags = getFmcLanguageTags(store);
 
-    let selected = fmcExtensionLanguageTags.sort();
-    let deselected = difference(languageKeys, selected).sort();
+    let selected = [...fmcExtensionLanguageTags].sort();
 
     // Deselected should be with status false
-    expect(deselected).toEqual(
-        languagesIndexToDelesect.map((index) => languageKeys[index]).sort()
+    expect(selected).toEqual(
+        languagesIndexToSelect.map((index) => languageKeys[index]).sort()
     );
+
+    let deselected = difference(languageKeys, selected).sort();
 
     // Selected and deselected should cover every languages
     expect([...selected, ...deselected].sort()).toStrictEqual(

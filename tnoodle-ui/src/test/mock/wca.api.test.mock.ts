@@ -741,7 +741,18 @@ export const wcifs: Record<string, Wcif> = {
         ],
         schedule: { numberOfDays: 0, venues: [] },
         persons: [],
-        extensions: [],
+        extensions: [
+            {
+                data: {
+                    isAllowedVersion: true,
+                    isManual: false,
+                    isSignedBuild: true,
+                    isStaging: false,
+                },
+                id: "org.worldcubeassociation.tnoodle.CompetitionStatus",
+                specUrl: "",
+            },
+        ],
     },
 
     [competitions[1].id]: {
@@ -911,6 +922,17 @@ export const wcifs: Record<string, Wcif> = {
         ],
         schedule: { numberOfDays: 0, venues: [] },
         persons: [],
-        extensions: [],
+        extensions: [
+            {
+                data: {
+                    isAllowedVersion: true,
+                    isManual: false,
+                    isSignedBuild: true,
+                    isStaging: false,
+                },
+                id: "org.worldcubeassociation.tnoodle.CompetitionStatus",
+                specUrl: "",
+            },
+        ],
     },
 };
