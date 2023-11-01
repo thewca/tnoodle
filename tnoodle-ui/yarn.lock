@@ -1874,10 +1874,10 @@
   dependencies:
     postcss-value-parser "^4.2.0"
 
-"@cubing/icons@^1.0.6":
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/@cubing/icons/-/icons-1.0.6.tgz#c05fa19fb2036eea6d38a468a11c1c426400eded"
-  integrity sha512-V9iLA0H4iRQlrXzyr6xx8lCmO+Ur25DSOxHN+cZi1Uvb4i7TZe2zzt3YfdSVkYsxyBZmQ0RKdr8WSAf803JJFg==
+"@cubing/icons@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@cubing/icons/-/icons-1.1.1.tgz#3dba7fb92538c7c24be751fa8f3abc86f24d941b"
+  integrity sha512-pDWzAmhC3x+XmQn0ga0JWIIShLLo7qrnlRUPsHg3XkU4YuXBe+h3j3tTNHzrbSnG9IFjOJ+7HXlwiBSECVi0KQ==
 
 "@eslint/eslintrc@^1.0.5":
   version "1.0.5"
