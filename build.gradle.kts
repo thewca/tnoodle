@@ -87,7 +87,7 @@ tasks.create<ProGuardTask>("minifyRelease") {
     val targetConfigurations = project(":$releaseProject").configurations
     libraryjars(targetConfigurations.findByName("runtimeClasspath")?.files)
 
-    printmapping("$buildDir/proguard.map")
+    printmapping(layout.buildDirectory.file("proguard.map"))
 }
 
 tasks.create("buildOfficial") {
