@@ -6,29 +6,13 @@ import org.worldcubeassociation.tnoodle.server.RouteHandler
 
 object StaticResourceHandler : RouteHandler {
     override fun install(router: Route) {
-        router.static {
-            resource("robots.txt", "wca/tnoodle-ui/robots.txt")
-        }
+        router.staticResources("css", "css")
 
-        router.static("css") {
-            resources("css")
-        }
+        router.singlePageApplication {
+            react("wca/tnoodle-ui")
 
-        router.static("scramble") {
-            resources("wca/tnoodle-ui")
-            defaultResource("wca/tnoodle-ui/index.html")
-
-            static("static") {
-                resources("wca/tnoodle-ui/static")
-            }
-
-            static("oauth") {
-                resource("*", "wca/tnoodle-ui/index.html")
-            }
-        }
-
-        router.static("wca") {
-            resources("wca")
+            useResources = true
+            applicationRoute = "scramble"
         }
     }
 }

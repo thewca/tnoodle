@@ -6,8 +6,6 @@ import org.worldcubeassociation.tnoodle.server.RouteHandler
 
 object IconHandler : RouteHandler {
     override fun install(router: Route) {
-        router.static {
-            resource("favicon.ico", "icons/favicon.ico")
-        }
+        router.staticResources("favicon.ico", "icons")
     }
 }
