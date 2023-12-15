@@ -4,8 +4,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
+import org.worldcubeassociation.tnoodle.server.serial.Colorizer
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Extension
+import org.worldcubeassociation.tnoodle.svglite.Color
 
 @Serializable
 sealed class ExtensionBuilder {
@@ -89,6 +91,18 @@ data class TNoodleStatusExtension(val isStaging: Boolean, val isManual: Boolean,
 
     companion object {
         const val ID = "org.worldcubeassociation.tnoodle.CompetitionStatus"
+        const val SPEC_URL = "TODO"
+    }
+}
+
+@Serializable
+@SerialName(ColorSchemeExtension.ID)
+data class ColorSchemeExtension(val colorScheme: Map<String, @Serializable(with = Colorizer::class) Color>) : ExtensionBuilder() {
+    override val id get() = ID
+    override val specUrl get() = SPEC_URL
+
+    companion object {
+        const val ID = "org.worldcubeassociation.tnoodle.ColorScheme"
         const val SPEC_URL = "TODO"
     }
 }

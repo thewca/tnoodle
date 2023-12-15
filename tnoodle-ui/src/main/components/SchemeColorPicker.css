@@ -1,0 +1,8 @@
+.color-bubble {
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.bg-transparent .tooltip-inner {
+    background-color: transparent;
+}

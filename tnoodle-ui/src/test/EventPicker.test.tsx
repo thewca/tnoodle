@@ -10,19 +10,42 @@ import {
 import { setEditingStatus } from "../main/redux/slice/WcifSlice";
 import store from "../main/redux/Store";
 import { defaultWcif } from "../main/util/wcif.util";
-import { events } from "./mock/tnoodle.api.test.mock";
+import {
+    colorScheme,
+    emptySvg,
+    events,
+    scrambleAndImage,
+} from "./mock/tnoodle.api.test.mock";
+import tnoodleApi from "../main/api/tnoodle.api";
+import { axiosResponse } from "./mock/util.test.mock";
 
 let container = document.createElement("div");
 beforeEach(() => {
     // setup a DOM element as a render target
     container = document.createElement("div");
     document.body.appendChild(container);
+
+    jest.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockImplementation(() =>
+        Promise.resolve({ data: colorScheme, ...axiosResponse })
+    );
+
+    jest.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockImplementation(() =>
+        Promise.resolve({ data: scrambleAndImage, ...axiosResponse })
+    );
+
+    jest.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockImplementation(() =>
+        Promise.resolve({ data: emptySvg, ...axiosResponse })
+    );
 });
 
 afterEach(() => {
     // cleanup on exiting
     container.remove();
     container = document.createElement("div");
+
+    jest.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockRestore();
+    jest.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockRestore();
+    jest.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockRestore();
 });
 
 it("Changing values from event", async () => {

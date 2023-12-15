@@ -54,7 +54,7 @@ data class PrintingFolder(
 
                     for ((uniq, sheet) in uniqueTitles) {
                         if (sheet is FewestMovesSheet) {
-                            val defaultCutoutSheet = FmcCutoutSheet(sheet.scramble, sheet.totalAttemptsNum, sheet.scrambleSetId, competitionName, sheet.activityCode, sheet.hasGroupId, Translate.DEFAULT_LOCALE, sheet.watermark)
+                            val defaultCutoutSheet = FmcCutoutSheet(sheet.scramble, sheet.totalAttemptsNum, sheet.scrambleSetId, competitionName, sheet.activityCode, sheet.hasGroupId, Translate.DEFAULT_LOCALE, sheet.watermark, sheet.colorScheme)
                             file("$uniq - Scramble Cutout Sheet.pdf", defaultCutoutSheet.render(pdfPassword))
 
                             if (fmcTranslations.isNotEmpty()) {
@@ -62,11 +62,11 @@ data class PrintingFolder(
                                     for (locale in fmcTranslations) {
                                         folder(locale.toLanguageTag()) {
                                             // fewest moves regular sheet
-                                            val localPrintingSheet = FmcSolutionSheet(sheet.scramble, sheet.totalAttemptsNum, sheet.scrambleSetId, competitionName, sheet.activityCode, sheet.hasGroupId, locale, sheet.watermark)
+                                            val localPrintingSheet = FmcSolutionSheet(sheet.scramble, sheet.totalAttemptsNum, sheet.scrambleSetId, competitionName, sheet.activityCode, sheet.hasGroupId, locale, sheet.watermark, sheet.colorScheme)
                                             file("$uniq.pdf", localPrintingSheet.render(pdfPassword))
 
                                             // scramble cutout sheet
-                                            val localCutoutSheet = FmcCutoutSheet(sheet.scramble, sheet.totalAttemptsNum, sheet.scrambleSetId, competitionName, sheet.activityCode, sheet.hasGroupId, locale, sheet.watermark)
+                                            val localCutoutSheet = FmcCutoutSheet(sheet.scramble, sheet.totalAttemptsNum, sheet.scrambleSetId, competitionName, sheet.activityCode, sheet.hasGroupId, locale, sheet.watermark, sheet.colorScheme)
                                             file("$uniq Scramble Cutout Sheet.pdf", localCutoutSheet.render(pdfPassword))
                                         }
                                     }

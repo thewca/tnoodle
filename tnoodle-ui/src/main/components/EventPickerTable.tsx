@@ -1,10 +1,9 @@
 import { chunk } from "lodash";
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import tnoodleApi from "../api/tnoodle.api";
 import { toWcaUrl } from "../api/wca.api";
 import RootState from "../model/RootState";
-import { setTranslations } from "../redux/slice/FmcSlice";
 import { setWcaEvents, setWcaFormats } from "../redux/slice/WcifSlice";
 import EventPicker from "./EventPicker";
 
@@ -24,30 +23,14 @@ const EventPickerTable = () => {
 
     const dispatch = useDispatch();
 
-    const getFmcTranslations = useCallback(() => {
-        tnoodleApi.fetchAvailableFmcTranslations().then((response) => {
-            const translations = Object.entries(response.data).map(
-                ([id, name]) => ({
-                    id,
-                    name,
-                    status: true,
-                })
-            );
-            dispatch(setTranslations(translations));
-        });
-    }, [dispatch]);
-
-    const fetchInformation = () => {
+    useEffect(() => {
         tnoodleApi.fetchFormats().then((response) => {
             dispatch(setWcaFormats(response.data));
         });
-        tnoodleApi
-            .fetchWcaEvents()
-            .then((response) => dispatch(setWcaEvents(response.data)));
-        getFmcTranslations();
-    };
-
-    useEffect(fetchInformation, [dispatch, getFmcTranslations]);
+        tnoodleApi.fetchWcaEvents().then((response) => {
+            dispatch(setWcaEvents(response.data));
+        });
+    }, [dispatch]);
 
     const maybeShowEditWarning = () => {
         if (!competitionId) {
@@ -101,13 +84,23 @@ const EventPickerTable = () => {
                 return (
                     <div className="row p-0" key={i}>
                         {chunk.map((wcaEvent) => {
+                            let wcifEvent = wcif.events.find(
+                                (item) => item.id === wcaEvent.id
+                            );
+
+                            if (wcifEvent === undefined) {
+                                wcifEvent = {
+                                    id: wcaEvent.id,
+                                    rounds: [],
+                                    extensions: [],
+                                };
+                            }
+
                             return (
                                 <div className="col-lg-6" key={wcaEvent.id}>
                                     <EventPicker
                                         wcaEvent={wcaEvent}
-                                        wcifEvent={wcif.events.find(
-                                            (item) => item.id === wcaEvent.id
-                                        )}
+                                        wcifEvent={wcifEvent}
                                     />
                                 </div>
                             );

@@ -1,13 +1,12 @@
 import axios from "axios";
 import BestMbld from "../model/BestMbld";
 import RunningVersion from "../model/RunningVersion";
-import Translation from "../model/Translation";
 import WcaEvent from "../model/WcaEvent";
 import WcaFormat from "../model/WcaFormat";
 import Wcif from "../model/Wcif";
 import { ScrambleClient } from "./tnoodle.socket";
 import WebsocketBlobResult from "../model/WebsocketBlobResult";
-import FrontendStatus from "../model/FrontendStatus";
+import ScrambleAndImage from "../model/ScrambleAndImage";
 
 let backendUrl = new URL("http://localhost:2014");
 export const tNoodleBackend = backendUrl.toString().replace(/\/$/g, "");
@@ -17,23 +16,14 @@ let versionEndpoint = "/version";
 let fmcTranslationsEndpoint = "/frontend/fmc/languages/available";
 let suggestedFmcTranslationsEndpoint = "/frontend/fmc/languages/competitors";
 let bestMbldAttemptEndpoint = "/frontend/mbld/best";
+let puzzleColorSchemeEndpoint = (puzzleId: string) =>
+    `/frontend/puzzle/${puzzleId}/colors`;
+let puzzleRandomScrambleEndpoint = (puzzleId: string) =>
+    `/frontend/puzzle/${puzzleId}/scramble`;
+let solvedPuzzleSvgEndpoint = (puzzleId: string) =>
+    `/frontend/puzzle/${puzzleId}/svg`;
 let wcaEventsEndpoint = "/frontend/data/events";
 let formatsEndpoint = "/frontend/data/formats";
-
-/**
- * Builds the object expected for FMC translations
- * @param {array} translations e.g. ["de", "da", "pt-BR"]
- */
-const fmcTranslationsHelper = (translations?: Translation[]) => {
-    if (!translations) {
-        return null;
-    }
-    return {
-        languageTags: translations
-            .filter((translation) => translation.status)
-            .map((translation) => translation.id),
-    };
-};
 
 class TnoodleApi {
     fetchWcaEvents = () =>
@@ -51,6 +41,29 @@ class TnoodleApi {
     fetchBestMbldAttempt = (wcif: Wcif) =>
         axios.post<BestMbld>(tNoodleBackend + bestMbldAttemptEndpoint, wcif);
 
+    fetchPuzzleColorScheme = (puzzleId: string) =>
+        axios.get<Record<string, string>>(
+            tNoodleBackend + puzzleColorSchemeEndpoint(puzzleId)
+        );
+
+    fetchPuzzleRandomScramble = (
+        puzzleId: string,
+        colorScheme: Record<string, string> = {}
+    ) =>
+        axios.post<ScrambleAndImage>(
+            tNoodleBackend + puzzleRandomScrambleEndpoint(puzzleId),
+            colorScheme
+        );
+
+    fetchPuzzleSolvedSvg = (
+        puzzleId: string,
+        colorScheme: Record<string, string> = {}
+    ) =>
+        axios.post<string>(
+            tNoodleBackend + solvedPuzzleSvgEndpoint(puzzleId),
+            colorScheme
+        );
+
     fetchRunningVersion = () =>
         axios.get<RunningVersion>(tNoodleBackend + versionEndpoint);
 
@@ -62,17 +75,11 @@ class TnoodleApi {
     fetchZip = (
         scrambleClient: ScrambleClient,
         wcif: Wcif,
-        mbld: string,
-        password: string,
-        status: FrontendStatus,
-        translations?: Translation[]
+        password: string
     ) => {
         let payload = {
             wcif,
-            multiCubes: { requestedScrambles: mbld },
-            fmcLanguages: fmcTranslationsHelper(translations),
             zipPassword: !password ? null : password,
-            frontendStatus: status,
         };
 
         return scrambleClient.loadScrambles(zipEndpoint, payload, wcif.id);

@@ -100,6 +100,7 @@ export const wcifs: Record<string, Wcif> = {
                         ],
                     },
                 ],
+                extensions: [],
             },
             {
                 id: "222",
@@ -147,6 +148,7 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "1",
                     },
                 ],
+                extensions: [],
             },
             {
                 id: "444",
@@ -194,6 +196,7 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "1",
                     },
                 ],
+                extensions: [],
             },
             {
                 id: "555",
@@ -241,6 +244,7 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "1",
                     },
                 ],
+                extensions: [],
             },
             {
                 id: "666",
@@ -274,6 +278,7 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "1",
                     },
                 ],
+                extensions: [],
             },
             {
                 id: "777",
@@ -307,6 +312,7 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "1",
                     },
                 ],
+                extensions: [],
             },
             {
                 id: "333bf",
@@ -354,6 +360,7 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "1",
                     },
                 ],
+                extensions: [],
             },
             {
                 id: "333fm",
@@ -374,6 +381,7 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "1",
                     },
                 ],
+                extensions: [],
             },
             {
                 id: "333oh",
@@ -421,6 +429,7 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "1",
                     },
                 ],
+                extensions: [],
             },
             {
                 id: "clock",
@@ -454,6 +463,7 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "1",
                     },
                 ],
+                extensions: [],
             },
             {
                 id: "minx",
@@ -487,6 +497,7 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "1",
                     },
                 ],
+                extensions: [],
             },
             {
                 id: "pyram",
@@ -534,6 +545,7 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "1",
                     },
                 ],
+                extensions: [],
             },
             {
                 id: "skewb",
@@ -581,6 +593,7 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "1",
                     },
                 ],
+                extensions: [],
             },
             {
                 id: "sq1",
@@ -628,6 +641,7 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "1",
                     },
                 ],
+                extensions: [],
             },
             {
                 id: "444bf",
@@ -647,6 +661,7 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "3",
                     },
                 ],
+                extensions: [],
             },
             {
                 id: "555bf",
@@ -666,6 +681,7 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "2",
                     },
                 ],
+                extensions: [],
             },
             {
                 id: "333mbf",
@@ -686,6 +702,7 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "1",
                     },
                 ],
+                extensions: [],
             },
             {
                 id: "333ft",
@@ -719,10 +736,23 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "1",
                     },
                 ],
+                extensions: [],
             },
         ],
         schedule: { numberOfDays: 0, venues: [] },
         persons: [],
+        extensions: [
+            {
+                data: {
+                    isAllowedVersion: true,
+                    isManual: false,
+                    isSignedBuild: true,
+                    isStaging: false,
+                },
+                id: "org.worldcubeassociation.tnoodle.CompetitionStatus",
+                specUrl: "",
+            },
+        ],
     },
 
     [competitions[1].id]: {
@@ -791,6 +821,7 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "1",
                     },
                 ],
+                extensions: [],
             },
             {
                 id: "222",
@@ -838,6 +869,7 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "1",
                     },
                 ],
+                extensions: [],
             },
             {
                 id: "444",
@@ -885,9 +917,22 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "1",
                     },
                 ],
+                extensions: [],
             },
         ],
         schedule: { numberOfDays: 0, venues: [] },
         persons: [],
+        extensions: [
+            {
+                data: {
+                    isAllowedVersion: true,
+                    isManual: false,
+                    isSignedBuild: true,
+                    isStaging: false,
+                },
+                id: "org.worldcubeassociation.tnoodle.CompetitionStatus",
+                specUrl: "",
+            },
+        ],
     },
 };

@@ -1,21 +1,22 @@
 import { render, act, fireEvent } from "@testing-library/react";
-import { shuffle } from "lodash";
+import { shuffle, difference } from "lodash";
 import React from "react";
 import { Provider } from "react-redux";
 import App from "../App";
 import tnoodleApi from "../main/api/tnoodle.api";
 import wcaApi from "../main/api/wca.api";
-import Translation from "../main/model/Translation";
-import FrontendStatus from "../main/model/FrontendStatus";
 import Wcif from "../main/model/Wcif";
-import { defaultWcif } from "../main/util/wcif.util";
+import { defaultWcif, frontendStatusExtensionId } from "../main/util/wcif.util";
 import {
     bestMbldAttempt,
+    colorScheme,
     defaultStatus,
+    emptySvg,
     events,
     formats,
     languages,
     plainZip,
+    scrambleAndImage,
     version,
 } from "./mock/tnoodle.api.test.mock";
 import { axiosResponse, getNewStore } from "./mock/util.test.mock";
@@ -25,14 +26,16 @@ import {
     scrambleProgram,
     wcifs,
 } from "./mock/wca.api.test.mock";
+import {
+    getFmcLanguageTags,
+    getMbldCubesCount,
+} from "./util/extension.test.util";
+import { findExtension } from "../main/util/extension.util";
 
 let container = document.createElement("div");
 
 let wcif: Wcif | null = null;
-let mbld: string | null = null;
 let password: string | null = null;
-let status: FrontendStatus | null = null;
-let translations: Translation[] | undefined;
 beforeEach(() => {
     // setup a DOM element as a render target
     container = document.createElement("div");
@@ -54,17 +57,26 @@ beforeEach(() => {
         () => Promise.resolve({ data: languages, ...axiosResponse })
     );
 
+    jest.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockImplementation(() =>
+        Promise.resolve({ data: colorScheme, ...axiosResponse })
+    );
+
+    jest.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockImplementation(() =>
+        Promise.resolve({ data: scrambleAndImage, ...axiosResponse })
+    );
+
+    jest.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockImplementation(() =>
+        Promise.resolve({ data: emptySvg, ...axiosResponse })
+    );
+
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
         Promise.resolve({ data: version, ...axiosResponse })
     );
 
     jest.spyOn(tnoodleApi, "fetchZip").mockImplementation(
-        (scrambleClient, _wcif, _mbld, _password, _status, _translations) => {
+        (scrambleClient, _wcif, _password) => {
             wcif = _wcif;
-            mbld = _mbld;
             password = _password;
-            status = _status;
-            translations = _translations;
 
             return Promise.resolve(plainZip);
         }
@@ -93,14 +105,15 @@ afterEach(() => {
     container = document.createElement("div");
 
     wcif = null;
-    mbld = null;
     password = null;
-    translations = undefined;
 
     // Clear mock
     jest.spyOn(tnoodleApi, "fetchWcaEvents").mockRestore();
     jest.spyOn(tnoodleApi, "fetchFormats").mockRestore();
     jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockRestore();
+    jest.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockRestore();
+    jest.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockRestore();
+    jest.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockRestore();
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
     jest.spyOn(tnoodleApi, "fetchZip").mockRestore();
     jest.spyOn(wcaApi, "getUpcomingManageableCompetitions").mockRestore();
@@ -135,7 +148,12 @@ it("Just generate scrambles", async () => {
     expect(wcif!.events.length).toBe(1);
 
     expect(password).toBe("");
-    expect(status).toEqual(defaultStatus);
+
+    let wcifStatus = findExtension(
+        store.getState().wcifSlice.wcif,
+        frontendStatusExtensionId
+    );
+    expect(wcifStatus!.data).toEqual(defaultStatus);
 });
 
 it("Changes on 333, scramble", async () => {
@@ -235,14 +253,14 @@ it("Remove 333, add FMC and MBLD", async () => {
     let mbldCubes = "70";
 
     // Pick random indexes from fmc to deselect
-    let laguageKeys = Object.keys(languages);
-    let numberOfLanguages = laguageKeys.length;
+    let languageKeys = Object.keys(languages);
+    let numberOfLanguages = languageKeys.length;
 
     // At least 1, we do not deselect every translation
     let languagesToDeselect =
         Math.floor(Math.random() * numberOfLanguages - 2) + 1;
 
-    let languagesIndexToDelesect = shuffle([
+    let languagesIndexToSelect = shuffle([
         ...Array.from(Array(numberOfLanguages).keys()),
     ]).slice(languagesToDeselect);
 
@@ -282,13 +300,11 @@ it("Remove 333, add FMC and MBLD", async () => {
 
             for (
                 let index = 0;
-                index < languagesIndexToDelesect.length;
+                index < languagesIndexToSelect.length;
                 index++
             ) {
                 await act(async () => {
-                    fireEvent.click(
-                        checkboxes[languagesIndexToDelesect[index]]
-                    );
+                    fireEvent.click(checkboxes[languagesIndexToSelect[index]]);
                 });
             }
         }
@@ -302,25 +318,23 @@ it("Remove 333, add FMC and MBLD", async () => {
 
     expect(wcif!.events.length).toBe(events.length);
 
-    expect(mbld).toBe(mbldCubes);
+    let mbldExtensionCubesCount = getMbldCubesCount(store);
+    expect(mbldExtensionCubesCount).toBe(mbldCubes);
 
-    let selected = translations!
-        .filter((translation) => translation.status)
-        .map((translation) => translation.id);
+    let fmcExtensionLanguageTags = getFmcLanguageTags(store);
 
-    let deselected = translations!
-        .filter((translation) => !translation.status)
-        .map((translation) => translation.id)
-        .sort();
+    let selected = [...fmcExtensionLanguageTags].sort();
 
     // Deselected should be with status false
-    expect(deselected).toEqual(
-        languagesIndexToDelesect.map((index) => laguageKeys[index]).sort()
+    expect(selected).toEqual(
+        languagesIndexToSelect.map((index) => languageKeys[index]).sort()
     );
+
+    let deselected = difference(languageKeys, selected).sort();
 
     // Selected and deselected should cover every languages
     expect([...selected, ...deselected].sort()).toStrictEqual(
-        laguageKeys.sort()
+        languageKeys.sort()
     );
 });
 
@@ -392,13 +406,13 @@ it("Logged user", async () => {
             );
         });
 
+        let mbldExtensionCubesCount = getMbldCubesCount(store);
+
         // We should warn in case of mbld
         if (
-            !!store
-                .getState()
-                .wcifSlice.wcif.events.find((event) => event.id === "333mbf") &&
-            store.getState().mbldSlice.bestMbldAttempt! >
-                Number(store.getState().mbldSlice.mbld)
+            !!mbldExtensionCubesCount &&
+            store.getState().eventDataSlice.bestMbldAttempt! >
+                Number(mbldExtensionCubesCount)
         ) {
             let items = container.querySelectorAll("tfoot tr th[colspan]");
             expect(items[items.length - 1].innerHTML).toContain(

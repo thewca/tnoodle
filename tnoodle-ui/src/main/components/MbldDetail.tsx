@@ -1,23 +1,58 @@
 import { useDispatch, useSelector } from "react-redux";
-import { MBLD_MIN } from "../constants/wca.constants";
+import { MBLD_DEFAULT, MBLD_MIN } from "../constants/wca.constants";
 import RootState from "../model/RootState";
-import { setMbld } from "../redux/slice/MbldSlice";
+import { setWcifEvent } from "../redux/slice/WcifSlice";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
+import WcifEvent from "../model/WcifEvent";
+import { mbldCubesExtensionId } from "../util/wcif.util";
+import { useEffect, useState } from "react";
+import {
+    findAndProcessExtension,
+    setExtensionLazily,
+} from "../util/extension.util";
 
-const MbldDetail = () => {
-    const mbld = useSelector((state: RootState) => state.mbldSlice.mbld);
+interface MbldDetailProps {
+    mbldWcifEvent: WcifEvent;
+}
+
+const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
     const bestMbldAttempt = useSelector(
-        (state: RootState) => state.mbldSlice.bestMbldAttempt
+        (state: RootState) => state.eventDataSlice.bestMbldAttempt
     );
     const generatingScrambles = useSelector(
         (state: RootState) => state.scramblingSlice.generatingScrambles
     );
 
+    const [mbld, setMbld] = useState<string>(String(MBLD_DEFAULT));
+
+    useEffect(() => {
+        findAndProcessExtension(mbldWcifEvent, mbldCubesExtensionId, (ext) => {
+            setMbld(ext.data.requestedScrambles);
+        });
+    }, [mbldWcifEvent]);
+
     const dispatch = useDispatch();
 
-    const handleMbldChange = (newMbld: string) => {
-        dispatch(setMbld(newMbld));
-        dispatch(setFileZip());
+    const buildMbldExtension = (mbld: string) => {
+        return {
+            id: mbldCubesExtensionId,
+            specUrl: "",
+            data: { requestedScrambles: mbld },
+        };
+    };
+
+    const updateEventMbld = (mbld: string) => {
+        setExtensionLazily(
+            mbldWcifEvent,
+            mbldCubesExtensionId,
+            () => {
+                return buildMbldExtension(mbld);
+            },
+            (mbldWcifEvent) => {
+                dispatch(setWcifEvent(mbldWcifEvent));
+                dispatch(setFileZip());
+            }
+        );
     };
 
     return (
@@ -31,7 +66,7 @@ const MbldDetail = () => {
                         className="form-control bg-dark text-white"
                         type="number"
                         value={mbld}
-                        onChange={(e) => handleMbldChange(e.target.value)}
+                        onChange={(e) => updateEventMbld(e.target.value)}
                         min={MBLD_MIN}
                         required
                         disabled={generatingScrambles}

@@ -2,6 +2,8 @@ export const events = [
     {
         id: "333",
         name: "3x3x3",
+        puzzle_id: "333",
+        puzzle_group_id: "nbyn",
         format_ids: ["a", "3", "2", "1"],
         can_change_time_limit: true,
         is_timed_event: true,
@@ -11,6 +13,8 @@ export const events = [
     {
         id: "222",
         name: "2x2x2",
+        puzzle_id: "222",
+        puzzle_group_id: "nbyn",
         format_ids: ["a", "3", "2", "1"],
         can_change_time_limit: true,
         is_timed_event: true,
@@ -20,6 +24,8 @@ export const events = [
     {
         id: "444",
         name: "4x4x4",
+        puzzle_id: "444",
+        puzzle_group_id: "nbyn",
         format_ids: ["a", "3", "2", "1"],
         can_change_time_limit: true,
         is_timed_event: true,
@@ -29,6 +35,8 @@ export const events = [
     {
         id: "555",
         name: "5x5x5",
+        puzzle_id: "555",
+        puzzle_group_id: "nbyn",
         format_ids: ["a", "3", "2", "1"],
         can_change_time_limit: true,
         is_timed_event: true,
@@ -38,6 +46,8 @@ export const events = [
     {
         id: "666",
         name: "6x6x6",
+        puzzle_id: "666",
+        puzzle_group_id: "nbyn",
         format_ids: ["m", "2", "1"],
         can_change_time_limit: true,
         is_timed_event: true,
@@ -47,6 +57,8 @@ export const events = [
     {
         id: "777",
         name: "7x7x7",
+        puzzle_id: "777",
+        puzzle_group_id: "nbyn",
         format_ids: ["m", "2", "1"],
         can_change_time_limit: true,
         is_timed_event: true,
@@ -56,6 +68,8 @@ export const events = [
     {
         id: "333bf",
         name: "3x3x3 Blindfolded",
+        puzzle_id: "333",
+        puzzle_group_id: "nbyn",
         format_ids: ["3", "2", "1"],
         can_change_time_limit: true,
         is_timed_event: true,
@@ -65,6 +79,8 @@ export const events = [
     {
         id: "333fm",
         name: "3x3x3 Fewest Moves",
+        puzzle_id: "333",
+        puzzle_group_id: "nbyn",
         format_ids: ["m", "2", "1"],
         can_change_time_limit: false,
         is_timed_event: false,
@@ -74,6 +90,8 @@ export const events = [
     {
         id: "333oh",
         name: "3x3x3 One-Handed",
+        puzzle_id: "333",
+        puzzle_group_id: "nbyn",
         format_ids: ["a", "3", "2", "1"],
         can_change_time_limit: true,
         is_timed_event: true,
@@ -83,6 +101,8 @@ export const events = [
     {
         id: "clock",
         name: "Clock",
+        puzzle_id: "clock",
+        puzzle_group_id: null,
         format_ids: ["a", "3", "2", "1"],
         can_change_time_limit: true,
         is_timed_event: true,
@@ -92,6 +112,8 @@ export const events = [
     {
         id: "minx",
         name: "Megaminx",
+        puzzle_id: "minx",
+        puzzle_group_id: null,
         format_ids: ["a", "3", "2", "1"],
         can_change_time_limit: true,
         is_timed_event: true,
@@ -101,6 +123,8 @@ export const events = [
     {
         id: "pyram",
         name: "Pyraminx",
+        puzzle_id: "pyram",
+        puzzle_group_id: null,
         format_ids: ["a", "3", "2", "1"],
         can_change_time_limit: true,
         is_timed_event: true,
@@ -110,6 +134,8 @@ export const events = [
     {
         id: "skewb",
         name: "Skewb",
+        puzzle_id: "skewb",
+        puzzle_group_id: null,
         format_ids: ["a", "3", "2", "1"],
         can_change_time_limit: true,
         is_timed_event: true,
@@ -119,6 +145,8 @@ export const events = [
     {
         id: "sq1",
         name: "Square-1",
+        puzzle_id: "sq1",
+        puzzle_group_id: null,
         format_ids: ["a", "3", "2", "1"],
         can_change_time_limit: true,
         is_timed_event: true,
@@ -128,6 +156,8 @@ export const events = [
     {
         id: "444bf",
         name: "4x4x4 Blindfolded",
+        puzzle_id: "444",
+        puzzle_group_id: "nbyn",
         format_ids: ["3", "2", "1"],
         can_change_time_limit: true,
         is_timed_event: true,
@@ -137,6 +167,8 @@ export const events = [
     {
         id: "555bf",
         name: "5x5x5 Blindfolded",
+        puzzle_id: "555",
+        puzzle_group_id: null,
         format_ids: ["3", "2", "1"],
         can_change_time_limit: true,
         is_timed_event: true,
@@ -146,6 +178,8 @@ export const events = [
     {
         id: "333mbf",
         name: "3x3x3 Multiple Blindfolded",
+        puzzle_id: "333",
+        puzzle_group_id: null,
         format_ids: ["3", "2", "1"],
         can_change_time_limit: false,
         is_timed_event: false,
@@ -210,4 +244,20 @@ export const bestMbldAttempt = {
     solved: 60,
     attempted: 60,
     time: 3012,
+};
+
+export const emptySvg = "<svg></svg>";
+
+export const colorScheme = {
+    U: "#FFFFFF",
+    F: "#00FF00",
+    R: "#FF0000",
+    D: "#FFFF00",
+    B: "#0000FF",
+    L: "#FF8000",
+};
+
+export const scrambleAndImage = {
+    scramble: "R U R' U' R' F R2 U' R' U' R U R' F'",
+    svgImage: emptySvg,
 };
