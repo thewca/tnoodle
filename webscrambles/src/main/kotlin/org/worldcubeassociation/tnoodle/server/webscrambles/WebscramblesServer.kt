@@ -4,9 +4,9 @@ import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.default
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.*
+import io.ktor.server.cio.*
 import io.ktor.server.engine.commandLineEnvironment
 import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
@@ -119,7 +119,7 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
             val ktorArgs = args + arrayOf("-port=$port")
 
             val cliEnv = commandLineEnvironment(ktorArgs)
-            embeddedServer(Netty, cliEnv).start()
+            embeddedServer(CIO, cliEnv).start()
 
             LOG.info("${LocalServerEnvironmentConfig.title} started")
 

@@ -46,7 +46,7 @@ dependencies {
     implementation(libs.kotlin.argparser)
     implementation(libs.system.tray)
     implementation(libs.apache.commons.lang3)
-    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.cio)
     implementation(libs.ktor.server.websockets)
     implementation(libs.ktor.server.status.pages)
 
