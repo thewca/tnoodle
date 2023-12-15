@@ -41,6 +41,7 @@ dependencies {
     implementation(libs.markdownj.core)
     implementation(libs.itextpdf)
     implementation(libs.itext7)
+    implementation(libs.itext7.bc.adapter)
     implementation(libs.batik.transcoder)
     implementation(libs.snakeyaml)
     implementation(libs.kotlin.argparser)

@@ -4,6 +4,7 @@ ktor = "2.3.7"
 kotless = "0.1.6"
 junit-jupiter = "5.10.1"
 batik = "1.17"
+itext7 = "8.0.2"
 
 nodejs = "20.10.0"
 
@@ -11,7 +12,8 @@ nodejs = "20.10.0"
 markdownj-core = { module = "org.markdownj:markdownj-core", version = "0.4" }
 zip4j = { module = "net.lingala.zip4j:zip4j", version = "2.11.5" }
 itextpdf = { module = "com.itextpdf:itextpdf", version = "5.5.13.3" }
-itext7 = { module = "com.itextpdf:itext7-core", version = "7.2.5" }
+itext7 = { module = "com.itextpdf:itext7-core", version.ref = "itext7" }
+itext7-bc-adapter = { module = "com.itextpdf:bouncy-castle-adapter", version.ref = "itext7" }
 batik-transcoder = { module = "org.apache.xmlgraphics:batik-transcoder", version.ref = "batik" }
 batik-codec = { module = "org.apache.xmlgraphics:batik-codec", version.ref = "batik" }
 snakeyaml = { module = "org.yaml:snakeyaml", version = "2.2" }
