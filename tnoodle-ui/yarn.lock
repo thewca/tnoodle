@@ -1938,10 +1938,10 @@
   dependencies:
     postcss-value-parser "^4.2.0"
 
-"@cubing/icons@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@cubing/icons/-/icons-1.1.1.tgz#3dba7fb92538c7c24be751fa8f3abc86f24d941b"
-  integrity sha512-pDWzAmhC3x+XmQn0ga0JWIIShLLo7qrnlRUPsHg3XkU4YuXBe+h3j3tTNHzrbSnG9IFjOJ+7HXlwiBSECVi0KQ==
+"@cubing/icons@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@cubing/icons/-/icons-1.1.2.tgz#f3212a635ee80a966945554485f9725bd2c8a387"
+  integrity sha512-YP86cLWK2N3Kn5RwZjooy1YfWrFwehcgb+R9WNHtx5n8wb1wNxTwuSs+iqc4EeW3DPjZwW+2LgH7L76+f3UVkg==
 
 "@eslint/eslintrc@^1.0.5":
   version "1.0.5"
