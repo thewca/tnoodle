@@ -26,8 +26,8 @@ val yarnBuild = tasks.named("yarn_build") {
     inputs.dir("public")
     inputs.file("package.json")
 
-    outputs.dir("${project.buildDir}/static")
-    outputs.file("${project.buildDir}/index.html")
+    outputs.dir(project.layout.buildDirectory.dir("static"))
+    outputs.file(project.layout.buildDirectory.file("index.html"))
 }
 
 val yarnTest = tasks.named("yarn_test") {
@@ -53,7 +53,7 @@ tasks.create<Zip>("packageReactFrontend") {
     archiveBaseName.set("react-new-frontend")
     archiveExtension.set("jar")
 
-    from("${project.buildDir}") {
+    from(project.layout.buildDirectory) {
         include("static/**/*")
         include("*.html")
         include("*.png")

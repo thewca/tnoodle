@@ -1,6 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles
 
 import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.TranslationException
+import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
 
@@ -19,7 +20,7 @@ object Translate {
     val LOCALES_BY_LANG_TAG = TRANSLATED_LOCALES.associateBy { it.toLanguageTag() }
 
     private fun loadTranslationResources(): Map<Locale, Map<String, *>> {
-        val yaml = Yaml(Constructor(HashMap::class.java))
+        val yaml = Yaml(Constructor(HashMap::class.java, LoaderOptions()))
         val locales = Locale.getAvailableLocales() + DEFAULT_LOCALE
 
         val loadedMaps = locales
