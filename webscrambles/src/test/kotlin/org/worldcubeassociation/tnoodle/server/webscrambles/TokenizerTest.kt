@@ -16,11 +16,7 @@ class TokenizerTest {
                 val tokenizedScramble = ScrambleStringUtil.splitToTokens(it)
                 val gluedTogetherScramble = tokenizedScramble.joinToString(ScrambleStringUtil.MOVES_DELIMITER) { (str, _) -> str.trim() }
 
-                // With Megaminx, it is a bit bothersome to reconstruct where the original newlines were.
-                // Since they are cosmetical anyways, we just ignore them even in the original scramble.
-                val originalScramble = if (event.id == "minx") it.replace("\n", " ") else it
-
-                Assertions.assertEquals(originalScramble, gluedTogetherScramble)
+                assertScramblesEqual(event, it, gluedTogetherScramble)
             }
         }
     }
@@ -34,11 +30,7 @@ class TokenizerTest {
                 val tokenizedScramble = ScrambleStringUtil.split(it)
                 val gluedTogetherScramble = tokenizedScramble.joinToString(ScrambleStringUtil.MOVES_DELIMITER)
 
-                // With Megaminx, it is a bit bothersome to reconstruct where the original newlines were.
-                // Since they are cosmetical anyways, we just ignore them even in the original scramble.
-                val originalScramble = if (event.id == "minx") it.replace("\n", " ") else it
-
-                Assertions.assertEquals(originalScramble, gluedTogetherScramble)
+                assertScramblesEqual(event, it, gluedTogetherScramble)
             }
         }
     }
@@ -56,11 +48,7 @@ class TokenizerTest {
                     line.joinToString(ScrambleStringUtil.MOVES_DELIMITER) { str -> str.trim() }
                 }
 
-                // With Megaminx, it is a bit bothersome to reconstruct where the original newlines were.
-                // Since they are cosmetical anyways, we just ignore them even in the original scramble.
-                val originalScramble = if (event.id == "minx") it.replace("\n", " ") else it
-
-                Assertions.assertEquals(originalScramble, gluedTogetherScramble)
+                assertScramblesEqual(event, it, gluedTogetherScramble)
             }
         }
     }
@@ -76,22 +64,20 @@ class TokenizerTest {
 
                 for (fontSize in listOf(3f, 12f, 120f)) {
                     for (lineWidth in listOf(12f, 120f, 1200f)) {
-                        val lines = FontUtil.splitToFixedSizeLines(
-                            lineSplitScramble,
-                            fontSize,
-                            lineWidth,
-                            1f,
-                            ScrambleStringUtil.MOVES_DELIMITER
-                        )
+                        for (unitToInches in listOf(.2f, 1f, 2f, 2000f)) {
+                            val lines = FontUtil.splitToFixedSizeLines(
+                                lineSplitScramble,
+                                fontSize,
+                                lineWidth,
+                                unitToInches,
+                                ScrambleStringUtil.MOVES_DELIMITER
+                            )
 
-                        val gluedTogetherScramble = lines.joinToString(ScrambleStringUtil.MOVES_DELIMITER) { str -> str.trim() }
-                            .replace(ScrambleStringUtil.NBSP_STRING, "")
+                            val gluedTogetherScramble = lines.joinToString(ScrambleStringUtil.MOVES_DELIMITER) { str -> str.trim() }
+                                .replace(ScrambleStringUtil.NBSP_STRING, "")
 
-                        // With Megaminx, it is a bit bothersome to reconstruct where the original newlines were.
-                        // Since they are cosmetical anyways, we just ignore them even in the original scramble.
-                        val originalScramble = if (event.id == "minx") it.replace("\n", " ") else it
-
-                        Assertions.assertEquals(originalScramble, gluedTogetherScramble)
+                            assertScramblesEqual(event, it, gluedTogetherScramble)
+                        }
                     }
                 }
             }
@@ -121,11 +107,7 @@ class TokenizerTest {
                             val gluedTogetherScramble = lines.joinToString(ScrambleStringUtil.MOVES_DELIMITER) { str -> str.trim() }
                                 .replace(ScrambleStringUtil.NBSP_STRING, "")
 
-                            // With Megaminx, it is a bit bothersome to reconstruct where the original newlines were.
-                            // Since they are cosmetical anyways, we just ignore them even in the original scramble.
-                            val originalScramble = if (event.id == "minx") it.replace("\n", " ") else it
-
-                            Assertions.assertEquals(originalScramble, gluedTogetherScramble)
+                            assertScramblesEqual(event, it, gluedTogetherScramble)
                         }
                     }
                 }
@@ -135,5 +117,13 @@ class TokenizerTest {
 
     companion object {
         const val SCRAMBLE_REPETITIONS = 20
+
+        fun assertScramblesEqual(event: EventData, original: String, reconstructed: String) {
+            // With Megaminx, it is a bit bothersome to reconstruct where the original newlines were.
+            // Since they are cosmetical anyways, we just ignore them even in the original scramble.
+            val originalScramble = if (event.id == "minx") original.replace("\n", " ") else original
+
+            Assertions.assertEquals(originalScramble, reconstructed)
+        }
     }
 }
