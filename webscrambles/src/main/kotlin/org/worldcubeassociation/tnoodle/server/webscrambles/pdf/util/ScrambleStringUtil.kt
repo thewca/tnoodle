@@ -6,12 +6,12 @@ import kotlin.math.ceil
 object ScrambleStringUtil {
     const val MOVES_DELIMITER = " "
 
-    val NBSP_STRING = Typography.nbsp.toString()
+    const val NBSP_STRING = Typography.nbsp.toString()
 
-    val MIN_ONE_LINE_FONT_SIZE = 15f
-    val MAX_PHRASE_FONT_SIZE = 20f
+    const val MIN_ONE_LINE_FONT_SIZE = 15f
+    const val MAX_PHRASE_FONT_SIZE = 20f
 
-    fun padTurnsUniformly(scramble: String, padding: String = NBSP_STRING): String {
+    private fun padTurnsUniformly(scramble: String, padding: String = NBSP_STRING): String {
         val maxTurnLength = scramble.split("\\s+".toRegex()).maxOfOrNull { it.length } ?: 0
         val lines = scramble.lines().dropLastWhile { it.isEmpty() }
 

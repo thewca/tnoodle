@@ -13,7 +13,7 @@ object ApplicationDataHandler : RouteHandler {
     override fun install(router: Route) {
         router.route("data") {
             get("events") {
-                val eventData = EventData.values().map(EventFrontendData.Companion::fromDataModel)
+                val eventData = EventData.entries.map(EventFrontendData.Companion::fromDataModel)
                 call.respond(eventData)
             }
 

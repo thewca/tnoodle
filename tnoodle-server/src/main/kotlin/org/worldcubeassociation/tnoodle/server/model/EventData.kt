@@ -22,7 +22,7 @@ enum class EventData(val id: String, val description: String, val scrambler: Puz
     constructor(scrambler: PuzzleData, legalFormats: Set<FormatData>) : this(scrambler.id, scrambler.description, scrambler, legalFormats)
 
     companion object {
-        val WCA_EVENTS = values().associateBy { it.id }.toSortedMap()
+        val WCA_EVENTS = entries.associateBy { it.id }.toSortedMap()
 
         val ONE_HOUR_EVENTS = setOf(THREE_FM, THREE_MULTI_BLD)
         val ATTEMPT_BASED_EVENTS = setOf(THREE_FM, THREE_MULTI_BLD)
