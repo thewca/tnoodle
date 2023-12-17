@@ -15,7 +15,7 @@ object ReadmeHandler : RouteHandler {
                 val scramblesReadmeStream = ReadmeHandler.javaClass.getResourceAsStream("/wca/readme-scramble.md")
                 val rawReadme = scramblesReadmeStream.bufferedReader().readText()
 
-                val scrambleFilteringInfo = PuzzleData.values()
+                val scrambleFilteringInfo = PuzzleData.entries
                     .map { it.scrambler }
                     .joinToString("\n") {
                         // those 2 spaces at the end are no accident: http://meta.stackoverflow.com/questions/26011/should-the-markdown-renderer-treat-a-single-line-break-as-br

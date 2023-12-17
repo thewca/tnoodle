@@ -62,6 +62,6 @@ enum class PuzzleData(
 
         private val SCRAMBLE_CACHERS = mutableMapOf<String, CoroutineScrambleCacher>()
 
-        val WCA_PUZZLES = values().associateBy { it.id }.toSortedMap()
+        val WCA_PUZZLES = entries.associateBy { it.id }.toSortedMap()
     }
 }

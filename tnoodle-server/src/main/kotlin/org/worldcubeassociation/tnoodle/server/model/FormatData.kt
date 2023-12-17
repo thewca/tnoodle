@@ -8,7 +8,7 @@ enum class FormatData(val key: String, val description: String, val tag: String,
     BEST_OF_1("1", "Best of 1", "Bo1", 1);
 
     companion object {
-        val WCA_FORMATS = values().associateBy { it.key }.toSortedMap()
+        val WCA_FORMATS = entries.associateBy { it.key }.toSortedMap()
 
         val BIG_AVERAGE_FORMATS = sortedSetOf(AVERAGE_OF_5, BEST_OF_3, BEST_OF_2, BEST_OF_1)
         val SMALL_AVERAGE_FORMATS = sortedSetOf(MEAN_OF_3, BEST_OF_2, BEST_OF_1)

@@ -9,10 +9,10 @@ enum class RegistrationStatus(val wcaString: String) {
     DELETED("deleted");
 
     companion object : SingletonStringEncoder<RegistrationStatus>("RegistrationStatus") {
-        fun fromWCAString(wcaString: String) = values().find { it.wcaString == wcaString }
+        fun fromWCAString(wcaString: String) = entries.find { it.wcaString == wcaString }
 
         override fun encodeInstance(instance: RegistrationStatus) = instance.wcaString
         override fun makeInstance(deserialized: String) = fromWCAString(deserialized)
-            ?: BadWcifParameterException.error("Unknown WCIF spec RegistrationStatus: '$deserialized'. Valid types: ${values().map { it.wcaString }}")
+            ?: BadWcifParameterException.error("Unknown WCIF spec RegistrationStatus: '$deserialized'. Valid types: ${entries.map { it.wcaString }}")
     }
 }

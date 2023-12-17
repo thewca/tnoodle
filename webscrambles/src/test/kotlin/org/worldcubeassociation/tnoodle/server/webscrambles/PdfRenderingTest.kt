@@ -54,7 +54,7 @@ class PdfRenderingTest {
 
     @Test
     fun `test that 3+2 scrambles get displayed on one page`() {
-        for (event in EventData.values()) {
+        for (event in EventData.entries) {
             println("Rendering 3+2 layout for ${event.id}")
 
             repeat(SCRAMBLE_REPETITIONS) {
@@ -66,7 +66,7 @@ class PdfRenderingTest {
 
     @Test
     fun `test that 5+2 scrambles get displayed on one page`() {
-        for (event in EventData.values()) {
+        for (event in EventData.entries) {
             println("Rendering 5+2 layout for ${event.id}")
 
             repeat(SCRAMBLE_REPETITIONS) {
@@ -78,7 +78,7 @@ class PdfRenderingTest {
 
     @Test
     fun `test that 7+0 scrambles get displayed on one page`() {
-        for (event in EventData.values()) {
+        for (event in EventData.entries) {
             println("Rendering 7+0 layout for ${event.id}")
 
             repeat(SCRAMBLE_REPETITIONS) {
