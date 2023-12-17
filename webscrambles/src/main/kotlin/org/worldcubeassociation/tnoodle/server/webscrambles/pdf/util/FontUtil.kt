@@ -88,7 +88,7 @@ object FontUtil {
         return lineTokens.map { it.joinToStringWithPadding(chunkGlue, padding) }
     }
 
-    fun splitAtPossibleBreaks(
+    tailrec fun splitAtPossibleBreaks(
         chunksWithBreakFlags: List<Pair<String, Boolean>>,
         currentPhraseAccu: List<String> = emptyList(),
         accu: List<List<String>> = emptyList()
@@ -120,7 +120,7 @@ object FontUtil {
         }
     }
 
-    fun splitToMaxFontSizeLines(
+    tailrec fun splitToMaxFontSizeLines(
         chunkSections: List<List<String>>,
         boxHeight: Float,
         boxWidth: Float,
@@ -166,7 +166,7 @@ object FontUtil {
         return accu.toMutableList().apply { add(element) }
     }
 
-    private fun splitChunksToLines(
+    private tailrec fun splitChunksToLines(
         chunks: List<List<String>>,
         lineRelWidth: Float,
         chunkGlue: String,
@@ -189,7 +189,7 @@ object FontUtil {
         }
     }
 
-    private fun takeChunksThatFitOneLine(
+    private tailrec fun takeChunksThatFitOneLine(
         chunkSections: List<List<String>>,
         lineRelativeWidth: Float,
         chunkGlue: String,
