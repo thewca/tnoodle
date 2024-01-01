@@ -23,11 +23,11 @@ const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
         (state: RootState) => state.scramblingSlice.generatingScrambles
     );
 
-    const [mbld, setMbld] = useState<string>(String(MBLD_DEFAULT));
+    const [mbld, setMbld] = useState<number>(MBLD_DEFAULT);
 
     useEffect(() => {
         findAndProcessExtension(mbldWcifEvent, mbldCubesExtensionId, (ext) => {
-            setMbld(ext.data.requestedScrambles);
+            setMbld(Number(ext.data.requestedScrambles));
         });
     }, [mbldWcifEvent]);
 
@@ -45,9 +45,7 @@ const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
         setExtensionLazily(
             mbldWcifEvent,
             mbldCubesExtensionId,
-            () => {
-                return buildMbldExtension(mbld);
-            },
+            () => buildMbldExtension(mbld),
             (mbldWcifEvent) => {
                 dispatch(setWcifEvent(mbldWcifEvent));
                 dispatch(setFileZip());
@@ -73,7 +71,7 @@ const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
                     />
                 </td>
             </tr>
-            {!!mbld && !!bestMbldAttempt && Number(mbld) < bestMbldAttempt && (
+            {!!mbld && !!bestMbldAttempt && mbld < bestMbldAttempt && (
                 <tr className="alert alert-warning">
                     <th colSpan={4}>
                         {`You selected ${mbld} cubes for Multi-Blind, but there's a competitor who already tried ${bestMbldAttempt} at a competition. Proceed if you are really certain of it.`}
