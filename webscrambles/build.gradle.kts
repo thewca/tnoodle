@@ -52,6 +52,8 @@ dependencies {
     implementation(libs.ktor.server.status.pages)
 
     runtimeOnly(libs.bouncycastle)
+    runtimeOnly(libs.logback.core)
+    runtimeOnly(libs.logback.classic)
 
     "deployable"(project(":tnoodle-ui"))
 

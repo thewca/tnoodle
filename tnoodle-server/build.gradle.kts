@@ -16,6 +16,7 @@ plugins {
 
 dependencies {
     api(libs.ktor.server.core)
+    api(libs.slf4j.api)
     api(libs.kotlinx.serialization.json)
     api(libs.tnoodle.scrambles)
 
@@ -28,6 +29,7 @@ dependencies {
     implementation(libs.ktor.server.servlet)
     implementation(libs.bouncycastle)
 
+    runtimeOnly(libs.logback.core)
     runtimeOnly(libs.logback.classic)
 }
 

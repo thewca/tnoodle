@@ -1,5 +1,5 @@
 package configurations
 
 object CompilerSettings {
-    const val KOTLIN_JVM_TARGET = 11
+    const val KOTLIN_JVM_TARGET = 8
 }
