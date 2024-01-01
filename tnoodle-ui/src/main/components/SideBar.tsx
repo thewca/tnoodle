@@ -30,6 +30,7 @@ import { defaultWcif } from "../util/wcif.util";
 import Loading from "./Loading";
 import "./SideBar.css";
 import Wcif from "../model/Wcif";
+import {setShowColorPicker} from "../redux/slice/SettingsSlice";
 
 const SideBar = () => {
     const [loadingUser, setLoadingUser] = useState(false);
@@ -45,6 +46,9 @@ const SideBar = () => {
     );
     const generatingScrambles = useSelector(
         (state: RootState) => state.scramblingSlice.generatingScrambles
+    );
+    const showColorPicker = useSelector(
+        (state: RootState) => state.settingsSlice.showColorPicker
     );
 
     const dispatch = useDispatch();
@@ -77,6 +81,7 @@ const SideBar = () => {
         }
 
         let competitionId = getQueryParameter("competitionId");
+
         if (!!competitionId) {
             handleCompetitionSelection(competitionId);
         }
@@ -266,6 +271,21 @@ const SideBar = () => {
             return loadingElement("Loading competition information");
         }
     };
+
+    const settingsArea = () => (
+        <div className="custom-control custom-switch text-white">
+            <input
+                type="checkbox"
+                className="custom-control-input"
+                id="colorPicker"
+                disabled={generatingScrambles}
+                checked={showColorPicker}
+                onChange={(e) => dispatch(setShowColorPicker(e.target.checked))}
+            />
+            <label className="custom-control-label" htmlFor="colorPicker">Show color scheme pickers</label>
+        </div>
+    )
+
     return (
         <div className="h-100 pb-2">
             <div className="d-flex flex-lg-column align-items-center overflow-hidden">
@@ -303,6 +323,7 @@ const SideBar = () => {
             </div>
             <Collapse in={isOpen}>
                 <div className="pt-2">
+                    {settingsArea()}
                     <div>
                         <ul className="list-group">
                             <li>

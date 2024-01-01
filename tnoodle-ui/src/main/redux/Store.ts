@@ -4,6 +4,7 @@ import { informationSlice } from "./slice/InformationSlice";
 import { scramblingSlice } from "./slice/ScramblingSlice";
 import { wcifSlice } from "./slice/WcifSlice";
 import { eventDataSlice } from "./slice/EventDataSlice";
+import {settingsSlice} from "./slice/SettingsSlice";
 
 const store = configureStore({
     reducer: {
@@ -12,6 +13,8 @@ const store = configureStore({
         scramblingSlice: scramblingSlice.reducer,
         wcifSlice: wcifSlice.reducer,
         eventDataSlice: eventDataSlice.reducer,
+        settingsSlice: settingsSlice.reducer,
     },
 });
+
 export default store;

@@ -51,6 +51,9 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     const scramblingProgressTarget = useSelector(
         (state: RootState) => state.scramblingSlice.scramblingProgressTarget
     );
+    const showColorPicker = useSelector(
+        (state: RootState) => state.settingsSlice.showColorPicker
+    );
 
     const [puzzleSvg, setPuzzleSvg] = useState<string>();
     const [randomSampleScramble, setRandomSampleScramble] =
@@ -509,7 +512,8 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                     <th className="lastTwoColumns" scope="col">
                         {wcifEvent.rounds.length > 0 &&
                             puzzleSvg !== undefined &&
-                            randomSampleScramble !== undefined && (
+                            randomSampleScramble !== undefined &&
+                            showColorPicker && (
                                 <div className={"mb-2"}>
                                     <OverlayTrigger
                                         placement={"left"}

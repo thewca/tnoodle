@@ -5,6 +5,7 @@ import { scramblingSlice } from "../../main/redux/slice/ScramblingSlice";
 import { wcifSlice } from "../../main/redux/slice/WcifSlice";
 import { AxiosHeaders } from "axios";
 import { eventDataSlice } from "../../main/redux/slice/EventDataSlice";
+import { settingsSlice } from "../../main/redux/slice/SettingsSlice";
 
 export const axiosResponse = {
     status: 200,
@@ -23,5 +24,6 @@ export const getNewStore = () =>
             scramblingSlice: scramblingSlice.reducer,
             wcifSlice: wcifSlice.reducer,
             eventDataSlice: eventDataSlice.reducer,
+            settingsSlice: settingsSlice.reducer,
         },
     });
