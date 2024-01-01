@@ -5,15 +5,12 @@ import { setWcifEvent } from "../redux/slice/WcifSlice";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
 import WcifEvent from "../model/WcifEvent";
 import { mbldCubesExtensionId } from "../util/wcif.util";
-import {
-    useCallback,
-    useEffect,
-    useState
-} from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
     findAndProcessExtension,
     findExtension,
-    setExtensionLazily, upsertExtension,
+    setExtensionLazily,
+    upsertExtension,
 } from "../util/extension.util";
 
 interface MbldDetailProps {
@@ -31,10 +28,8 @@ const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
     const [mbld, setMbld] = useState<number>(MBLD_DEFAULT);
 
     useEffect(() => {
-        findAndProcessExtension(
-            mbldWcifEvent,
-            mbldCubesExtensionId,
-            (ext) => setMbld(ext.data.requestedScrambles)
+        findAndProcessExtension(mbldWcifEvent, mbldCubesExtensionId, (ext) =>
+            setMbld(ext.data.requestedScrambles)
         );
     }, [mbldWcifEvent]);
 
@@ -48,26 +43,39 @@ const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
         };
     };
 
-    const updateEventMbld = useCallback((mbld: number) => {
-        setExtensionLazily(
-            mbldWcifEvent,
-            mbldCubesExtensionId,
-            () => buildMbldExtension(mbld),
-            (newWcifEvent) => {
-                newWcifEvent.rounds = newWcifEvent.rounds.map((wcifRound) => {
-                    const overrideExtension = buildMbldExtension(mbld);
-                    return upsertExtension(wcifRound, overrideExtension);
-                });
+    const updateEventMbld = useCallback(
+        (mbld: number) => {
+            setExtensionLazily(
+                mbldWcifEvent,
+                mbldCubesExtensionId,
+                () => buildMbldExtension(mbld),
+                (newWcifEvent) => {
+                    newWcifEvent.rounds = newWcifEvent.rounds.map(
+                        (wcifRound) => {
+                            const overrideExtension = buildMbldExtension(mbld);
+                            return upsertExtension(
+                                wcifRound,
+                                overrideExtension
+                            );
+                        }
+                    );
 
-                dispatch(setWcifEvent(newWcifEvent));
-                dispatch(setFileZip());
-            }
-        );
-    }, [dispatch, mbldWcifEvent]);
+                    dispatch(setWcifEvent(newWcifEvent));
+                    dispatch(setFileZip());
+                }
+            );
+        },
+        [dispatch, mbldWcifEvent]
+    );
 
     useEffect(() => {
-        const existingExtensionMbld = findExtension(mbldWcifEvent, mbldCubesExtensionId);
-        const shouldOverride = existingExtensionMbld === undefined || existingExtensionMbld.data.requestedScrambles !== bestMbldAttempt;
+        const existingExtensionMbld = findExtension(
+            mbldWcifEvent,
+            mbldCubesExtensionId
+        );
+        const shouldOverride =
+            existingExtensionMbld === undefined ||
+            existingExtensionMbld.data.requestedScrambles !== bestMbldAttempt;
 
         if (shouldOverride && bestMbldAttempt !== undefined) {
             updateEventMbld(bestMbldAttempt);
@@ -85,7 +93,9 @@ const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
                         className="form-control bg-dark text-white"
                         type="number"
                         value={mbld}
-                        onChange={(e) => updateEventMbld(Number(e.target.value))}
+                        onChange={(e) =>
+                            updateEventMbld(Number(e.target.value))
+                        }
                         min={MBLD_MIN}
                         required
                         disabled={generatingScrambles}

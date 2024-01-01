@@ -30,7 +30,7 @@ import { defaultWcif } from "../util/wcif.util";
 import Loading from "./Loading";
 import "./SideBar.css";
 import Wcif from "../model/Wcif";
-import {setShowColorPicker} from "../redux/slice/SettingsSlice";
+import { setShowColorPicker } from "../redux/slice/SettingsSlice";
 
 const SideBar = () => {
     const [loadingUser, setLoadingUser] = useState(false);
@@ -282,9 +282,11 @@ const SideBar = () => {
                 checked={showColorPicker}
                 onChange={(e) => dispatch(setShowColorPicker(e.target.checked))}
             />
-            <label className="custom-control-label" htmlFor="colorPicker">Show color scheme pickers</label>
+            <label className="custom-control-label" htmlFor="colorPicker">
+                Show color scheme pickers
+            </label>
         </div>
-    )
+    );
 
     return (
         <div className="h-100 pb-2">

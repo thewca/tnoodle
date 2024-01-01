@@ -1,5 +1,5 @@
 import { chunk } from "lodash";
-import React, {useCallback, useEffect, useState} from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import RootState from "../model/RootState";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
@@ -71,9 +71,7 @@ const FmcTranslationsDetail = ({
     };
 
     const updateEventSelectedTranslations = useCallback(
-        (
-            selectedTranslations: string[]
-        ) => {
+        (selectedTranslations: string[]) => {
             setExtensionLazily(
                 fmcWcifEvent,
                 fmcTranslationsExtensionId,
@@ -83,16 +81,27 @@ const FmcTranslationsDetail = ({
                     dispatch(setFileZip());
                 }
             );
-        }, [dispatch, fmcWcifEvent]
+        },
+        [dispatch, fmcWcifEvent]
     );
 
     useEffect(() => {
-        const existingExtensionFmc = findExtension(fmcWcifEvent, fmcTranslationsExtensionId);
+        const existingExtensionFmc = findExtension(
+            fmcWcifEvent,
+            fmcTranslationsExtensionId
+        );
 
-        if (existingExtensionFmc === undefined && suggestedFmcTranslations !== undefined) {
+        if (
+            existingExtensionFmc === undefined &&
+            suggestedFmcTranslations !== undefined
+        ) {
             updateEventSelectedTranslations(suggestedFmcTranslations);
         }
-    }, [fmcWcifEvent, updateEventSelectedTranslations, suggestedFmcTranslations]);
+    }, [
+        fmcWcifEvent,
+        updateEventSelectedTranslations,
+        suggestedFmcTranslations,
+    ]);
 
     const handleTranslation = (id: string, status: boolean) => {
         let newSelectedTranslations = selectedTranslations.filter(
