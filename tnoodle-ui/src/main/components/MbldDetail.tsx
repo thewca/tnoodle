@@ -13,7 +13,7 @@ import {
 import {
     findAndProcessExtension,
     findExtension,
-    setExtensionLazily,
+    setExtensionLazily, upsertExtension,
 } from "../util/extension.util";
 
 interface MbldDetailProps {
@@ -53,8 +53,13 @@ const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
             mbldWcifEvent,
             mbldCubesExtensionId,
             () => buildMbldExtension(mbld),
-            (mbldWcifEvent) => {
-                dispatch(setWcifEvent(mbldWcifEvent));
+            (newWcifEvent) => {
+                newWcifEvent.rounds = newWcifEvent.rounds.map((wcifRound) => {
+                    const overrideExtension = buildMbldExtension(mbld);
+                    return upsertExtension(wcifRound, overrideExtension);
+                });
+
+                dispatch(setWcifEvent(newWcifEvent));
                 dispatch(setFileZip());
             }
         );
