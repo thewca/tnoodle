@@ -5,9 +5,14 @@ import { setWcifEvent } from "../redux/slice/WcifSlice";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
 import WcifEvent from "../model/WcifEvent";
 import { mbldCubesExtensionId } from "../util/wcif.util";
-import { useEffect, useState } from "react";
+import {
+    useCallback,
+    useEffect,
+    useState
+} from "react";
 import {
     findAndProcessExtension,
+    findExtension,
     setExtensionLazily,
 } from "../util/extension.util";
 
@@ -26,14 +31,16 @@ const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
     const [mbld, setMbld] = useState<number>(MBLD_DEFAULT);
 
     useEffect(() => {
-        findAndProcessExtension(mbldWcifEvent, mbldCubesExtensionId, (ext) => {
-            setMbld(Number(ext.data.requestedScrambles));
-        });
+        findAndProcessExtension(
+            mbldWcifEvent,
+            mbldCubesExtensionId,
+            (ext) => setMbld(ext.data.requestedScrambles)
+        );
     }, [mbldWcifEvent]);
 
     const dispatch = useDispatch();
 
-    const buildMbldExtension = (mbld: string) => {
+    const buildMbldExtension = (mbld: number) => {
         return {
             id: mbldCubesExtensionId,
             specUrl: "",
@@ -41,7 +48,7 @@ const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
         };
     };
 
-    const updateEventMbld = (mbld: string) => {
+    const updateEventMbld = useCallback((mbld: number) => {
         setExtensionLazily(
             mbldWcifEvent,
             mbldCubesExtensionId,
@@ -51,7 +58,16 @@ const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
                 dispatch(setFileZip());
             }
         );
-    };
+    }, [dispatch, mbldWcifEvent]);
+
+    useEffect(() => {
+        const existingExtensionMbld = findExtension(mbldWcifEvent, mbldCubesExtensionId);
+        const shouldOverride = existingExtensionMbld === undefined || existingExtensionMbld.data.requestedScrambles !== bestMbldAttempt;
+
+        if (shouldOverride && bestMbldAttempt !== undefined) {
+            updateEventMbld(bestMbldAttempt);
+        }
+    }, [mbldWcifEvent, updateEventMbld, bestMbldAttempt]);
 
     return (
         <tfoot>
@@ -64,7 +80,7 @@ const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
                         className="form-control bg-dark text-white"
                         type="number"
                         value={mbld}
-                        onChange={(e) => updateEventMbld(e.target.value)}
+                        onChange={(e) => updateEventMbld(Number(e.target.value))}
                         min={MBLD_MIN}
                         required
                         disabled={generatingScrambles}

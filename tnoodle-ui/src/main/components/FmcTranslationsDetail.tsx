@@ -1,5 +1,5 @@
 import { chunk } from "lodash";
-import React, { useEffect, useState } from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import RootState from "../model/RootState";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
@@ -10,6 +10,7 @@ import { fmcTranslationsExtensionId } from "../util/wcif.util";
 import { setWcifEvent } from "../redux/slice/WcifSlice";
 import {
     findAndProcessExtension,
+    findExtension,
     setExtensionLazily,
 } from "../util/extension.util";
 
@@ -47,15 +48,15 @@ const FmcTranslationsDetail = ({
         );
     }, [fmcWcifEvent]);
 
-    const dispatch = useDispatch();
-
     useEffect(() => {
         if (availableTranslations === undefined) {
             tnoodleApi.fetchAvailableFmcTranslations().then((response) => {
                 setAvailableTranslations(response.data);
             });
         }
-    }, [dispatch, availableTranslations]);
+    }, [availableTranslations]);
+
+    const dispatch = useDispatch();
 
     const buildFmcExtension = (selectedTranslations: string[]) => {
         if (selectedTranslations.length === 0) {
@@ -69,21 +70,29 @@ const FmcTranslationsDetail = ({
         };
     };
 
-    const updateEventSelectedTranslations = (
-        selectedTranslations: string[]
-    ) => {
-        setExtensionLazily(
-            fmcWcifEvent,
-            fmcTranslationsExtensionId,
-            () => {
-                return buildFmcExtension(selectedTranslations);
-            },
-            (fmcWcifEvent) => {
-                dispatch(setWcifEvent(fmcWcifEvent));
-                dispatch(setFileZip());
-            }
-        );
-    };
+    const updateEventSelectedTranslations = useCallback(
+        (
+            selectedTranslations: string[]
+        ) => {
+            setExtensionLazily(
+                fmcWcifEvent,
+                fmcTranslationsExtensionId,
+                () => buildFmcExtension(selectedTranslations),
+                (fmcWcifEvent) => {
+                    dispatch(setWcifEvent(fmcWcifEvent));
+                    dispatch(setFileZip());
+                }
+            );
+        }, [dispatch, fmcWcifEvent]
+    );
+
+    useEffect(() => {
+        const existingExtensionFmc = findExtension(fmcWcifEvent, fmcTranslationsExtensionId);
+
+        if (existingExtensionFmc === undefined && suggestedFmcTranslations !== undefined) {
+            updateEventSelectedTranslations(suggestedFmcTranslations);
+        }
+    }, [fmcWcifEvent, updateEventSelectedTranslations, suggestedFmcTranslations]);
 
     const handleTranslation = (id: string, status: boolean) => {
         let newSelectedTranslations = selectedTranslations.filter(
