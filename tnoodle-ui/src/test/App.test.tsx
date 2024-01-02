@@ -250,7 +250,7 @@ it("Remove 333, add FMC and MBLD", async () => {
     let events = Array.from(container.querySelectorAll("form table"));
     const names = [mbldEvent, fmcEvent];
 
-    let mbldCubes = "70";
+    let mbldCubes = 70;
 
     // Pick random indexes from fmc to deselect
     let languageKeys = Object.keys(languages);

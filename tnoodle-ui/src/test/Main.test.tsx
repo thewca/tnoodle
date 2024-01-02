@@ -136,8 +136,8 @@ it("There should be only 1 button of type submit, check FMC changes", async () =
     // The only submit button must be Generate Scrambles
     expect(buttonsTypeSubmit[0].innerHTML).toBe("Generate Scrambles");
 
-    // At first, there should be no translation information at all
-    expect(getFmcLanguageTags(store)).toBeUndefined();
+    // At first, the default translation selection should be the recommended tags
+    expect(getFmcLanguageTags(store)).toEqual(suggestedFmcTranslations);
 
     // Select suggested
     await act(async () => {
@@ -151,7 +151,7 @@ it("There should be only 1 button of type submit, check FMC changes", async () =
         fireEvent.click(completeButtons[completeButtons.length - 2]);
     });
 
-    expect(getFmcLanguageTags(store)).toBeUndefined();
+    expect(getFmcLanguageTags(store)).toEqual([]);
 
     // Select All
     await act(async () => {

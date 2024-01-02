@@ -59,10 +59,6 @@ const FmcTranslationsDetail = ({
     const dispatch = useDispatch();
 
     const buildFmcExtension = (selectedTranslations: string[]) => {
-        if (selectedTranslations.length === 0) {
-            return null;
-        }
-
         return {
             id: fmcTranslationsExtensionId,
             specUrl: "",

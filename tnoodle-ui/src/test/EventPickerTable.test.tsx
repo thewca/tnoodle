@@ -177,7 +177,7 @@ it("Changes in MBLD should go to the store", async () => {
     // MBLD should be the last table
     const mbldTable = tables[tables.length - 1];
     const mbldInputs = mbldTable.querySelectorAll("input");
-    const newMbldScrambles = "70";
+    const newMbldScrambles = 70;
 
     await act(async () => {
         fireEvent.change(mbldInputs[mbldInputs.length - 1], {

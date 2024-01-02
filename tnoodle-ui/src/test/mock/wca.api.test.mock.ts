@@ -363,27 +363,6 @@ export const wcifs: Record<string, Wcif> = {
                 extensions: [],
             },
             {
-                id: "333fm",
-                rounds: [
-                    {
-                        id: "333fm-r1",
-                        format: "m",
-                        timeLimit: null,
-                        extensions: [
-                            {
-                                data: {
-                                    numCopies: "1",
-                                },
-                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
-                                specUrl: "",
-                            },
-                        ],
-                        scrambleSetCount: "1",
-                    },
-                ],
-                extensions: [],
-            },
-            {
                 id: "333oh",
                 rounds: [
                     {
@@ -684,6 +663,35 @@ export const wcifs: Record<string, Wcif> = {
                 extensions: [],
             },
             {
+                id: "333fm",
+                rounds: [
+                    {
+                        id: "333fm-r1",
+                        format: "m",
+                        timeLimit: null,
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
+                        scrambleSetCount: "1",
+                    },
+                ],
+                extensions: [
+                    {
+                        data: {
+                            languageTags: ["de", "es", "pt-BR"],
+                        },
+                        id: "org.worldcubeassociation.tnoodle.FmcLanguages",
+                        specUrl: "",
+                    },
+                ],
+            },
+            {
                 id: "333mbf",
                 rounds: [
                     {
@@ -698,45 +706,26 @@ export const wcifs: Record<string, Wcif> = {
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
-                        ],
-                        scrambleSetCount: "1",
-                    },
-                ],
-                extensions: [],
-            },
-            {
-                id: "333ft",
-                rounds: [
-                    {
-                        id: "333ft-r1",
-                        format: "a",
-                        extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    requestedScrambles: 60,
                                 },
-                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
-                                specUrl: "",
-                            },
-                        ],
-                        scrambleSetCount: "1",
-                    },
-                    {
-                        id: "333ft-r2",
-                        format: "a",
-                        extensions: [
-                            {
-                                data: {
-                                    numCopies: "1",
-                                },
-                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.MultiScrambleCount",
                                 specUrl: "",
                             },
                         ],
                         scrambleSetCount: "1",
                     },
                 ],
-                extensions: [],
+                extensions: [
+                    {
+                        data: {
+                            requestedScrambles: 60,
+                        },
+                        id: "org.worldcubeassociation.tnoodle.MultiScrambleCount",
+                        specUrl: "",
+                    },
+                ],
             },
         ],
         schedule: { numberOfDays: 0, venues: [] },
