@@ -1,5 +1,5 @@
 import { chunk } from "lodash";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import RootState from "../model/RootState";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
@@ -8,11 +8,7 @@ import tnoodleApi from "../api/tnoodle.api";
 import WcifEvent from "../model/WcifEvent";
 import { fmcTranslationsExtensionId } from "../util/wcif.util";
 import { setWcifEvent } from "../redux/slice/WcifSlice";
-import {
-    findAndProcessExtension,
-    findExtension,
-    setExtensionLazily,
-} from "../util/extension.util";
+import { findExtension, setExtensionLazily } from "../util/extension.util";
 
 const TRANSLATIONS_PER_LINE = 3;
 
@@ -32,21 +28,6 @@ const FmcTranslationsDetail = ({
 
     const [availableTranslations, setAvailableTranslations] =
         useState<Record<string, string>>();
-    const [selectedTranslations, setSelectedTranslations] = useState<string[]>(
-        []
-    );
-
-    const [showTranslations, setShowTranslations] = useState(false);
-
-    useEffect(() => {
-        findAndProcessExtension(
-            fmcWcifEvent,
-            fmcTranslationsExtensionId,
-            (ext) => {
-                setSelectedTranslations(ext.data.languageTags);
-            }
-        );
-    }, [fmcWcifEvent]);
 
     useEffect(() => {
         if (availableTranslations === undefined) {
@@ -55,6 +36,17 @@ const FmcTranslationsDetail = ({
             });
         }
     }, [availableTranslations]);
+
+    const [showTranslations, setShowTranslations] = useState(false);
+
+    const selectedTranslations = useMemo<string[]>(() => {
+        return (
+            findExtension(fmcWcifEvent, fmcTranslationsExtensionId)?.data
+                ?.languageTags ||
+            suggestedFmcTranslations ||
+            []
+        );
+    }, [fmcWcifEvent, suggestedFmcTranslations]);
 
     const dispatch = useDispatch();
 
@@ -80,24 +72,6 @@ const FmcTranslationsDetail = ({
         },
         [dispatch, fmcWcifEvent]
     );
-
-    useEffect(() => {
-        const existingExtensionFmc = findExtension(
-            fmcWcifEvent,
-            fmcTranslationsExtensionId
-        );
-
-        if (
-            existingExtensionFmc === undefined &&
-            suggestedFmcTranslations !== undefined
-        ) {
-            updateEventSelectedTranslations(suggestedFmcTranslations);
-        }
-    }, [
-        fmcWcifEvent,
-        updateEventSelectedTranslations,
-        suggestedFmcTranslations,
-    ]);
 
     const handleTranslation = (id: string, status: boolean) => {
         let newSelectedTranslations = selectedTranslations.filter(

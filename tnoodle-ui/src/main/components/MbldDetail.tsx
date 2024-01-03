@@ -5,9 +5,8 @@ import { setWcifEvent } from "../redux/slice/WcifSlice";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
 import WcifEvent from "../model/WcifEvent";
 import { mbldCubesExtensionId } from "../util/wcif.util";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo } from "react";
 import {
-    findAndProcessExtension,
     findExtension,
     setExtensionLazily,
     upsertExtension,
@@ -25,13 +24,14 @@ const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
         (state: RootState) => state.scramblingSlice.generatingScrambles
     );
 
-    const [mbld, setMbld] = useState<number>(MBLD_DEFAULT);
-
-    useEffect(() => {
-        findAndProcessExtension(mbldWcifEvent, mbldCubesExtensionId, (ext) =>
-            setMbld(ext.data.requestedScrambles)
+    const mbld = useMemo(() => {
+        return (
+            findExtension(mbldWcifEvent, mbldCubesExtensionId)?.data
+                ?.requestedScrambles ||
+            bestMbldAttempt ||
+            MBLD_DEFAULT
         );
-    }, [mbldWcifEvent]);
+    }, [mbldWcifEvent, bestMbldAttempt]);
 
     const dispatch = useDispatch();
 
@@ -53,6 +53,7 @@ const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
                     newWcifEvent.rounds = newWcifEvent.rounds.map(
                         (wcifRound) => {
                             const overrideExtension = buildMbldExtension(mbld);
+
                             return upsertExtension(
                                 wcifRound,
                                 overrideExtension
@@ -67,20 +68,6 @@ const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
         },
         [dispatch, mbldWcifEvent]
     );
-
-    useEffect(() => {
-        const existingExtensionMbld = findExtension(
-            mbldWcifEvent,
-            mbldCubesExtensionId
-        );
-        const shouldOverride =
-            existingExtensionMbld === undefined ||
-            existingExtensionMbld.data.requestedScrambles !== bestMbldAttempt;
-
-        if (shouldOverride && bestMbldAttempt !== undefined) {
-            updateEventMbld(bestMbldAttempt);
-        }
-    }, [mbldWcifEvent, updateEventMbld, bestMbldAttempt]);
 
     return (
         <tfoot>

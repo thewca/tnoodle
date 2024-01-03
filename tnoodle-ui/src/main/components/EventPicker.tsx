@@ -17,7 +17,7 @@ import "./EventPicker.css";
 import FmcTranslationsDetail from "./FmcTranslationsDetail";
 import MbldDetail from "./MbldDetail";
 import "@cubing/icons";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import SVG from "react-inlinesvg";
 import SchemeColorPicker from "./SchemeColorPicker";
 import ScrambleAndImage from "../model/ScrambleAndImage";
@@ -61,10 +61,16 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
 
     const [defaultColorScheme, setDefaultColorScheme] =
         useState<Record<string, string>>();
-    const [colorScheme, setColorScheme] = useState<Record<string, string>>();
 
     const [showColorSchemeConfig, setShowColorSchemeConfig] =
         useState<boolean>(false);
+
+    const colorScheme = useMemo(() => {
+        return (
+            findExtension(wcifEvent, colorSchemeExtensionId)?.data
+                ?.colorScheme || defaultColorScheme
+        );
+    }, [wcifEvent, defaultColorScheme]);
 
     const fetchDisplayScramble = useCallback(
         (fetchNewScramble = true) => {
@@ -92,19 +98,6 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             fetchDisplayScramble();
         }
     }, [wcaEvent.puzzle_id, colorScheme, fetchDisplayScramble]);
-
-    useEffect(() => {
-        let colorSchemeExtension = findExtension(
-            wcifEvent,
-            colorSchemeExtensionId
-        );
-
-        if (colorSchemeExtension !== undefined) {
-            setColorScheme(colorSchemeExtension.data.colorScheme);
-        } else if (defaultColorScheme !== undefined) {
-            setColorScheme(defaultColorScheme);
-        }
-    }, [wcifEvent, defaultColorScheme]);
 
     const dispatch = useDispatch();
 
@@ -243,9 +236,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             setExtensionLazily(
                 wcifEvent,
                 colorSchemeExtensionId,
-                () => {
-                    return buildColorSchemeExtension(colorScheme);
-                },
+                () => buildColorSchemeExtension(colorScheme),
                 dispatchWcifEvent
             );
         }
