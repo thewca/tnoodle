@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.util
+package org.worldcubeassociation.tnoodle.server.webscrambles.server
 
 import java.io.*
 import java.net.URISyntaxException

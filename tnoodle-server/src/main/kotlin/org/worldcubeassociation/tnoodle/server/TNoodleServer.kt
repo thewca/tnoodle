@@ -8,8 +8,6 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.routing.*
-import org.worldcubeassociation.tnoodle.server.routing.JsEnvHandler
-import org.worldcubeassociation.tnoodle.server.routing.IconHandler
 import org.worldcubeassociation.tnoodle.server.routing.VersionHandler
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 
@@ -18,8 +16,6 @@ class TNoodleServer(val environmentConfig: ServerEnvironmentConfig) : Applicatio
         val versionHandler = VersionHandler(environmentConfig)
 
         app.routing {
-            JsEnvHandler.install(this)
-            IconHandler.install(this)
             versionHandler.install(this)
         }
 

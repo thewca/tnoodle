@@ -14,12 +14,11 @@ import kotlinx.serialization.SerializationException
 import org.slf4j.LoggerFactory
 import org.worldcubeassociation.tnoodle.server.ApplicationHandler
 import org.worldcubeassociation.tnoodle.server.TNoodleServer
-import org.worldcubeassociation.tnoodle.server.routing.JsEnvHandler
 import org.worldcubeassociation.tnoodle.server.ServerEnvironmentConfig
+import org.worldcubeassociation.tnoodle.server.webscrambles.config.LocalServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.MainLauncher.NO_REEXEC_OPT
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.job.JobSchedulingHandler
-import org.worldcubeassociation.tnoodle.server.config.LocalServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.BadWcifParameterException
 import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.ScheduleMatchingException
 import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.ScrambleMatchingException
@@ -53,6 +52,7 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
             }
 
             HomepageHandler.install(this)
+            IconHandler.install(this)
             ReadmeHandler.install(this)
             StaticResourceHandler.install(this)
             wcifHandler.install(this)
@@ -83,8 +83,6 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
         fun main(args: Array<String>) {
             val parser = ArgParser(args)
 
-            val desiredJsEnv by parser.adding("--jsenv", help = "Add entry to global js object TNOODLE_ENV in /env.js. Treated as strings, so FOO=42 will create the entry TNOODLE_ENV['FOO'] = '42';")
-
             val cliPort by parser.storing("-p", "--port", help = "Start TNoodle on given port. Should be numeric. Defaults to ${OfflineJarUtils.TNOODLE_PORT}", transform = String::toInt)
                 .default(OfflineJarUtils.TNOODLE_PORT)
 
@@ -101,11 +99,6 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
             } else false
 
             offlineHandler.setApplicationIcon(isWrapped)
-
-            for (jsEnv in desiredJsEnv) {
-                val (key, strValue) = jsEnv.split("=", limit = 2)
-                JsEnvHandler.putJsEnv(key, strValue)
-            }
 
             if (!noUpgrade) {
                 try {

@@ -8,7 +8,7 @@ import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.ServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.serial.VersionInfo
 
-class VersionHandler(val version: ServerEnvironmentConfig) : RouteHandler {
+class VersionHandler(version: ServerEnvironmentConfig) : RouteHandler {
     private val serialVersionInfo = VersionInfo.fromEnvironmentConfig(version)
 
     override fun install(router: Route) {

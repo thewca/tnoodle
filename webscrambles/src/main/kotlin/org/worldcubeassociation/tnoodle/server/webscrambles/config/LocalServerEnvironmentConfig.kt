@@ -1,8 +1,8 @@
-package org.worldcubeassociation.tnoodle.server.config
+package org.worldcubeassociation.tnoodle.server.webscrambles.config
 
 import org.worldcubeassociation.tnoodle.server.ServerEnvironmentConfig
-import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
-import org.worldcubeassociation.tnoodle.server.util.WebServerUtils.DEVEL_VERSION
+import org.worldcubeassociation.tnoodle.server.webscrambles.server.WebServerUtils.DEVEL_VERSION
+import org.worldcubeassociation.tnoodle.server.webscrambles.server.WebServerUtils
 
 object LocalServerEnvironmentConfig : ServerEnvironmentConfig {
     override val projectName

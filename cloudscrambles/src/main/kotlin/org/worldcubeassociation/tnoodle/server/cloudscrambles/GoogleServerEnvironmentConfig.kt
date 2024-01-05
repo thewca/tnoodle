@@ -1,8 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.cloudscrambles
 
 import org.worldcubeassociation.tnoodle.server.ServerEnvironmentConfig
-import org.worldcubeassociation.tnoodle.server.util.WebServerUtils.DEVEL_VERSION
-import org.worldcubeassociation.tnoodle.server.util.WebServerUtils.callerClass
 import java.io.File
 import java.io.File.separator
 
@@ -19,11 +17,11 @@ object GoogleServerEnvironmentConfig : ServerEnvironmentConfig {
 
     override val projectName: String
         get() = CONFIG_DATA.getOrNull(0)
-            ?: callerClass?.simpleName!!
+            ?: "TNoodle-GENERIC_CLOUD"
 
     override val projectVersion: String
         get() = CONFIG_DATA.getOrNull(1)
-            ?: DEVEL_VERSION
+            ?: "devel-TEMP"
 
     fun overrideFontConfig() {
         if (File(FONT_CONFIG).exists()) {

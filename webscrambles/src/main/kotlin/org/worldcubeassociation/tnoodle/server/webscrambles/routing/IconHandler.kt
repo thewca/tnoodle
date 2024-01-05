@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.routing
+package org.worldcubeassociation.tnoodle.server.webscrambles.routing
 
 import io.ktor.server.http.content.*
 import io.ktor.server.routing.Route

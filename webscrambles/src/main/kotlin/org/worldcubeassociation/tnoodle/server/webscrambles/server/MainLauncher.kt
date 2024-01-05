@@ -1,7 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.server
 
 import org.slf4j.LoggerFactory
-import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
 import java.io.File
 import java.io.IOException
 import kotlin.math.max
