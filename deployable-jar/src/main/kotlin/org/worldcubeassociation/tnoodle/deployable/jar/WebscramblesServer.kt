@@ -52,6 +52,7 @@ class WebscramblesServer(environmentConfig: ServerEnvironmentConfig) : Applicati
                 .default(OfflineJarUtils.TNOODLE_PORT)
 
             val noBrowser by parser.flagging("-n", "--nobrowser", help = "Don't open the browser when starting the server")
+            val noIconBar by parser.flagging("-b", "--noiconbar", help = "Don't add an icon to the system bar")
             val noUpgrade by parser.flagging("-u", "--noupgrade", help = "If an instance of TNoodle is running on the desired port(s), do not attempt to kill it and start up")
             val noReexec by parser.flagging(NO_REEXEC_OPT, help = "Do not reexec. This is sometimes done to rename java.exe on Windows, or to get a larger heap size.")
             val onlineConfig by parser.flagging("-o", "--online", help = "Change configuration for online mode. This will override port bindings and sun.awt.fontconfig")
@@ -63,7 +64,9 @@ class WebscramblesServer(environmentConfig: ServerEnvironmentConfig) : Applicati
                 MainLauncher.wrapMain(args, MIN_HEAP_SIZE_MEGS)
             } else false
 
-            offlineHandler.setApplicationIcon(isWrapped)
+            if (!noIconBar) {
+                offlineHandler.setApplicationIcon(isWrapped)
+            }
 
             if (!noUpgrade) {
                 try {
@@ -75,13 +78,13 @@ class WebscramblesServer(environmentConfig: ServerEnvironmentConfig) : Applicati
                 }
             }
 
+            LOG.info("${LocalServerEnvironmentConfig.title} started")
+
             // ktor specifically requires ONE dash, but our parsing library specifically requires TWO dashes
             val ktorArgs = args + arrayOf("-port=$port")
 
             val cliEnv = commandLineEnvironment(ktorArgs)
-            embeddedServer(CIO, cliEnv).start()
-
-            LOG.info("${LocalServerEnvironmentConfig.title} started")
+            embeddedServer(CIO, cliEnv).start(wait = noIconBar)
 
             if (!noBrowser) {
                 offlineHandler.openTabInBrowser()

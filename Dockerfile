@@ -40,4 +40,4 @@ ENV ONLINE_MODE=${ONLINE_MODE:-""}
 ENV PORT=${PORT:-2014}
 
 # We launch java to execute the jar, with good defauls intended for containers.
-CMD java -server -XX:+UnlockExperimentalVMOptions -XX:InitialRAMFraction=2 -XX:MinRAMFraction=2 -XX:MaxRAMFraction=2 -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:+UseStringDeduplication -jar tnoodle-application.jar $ONLINE_MODE
+CMD java -server -XX:+UnlockExperimentalVMOptions -XX:InitialRAMFraction=2 -XX:MinRAMFraction=2 -XX:MaxRAMFraction=2 -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:+UseStringDeduplication -jar tnoodle-application.jar $ONLINE_MODE -b
