@@ -7,11 +7,11 @@ import org.junit.jupiter.api.function.ThrowingSupplier
 import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.UpcomingCompetition
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder.toDocuments
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFScrambleMatcher
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.MultiScrambleCountExtension
+import org.worldcubeassociation.tnoodle.server.wcif.WCIFDataBuilder
+import org.worldcubeassociation.tnoodle.server.wcif.WCIFDataBuilder.toDocuments
+import org.worldcubeassociation.tnoodle.server.wcif.WCIFScrambleMatcher
+import org.worldcubeassociation.tnoodle.server.wcif.model.Competition
+import org.worldcubeassociation.tnoodle.server.wcif.model.extension.MultiScrambleCountExtension
 import java.net.URL
 import java.time.LocalDateTime
 import kotlin.random.Random

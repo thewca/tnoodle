@@ -5,10 +5,11 @@ import com.itextpdf.kernel.pdf.PdfReader
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.worldcubeassociation.tnoodle.server.model.EventData
+import org.worldcubeassociation.tnoodle.server.pdf.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.*
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ActivityCode
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Scramble
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ScrambleSet
+import org.worldcubeassociation.tnoodle.server.wcif.model.ActivityCode
+import org.worldcubeassociation.tnoodle.server.wcif.model.Scramble
+import org.worldcubeassociation.tnoodle.server.wcif.model.ScrambleSet
 import java.time.LocalDateTime
 import java.util.*
 

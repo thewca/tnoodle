@@ -3,8 +3,8 @@ package org.worldcubeassociation.tnoodle.server.webscrambles
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.worldcubeassociation.tnoodle.server.model.EventData
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.ScrambleStringUtil
+import org.worldcubeassociation.tnoodle.server.pdf.util.FontUtil
+import org.worldcubeassociation.tnoodle.server.pdf.util.ScrambleStringUtil
 
 class TokenizerTest {
     @Test

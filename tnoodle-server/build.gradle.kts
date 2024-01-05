@@ -20,6 +20,10 @@ dependencies {
     api(libs.kotlinx.serialization.json)
     api(libs.tnoodle.scrambles)
 
+    implementation(libs.zip4j)
+    implementation(libs.itextpdf)
+    implementation(libs.itext7)
+    implementation(libs.batik.transcoder)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
@@ -27,7 +31,11 @@ dependencies {
     implementation(libs.ktor.server.default.headers)
     implementation(libs.ktor.server.cors)
     implementation(libs.ktor.server.servlet)
+    implementation(libs.ktor.server.websockets)
+    implementation(libs.ktor.server.status.pages)
+    implementation(libs.apache.commons.lang3)
     implementation(libs.bouncycastle)
+    implementation(libs.snakeyaml)
 
     runtimeOnly(libs.logback.core)
     runtimeOnly(libs.logback.classic)

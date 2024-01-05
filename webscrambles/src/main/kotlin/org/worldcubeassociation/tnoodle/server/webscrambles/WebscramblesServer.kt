@@ -2,15 +2,11 @@ package org.worldcubeassociation.tnoodle.server.webscrambles
 
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.default
-import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.commandLineEnvironment
 import io.ktor.server.engine.embeddedServer
-import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.routing.*
-import io.ktor.server.websocket.*
-import kotlinx.serialization.SerializationException
 import org.slf4j.LoggerFactory
 import org.worldcubeassociation.tnoodle.server.ApplicationHandler
 import org.worldcubeassociation.tnoodle.server.TNoodleServer
@@ -18,54 +14,20 @@ import org.worldcubeassociation.tnoodle.server.ServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.config.LocalServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.MainLauncher.NO_REEXEC_OPT
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.*
-import org.worldcubeassociation.tnoodle.server.webscrambles.routing.job.JobSchedulingHandler
-import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.BadWcifParameterException
-import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.ScheduleMatchingException
-import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.ScrambleMatchingException
-import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.TranslationException
-import org.worldcubeassociation.tnoodle.server.webscrambles.routing.frontend.ApplicationDataHandler
-import org.worldcubeassociation.tnoodle.server.webscrambles.routing.frontend.PuzzleDrawingHandler
-import org.worldcubeassociation.tnoodle.server.webscrambles.routing.frontend.WcifDataHandler
-import org.worldcubeassociation.tnoodle.server.webscrambles.serial.FrontendErrorMessage.Companion.frontendException
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.MainLauncher
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.OfflineJarUtils
 import java.io.IOException
 import java.net.URL
 
-class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : ApplicationHandler {
+class WebscramblesServer(environmentConfig: ServerEnvironmentConfig) : ApplicationHandler {
     private val baseServer = TNoodleServer(environmentConfig)
 
     override fun spinUp(app: Application) {
-        val wcifHandler = WcifHandler(environmentConfig)
-
-        app.install(WebSockets)
-
         app.routing {
-            route("frontend") {
-                ApplicationDataHandler.install(this)
-                WcifDataHandler.install(this)
-                PuzzleDrawingHandler.install(this)
-            }
-
-            route("jobs") {
-                JobSchedulingHandler.install(this)
-            }
-
             HomepageHandler.install(this)
             IconHandler.install(this)
             ReadmeHandler.install(this)
             StaticResourceHandler.install(this)
-            wcifHandler.install(this)
-        }
-
-        app.install(StatusPages) {
-            frontendException<ScheduleMatchingException>(HttpStatusCode.BadRequest)
-            frontendException<ScrambleMatchingException>(HttpStatusCode.BadRequest)
-            frontendException<BadWcifParameterException>(HttpStatusCode.BadRequest)
-
-            frontendException<SerializationException>(HttpStatusCode.BadRequest)
-
-            frontendException<TranslationException>(HttpStatusCode.FailedDependency)
         }
 
         baseServer.spinUp(app)
