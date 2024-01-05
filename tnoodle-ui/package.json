@@ -16,7 +16,7 @@
         "react-redux": "^9.0.4",
         "react-scripts": "5.0.1",
         "web-vitals": "^3.5.1",
-        "react-inlinesvg": "^3.0.2",
+        "react-inlinesvg": "^4.1.0",
         "react-color": "^2.19.3"
     },
     "scripts": {
