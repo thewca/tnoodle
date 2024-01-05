@@ -8,9 +8,13 @@ import java.nio.file.Files
 object FileUtils {
     fun Task.symlink(linkName: File, originFile: File): Boolean {
         return try {
-            if (linkName.exists() && !linkName.delete()) {
-                logger.warn("Unable to create symlink: Cannot override previously existing file with same name as target")
-                return false
+            if (linkName.exists()) {
+                if (linkName.delete()) {
+                    logger.info("Deleted old symlink")
+                } else {
+                    logger.warn("Unable to create symlink: Cannot override previously existing file with same name as target")
+                    return false
+                }
             }
 
             Files.createSymbolicLink(linkName.toPath(), originFile.toPath())

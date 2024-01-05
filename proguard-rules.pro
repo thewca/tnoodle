@@ -32,16 +32,16 @@
 -keep class sun.awt.SunToolkit { *; }
 
 -keep,includedescriptorclasses class kotlinx.serialization.json.**$$serializer { *; }
--keep,includedescriptorclasses class org.worldcubeassociation.tnoodle.server.webscrambles.**$$serializer { *; }
+-keep,includedescriptorclasses class org.worldcubeassociation.tnoodle.server.**$$serializer { *; }
 
 -keepattributes *Annotation*
 -keepattributes InnerClasses
 
--keepclasseswithmembers class org.worldcubeassociation.tnoodle.server.webscrambles.** {
+-keepclasseswithmembers class org.worldcubeassociation.tnoodle.server.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 
--keepclassmembers class org.worldcubeassociation.tnoodle.server.webscrambles.** {
+-keepclassmembers class org.worldcubeassociation.tnoodle.server.** {
     *** Companion;
 }
 

@@ -1,6 +1,6 @@
 rootProject.name = "tnoodle"
 
-include("cloudscrambles")
-include("tnoodle-server")
-include("tnoodle-ui")
-include("webscrambles")
+include("server")
+include("client")
+include("deployable-jar")
+include("deployable-gce")

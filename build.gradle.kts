@@ -37,10 +37,10 @@ plugins {
 }
 
 val releasePrefix = "TNoodle-WCA"
-val releaseProject = "webscrambles"
+val releaseProject = "deployable-jar"
 
 tasks.create("registerReleaseTag") {
-    val signatureProject = project(":tnoodle-server")
+    val signatureProject = project(":server")
     val filenameToSign = "rsa/tnoodle_public.pem"
 
     val signatureStorage = signatureProject.file("src/main/resources/$SIGNATURE_PACKAGE/$filenameToSign.$SIGNATURE_SUFFIX")
@@ -125,13 +125,13 @@ tasks.create("runBackend") {
     description = "Run an unofficial JAR that only holds the backend and nothing else. Visiting the localhost website WILL NOT WORK"
     group = "Development"
 
-    dependsOn(":$releaseProject:run")
+    dependsOn(":server:run")
 }
 
 tasks.create("installCloud") {
     dependsOn("registerCloudReleaseTag", ":cloudscrambles:appengineDeploy")
 }
 
-tasks.create("installEmulateCloud") {
+tasks.create("emulateCloud") {
     dependsOn("registerCloudReleaseTag", ":cloudscrambles:appengineRun")
 }
