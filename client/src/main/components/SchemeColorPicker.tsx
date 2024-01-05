@@ -1,6 +1,8 @@
 import "./SchemeColorPicker.css";
 import { ColorResult, SketchPicker } from "react-color";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { useSelector } from "react-redux";
+import RootState from "../model/RootState";
 
 interface SchemeColorPickerProps {
     defaultColors: string[];
@@ -15,6 +17,10 @@ const SchemeColorPicker = ({
     colorValue,
     onColorChange,
 }: SchemeColorPickerProps) => {
+    const generatingScrambles = useSelector(
+        (state: RootState) => state.scramblingSlice.generatingScrambles
+    );
+
     const handleColorChange = (color: ColorResult) => {
         onColorChange(color.hex);
     };
@@ -37,7 +43,7 @@ const SchemeColorPicker = ({
         >
             <span
                 className={"color-bubble"}
-                style={{ backgroundColor: colorValue }}
+                style={{ backgroundColor: colorValue, pointerEvents: generatingScrambles ? 'none' : 'inherit' }}
             >
                 {colorKey}
             </span>

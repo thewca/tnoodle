@@ -134,9 +134,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         setExtensionLazily(
             wcifEvent,
             colorSchemeExtensionId,
-            () => {
-                return buildColorSchemeExtension(colorScheme);
-            },
+            () => buildColorSchemeExtension(colorScheme),
             dispatchWcifEvent
         );
     };
@@ -306,6 +304,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                                 defaultColorScheme
                                             )
                                         }
+                                        disabled={generatingScrambles}
                                     >
                                         Reset to default
                                     </button>
@@ -321,6 +320,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                                         )
                                                 )
                                             }
+                                            disabled={generatingScrambles}
                                         >
                                             Propagate to puzzle
                                         </button>
@@ -337,6 +337,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                                         )
                                                 )
                                             }
+                                            disabled={generatingScrambles}
                                         >
                                             Propagate to group
                                         </button>
