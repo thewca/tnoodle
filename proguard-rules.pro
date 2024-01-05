@@ -14,6 +14,7 @@
 -keep class io.ktor.serialization.** { *; }
 -keep class kotlin.reflect.jvm.internal.** { *; }
 -keep class kotlin.text.RegexOption { *; }
+-keep class io.ktor.serialization.kotlinx.json.KotlinxSerializationJsonExtensionProvider { *; }
 
 # CSS rendering uses reflection black magic, so static bytecode optimisers need a little help
 -keep class org.apache.batik.css.parser.** { *; }

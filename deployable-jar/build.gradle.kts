@@ -1,5 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import configurations.CompilerSettings.KOTLIN_JVM_TOOLCHAIN
 import configurations.CompilerSettings.KOTLIN_JVM_TARGET
+import configurations.CompilerSettings.JAVA_BYTECODE_VERSION
 import configurations.FileUtils.symlink
 import configurations.Languages.attachRemoteRepositories
 import configurations.ProjectVersions.TNOODLE_SYMLINK
@@ -32,7 +34,15 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(KOTLIN_JVM_TARGET)
+    jvmToolchain(KOTLIN_JVM_TOOLCHAIN)
+
+    compilerOptions {
+        jvmTarget.set(KOTLIN_JVM_TARGET)
+    }
+}
+
+java {
+    targetCompatibility = JAVA_BYTECODE_VERSION
 }
 
 application {

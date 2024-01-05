@@ -1,4 +1,5 @@
-import configurations.CompilerSettings.KOTLIN_JVM_TARGET
+import configurations.CompilerSettings
+import configurations.CompilerSettings.KOTLIN_JVM_TOOLCHAIN
 import configurations.Frameworks.configureJUnit5
 import configurations.Languages.attachRemoteRepositories
 
@@ -66,7 +67,15 @@ dependencies {
 configureJUnit5()
 
 kotlin {
-    jvmToolchain(KOTLIN_JVM_TARGET)
+    jvmToolchain(KOTLIN_JVM_TOOLCHAIN)
+
+    compilerOptions {
+        jvmTarget.set(CompilerSettings.KOTLIN_JVM_TARGET)
+    }
+}
+
+java {
+    targetCompatibility = CompilerSettings.JAVA_BYTECODE_VERSION
 }
 
 application {
