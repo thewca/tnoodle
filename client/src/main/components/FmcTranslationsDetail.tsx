@@ -73,6 +73,14 @@ const FmcTranslationsDetail = ({
         [dispatch, fmcWcifEvent]
     );
 
+    useEffect(() => {
+        const wcifExtension = findExtension(fmcWcifEvent, fmcTranslationsExtensionId);
+
+        if (wcifExtension === undefined && suggestedFmcTranslations !== undefined) {
+            updateEventSelectedTranslations(suggestedFmcTranslations);
+        }
+    }, [fmcWcifEvent, updateEventSelectedTranslations, suggestedFmcTranslations]);
+
     const handleTranslation = (id: string, status: boolean) => {
         let newSelectedTranslations = selectedTranslations.filter(
             (it) => it !== id || status
@@ -160,7 +168,6 @@ const FmcTranslationsDetail = ({
                         type="button"
                         className="btn btn-primary"
                         onClick={() => setShowTranslations(!showTranslations)}
-                        disabled={generatingScrambles}
                     >
                         Translations
                     </button>

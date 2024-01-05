@@ -681,7 +681,15 @@ export const wcifs: Record<string, Wcif> = {
                         scrambleSetCount: "1",
                     },
                 ],
-                extensions: [],
+                extensions: [
+                    {
+                        data: {
+                            languageTags: ["de", "es", "pt-BR"],
+                        },
+                        id: "org.worldcubeassociation.tnoodle.FmcLanguages",
+                        specUrl: "",
+                    }
+                ],
             },
             {
                 id: "333mbf",
@@ -698,11 +706,26 @@ export const wcifs: Record<string, Wcif> = {
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
+                            {
+                                data: {
+                                    requestedScrambles: 60,
+                                },
+                                id: "org.worldcubeassociation.tnoodle.MultiScrambleCount",
+                                specUrl: "",
+                            },
                         ],
                         scrambleSetCount: "1",
                     },
                 ],
-                extensions: [],
+                extensions: [
+                    {
+                        data: {
+                            requestedScrambles: 60,
+                        },
+                        id: "org.worldcubeassociation.tnoodle.MultiScrambleCount",
+                        specUrl: "",
+                    }
+                ],
             },
         ],
         schedule: { numberOfDays: 0, venues: [] },

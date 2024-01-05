@@ -5,7 +5,7 @@ import { setWcifEvent } from "../redux/slice/WcifSlice";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
 import WcifEvent from "../model/WcifEvent";
 import { mbldCubesExtensionId } from "../util/wcif.util";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import {
     findExtension,
     setExtensionLazily,
@@ -68,6 +68,14 @@ const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
         },
         [dispatch, mbldWcifEvent]
     );
+
+    useEffect(() => {
+        const wcifExtension = findExtension(mbldWcifEvent, mbldCubesExtensionId);
+
+        if (wcifExtension === undefined && bestMbldAttempt !== undefined) {
+            updateEventMbld(bestMbldAttempt);
+        }
+    }, [mbldWcifEvent, updateEventMbld, bestMbldAttempt]);
 
     return (
         <tfoot>
