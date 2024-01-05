@@ -6,8 +6,8 @@ import io.ktor.server.routing.*
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.model.FormatData
-import org.worldcubeassociation.tnoodle.server.serial.EventFrontendData
-import org.worldcubeassociation.tnoodle.server.serial.FormatFrontendData
+import org.worldcubeassociation.tnoodle.server.serial.frontend.EventFrontendData
+import org.worldcubeassociation.tnoodle.server.serial.frontend.FormatFrontendData
 
 object ApplicationDataHandler : RouteHandler {
     override fun install(router: Route) {

@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.wcif.model
 
-import org.worldcubeassociation.tnoodle.server.serial.SingletonStringEncoder
+import org.worldcubeassociation.tnoodle.server.serial.types.SingletonStringEncoder
 
 data class Role(val roleString: String) {
     val isDelegate

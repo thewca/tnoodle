@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.serial
+package org.worldcubeassociation.tnoodle.server.serial.types
 
 import java.time.Duration
 

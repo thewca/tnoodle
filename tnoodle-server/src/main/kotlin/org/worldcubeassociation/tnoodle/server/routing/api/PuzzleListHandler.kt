@@ -1,10 +1,10 @@
-package org.worldcubeassociation.tnoodle.server.cloudscrambles.routing
+package org.worldcubeassociation.tnoodle.server.routing.api
 
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.worldcubeassociation.tnoodle.server.RouteHandler
-import org.worldcubeassociation.tnoodle.server.cloudscrambles.serial.PuzzleInfoJsonData
+import org.worldcubeassociation.tnoodle.server.serial.api.PuzzleInfoJsonData
 import org.worldcubeassociation.tnoodle.server.model.PuzzleData
 
 object PuzzleListHandler : RouteHandler {

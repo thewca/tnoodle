@@ -2,7 +2,7 @@ package org.worldcubeassociation.tnoodle.server.wcif.model
 
 import kotlinx.serialization.*
 import org.worldcubeassociation.tnoodle.server.model.EventData
-import org.worldcubeassociation.tnoodle.server.serial.SingletonStringEncoder
+import org.worldcubeassociation.tnoodle.server.serial.types.SingletonStringEncoder
 import org.worldcubeassociation.tnoodle.server.Translate
 import org.worldcubeassociation.tnoodle.server.exceptions.TranslationException
 import org.worldcubeassociation.tnoodle.server.wcif.provider.EventIdProvider

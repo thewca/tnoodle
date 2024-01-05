@@ -1,8 +1,8 @@
-package org.worldcubeassociation.tnoodle.server.serial
+package org.worldcubeassociation.tnoodle.server.serial.types
 
 import org.worldcubeassociation.tnoodle.svglite.Color
 
-object Colorizer : SingletonStringEncoder<Color>("Color") {
+object ColorSerializer : SingletonStringEncoder<Color>("Color") {
     override fun encodeInstance(instance: Color) = instance.toHex()
     override fun makeInstance(deserialized: String) = Color(deserialized)
 }

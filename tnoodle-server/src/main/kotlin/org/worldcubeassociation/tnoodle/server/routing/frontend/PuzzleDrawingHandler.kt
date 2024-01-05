@@ -7,7 +7,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.model.PuzzleData
-import org.worldcubeassociation.tnoodle.server.serial.FrontendScrambleAndImage
+import org.worldcubeassociation.tnoodle.server.serial.frontend.FrontendScrambleAndImage
 import org.worldcubeassociation.tnoodle.svglite.Color
 
 object PuzzleDrawingHandler : RouteHandler {

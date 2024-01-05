@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.serial
+package org.worldcubeassociation.tnoodle.server.serial.frontend
 
 import kotlinx.serialization.Serializable
 import org.worldcubeassociation.tnoodle.server.model.FormatData

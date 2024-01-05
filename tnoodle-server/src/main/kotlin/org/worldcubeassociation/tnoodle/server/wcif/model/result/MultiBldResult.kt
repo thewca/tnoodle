@@ -1,7 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.wcif.model.result
 
 import kotlinx.serialization.Serializable
-import org.worldcubeassociation.tnoodle.server.serial.DurationSecondsSerializer
+import org.worldcubeassociation.tnoodle.server.serial.types.DurationSecondsSerializer
 import java.time.Duration
 
 @Serializable

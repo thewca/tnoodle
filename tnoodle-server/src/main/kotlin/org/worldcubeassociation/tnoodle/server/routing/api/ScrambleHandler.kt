@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.cloudscrambles.routing
+package org.worldcubeassociation.tnoodle.server.routing.api
 
 import io.ktor.server.application.*
 import io.ktor.server.response.*

@@ -1,9 +1,10 @@
-package org.worldcubeassociation.tnoodle.server.serial
+package org.worldcubeassociation.tnoodle.server.serial.frontend
 
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import kotlinx.serialization.Serializable
+import org.worldcubeassociation.tnoodle.server.serial.types.LocalDateTimeSerializer
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.time.LocalDateTime

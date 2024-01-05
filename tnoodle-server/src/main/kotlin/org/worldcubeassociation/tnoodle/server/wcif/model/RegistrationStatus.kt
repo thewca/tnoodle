@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.wcif.model
 
-import org.worldcubeassociation.tnoodle.server.serial.SingletonStringEncoder
+import org.worldcubeassociation.tnoodle.server.serial.types.SingletonStringEncoder
 import org.worldcubeassociation.tnoodle.server.exceptions.BadWcifParameterException
 
 enum class RegistrationStatus(val wcaString: String) {

@@ -1,7 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.wcif.model
 
 import kotlinx.serialization.*
-import org.worldcubeassociation.tnoodle.server.serial.SingletonStringEncoder
+import org.worldcubeassociation.tnoodle.server.serial.types.SingletonStringEncoder
 
 @Serializable
 data class Scramble(val scrambleString: String) {

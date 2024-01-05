@@ -12,8 +12,8 @@ import kotlinx.serialization.builtins.serializer
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.crypto.StringEncryption.encodeBase64
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
-import org.worldcubeassociation.tnoodle.server.serial.FrontendErrorMessage
-import org.worldcubeassociation.tnoodle.server.serial.FrontendErrorMessage.Companion.asFrontendError
+import org.worldcubeassociation.tnoodle.server.serial.frontend.FrontendErrorMessage
+import org.worldcubeassociation.tnoodle.server.serial.frontend.FrontendErrorMessage.Companion.asFrontendError
 
 object JobSchedulingHandler : RouteHandler {
     private val JOBS = mutableMapOf<Int, MutableMap<String, Int>>()

@@ -1,6 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.serial
 
 import kotlinx.serialization.Serializable
+import org.worldcubeassociation.tnoodle.server.serial.types.LocalDateTimeSerializer
 import org.worldcubeassociation.tnoodle.server.wcif.model.Competition
 import java.time.LocalDateTime
 

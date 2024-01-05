@@ -18,7 +18,10 @@ import org.worldcubeassociation.tnoodle.server.exceptions.TranslationException
 import org.worldcubeassociation.tnoodle.server.job.JobSchedulingHandler
 import org.worldcubeassociation.tnoodle.server.routing.VersionHandler
 import org.worldcubeassociation.tnoodle.server.routing.WcifHandler
-import org.worldcubeassociation.tnoodle.server.serial.FrontendErrorMessage.Companion.frontendException
+import org.worldcubeassociation.tnoodle.server.routing.api.PuzzleListHandler
+import org.worldcubeassociation.tnoodle.server.routing.api.ScrambleHandler
+import org.worldcubeassociation.tnoodle.server.routing.api.ScrambleViewHandler
+import org.worldcubeassociation.tnoodle.server.serial.frontend.FrontendErrorMessage.Companion.frontendException
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 import org.worldcubeassociation.tnoodle.server.routing.frontend.ApplicationDataHandler
 import org.worldcubeassociation.tnoodle.server.routing.frontend.PuzzleDrawingHandler
@@ -39,6 +42,14 @@ class TNoodleServer(val environmentConfig: ServerEnvironmentConfig) : Applicatio
                 ApplicationDataHandler.install(this)
                 WcifDataHandler.install(this)
                 PuzzleDrawingHandler.install(this)
+            }
+
+            route("api") {
+                route("v0") {
+                    PuzzleListHandler.install(this)
+                    ScrambleHandler.install(this)
+                    ScrambleViewHandler.install(this)
+                }
             }
 
             route("jobs") {

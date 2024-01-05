@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.wcif.model
 
-import org.worldcubeassociation.tnoodle.server.serial.SingletonIntEncoder
+import org.worldcubeassociation.tnoodle.server.serial.types.SingletonIntEncoder
 import org.worldcubeassociation.tnoodle.server.wcif.model.result.MultiBldResult
 import java.time.Duration
 
