@@ -1,7 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.FileUtils.symlink
-import configurations.Frameworks.configureJUnit5
 import configurations.Languages.attachRemoteRepositories
 import configurations.ProjectVersions.TNOODLE_SYMLINK
 import configurations.ProjectVersions.tNoodleImplOrDefault
@@ -10,16 +9,6 @@ import configurations.ProjectVersions.tNoodleVersionOrDefault
 description = "An extension over the core server to provide a user-friendly UI. Also draws PDFs."
 
 attachRemoteRepositories()
-
-buildscript {
-    repositories {
-        maven(url = "$rootDir/gradle/repository")
-    }
-
-    dependencies {
-        classpath(libs.wca.i18n)
-    }
-}
 
 plugins {
     kotlin("jvm")
@@ -38,21 +27,15 @@ dependencies {
     implementation(project(":tnoodle-server"))
 
     implementation(libs.markdownj.core)
-    implementation(libs.itext7.bc.adapter)
     implementation(libs.kotlin.argparser)
     implementation(libs.system.tray)
     implementation(libs.ktor.server.cio)
 
-    runtimeOnly(libs.bouncycastle)
     runtimeOnly(libs.logback.core)
     runtimeOnly(libs.logback.classic)
 
     "deployable"(project(":tnoodle-ui"))
-
-    testImplementation(libs.mockk)
 }
-
-configureJUnit5()
 
 kotlin {
     jvmToolchain(KOTLIN_JVM_TARGET)
@@ -60,21 +43,6 @@ kotlin {
 
 application {
     mainClass.set("org.worldcubeassociation.tnoodle.server.webscrambles.WebscramblesServer")
-}
-
-tasks.create<JavaExec>("i18nCheck") {
-    val ymlFiles = sourceSets.main.get().resources.matching {
-        include("i18n/*.yml")
-    }.sortedBy { it.nameWithoutExtension != "en" }
-
-    mainClass.set("JarMain") // Warbler gives *fantastic* class names to the jruby bundles :/
-    classpath = buildscript.configurations["classpath"]
-
-    setArgs(ymlFiles)
-}
-
-tasks.getByName("check") {
-    dependsOn("i18nCheck")
 }
 
 tasks.create("registerManifest") {

@@ -1,4 +1,5 @@
 import configurations.CompilerSettings.KOTLIN_JVM_TARGET
+import configurations.Frameworks.configureJUnit5
 import configurations.Languages.attachRemoteRepositories
 
 import crypto.BuildVerification.SIGNATURE_PACKAGE
@@ -7,6 +8,16 @@ import crypto.BuildVerification.SIGNATURE_SUFFIX
 description = "Embeddable webserver built around the Kotlin ktor framework"
 
 attachRemoteRepositories()
+
+buildscript {
+    repositories {
+        maven(url = "$rootDir/gradle/repository")
+    }
+
+    dependencies {
+        classpath(libs.wca.i18n)
+    }
+}
 
 plugins {
     kotlin("jvm")
@@ -23,6 +34,7 @@ dependencies {
     implementation(libs.zip4j)
     implementation(libs.itextpdf)
     implementation(libs.itext7)
+    implementation(libs.itext7.bc.adapter)
     implementation(libs.batik.transcoder)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.ktor.server.content.negotiation)
@@ -37,12 +49,36 @@ dependencies {
     implementation(libs.bouncycastle)
     implementation(libs.snakeyaml)
 
+    runtimeOnly(libs.bouncycastle)
     runtimeOnly(libs.logback.core)
     runtimeOnly(libs.logback.classic)
+
+    testImplementation(libs.mockk)
+    testImplementation(libs.ktor.client.core)
+    testImplementation(libs.ktor.client.cio)
+    testImplementation(libs.ktor.client.content.negotiation)
+    testImplementation(libs.ktor.serialization.kotlinx.json)
 }
+
+configureJUnit5()
 
 kotlin {
     jvmToolchain(KOTLIN_JVM_TARGET)
+}
+
+tasks.create<JavaExec>("i18nCheck") {
+    val ymlFiles = sourceSets.main.get().resources.matching {
+        include("i18n/*.yml")
+    }.sortedBy { it.nameWithoutExtension != "en" }
+
+    mainClass.set("JarMain") // Warbler gives *fantastic* class names to the jruby bundles :/
+    classpath = buildscript.configurations["classpath"]
+
+    setArgs(ymlFiles)
+}
+
+tasks.getByName("check") {
+    dependsOn("i18nCheck")
 }
 
 tasks.create("deleteSignatures") {

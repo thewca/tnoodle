@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles
+package org.worldcubeassociation.tnoodle.server
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
