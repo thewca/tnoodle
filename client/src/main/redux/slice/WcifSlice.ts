@@ -13,17 +13,15 @@ import {
 } from "../../util/wcif.util";
 
 interface WcifState {
-    editingStatus: boolean;
     wcaEvents?: WcaEvent[];
     wcaFormats?: Record<string, WcaFormat>;
     wcif: Wcif;
 }
 
 const initialState: WcifState = {
-    editingStatus: true, // If we fetch competition info, some fields can't be changed
     wcaEvents: undefined,
     wcaFormats: undefined,
-    wcif: defaultWcif,
+    wcif: { ...defaultWcif },
 };
 
 export const wcifSlice = createSlice({
@@ -31,17 +29,15 @@ export const wcifSlice = createSlice({
     initialState,
     reducers: {
         setCompetitionName: (state, action: PayloadAction<string>) => {
-            let competitionName = action.payload;
-            let id = competitionName2Id(competitionName);
+            const competitionName = action.payload;
+            const id = competitionName2Id(competitionName);
+
             state.wcif = {
                 ...state.wcif,
                 name: competitionName,
                 shortName: competitionName,
                 id,
             };
-        },
-        setEditingStatus: (state, action: PayloadAction<boolean>) => {
-            state.editingStatus = action.payload;
         },
         setWcifEvent: (state, action: PayloadAction<WcifEvent>) => {
             state.wcif = {
@@ -92,7 +88,6 @@ export const wcifSlice = createSlice({
 
 export const {
     setCompetitionName,
-    setEditingStatus,
     setWcifEvent,
     setWcaEvents,
     setWcaFormats,

@@ -8,8 +8,8 @@ import { setCompetitionName } from "../redux/slice/WcifSlice";
 const EntryInterface = () => {
     const [showPassword, setShowPassword] = useState(false);
 
-    const editingStatus = useSelector(
-        (state: RootState) => state.wcifSlice.editingStatus
+    const isManualSelection = useSelector(
+        (state: RootState) => state.informationSlice.isManualSelection
     );
     const password = useSelector(
         (state: RootState) => state.scramblingSlice.password
@@ -51,7 +51,7 @@ const EntryInterface = () => {
                         handleCompetitionNameChange(e.target.value)
                     }
                     value={competitionName}
-                    disabled={!editingStatus || generatingScrambles}
+                    disabled={!isManualSelection || generatingScrambles}
                     required
                 />
             </div>

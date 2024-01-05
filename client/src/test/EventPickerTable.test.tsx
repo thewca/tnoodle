@@ -3,8 +3,8 @@ import React from "react";
 import { Provider } from "react-redux";
 import tnoodleApi from "../main/api/tnoodle.api";
 import EventPickerTable from "../main/components/EventPickerTable";
-import { setCompetitionId } from "../main/redux/slice/CompetitionSlice";
-import { setEditingStatus, setWcifEvent } from "../main/redux/slice/WcifSlice";
+import { setWcif, setWcifEvent } from "../main/redux/slice/WcifSlice";
+import { setIsManualSelection } from "../main/redux/slice/InformationSlice";
 import {
     getDefaultCopiesExtension,
     mbldCubesExtensionId,
@@ -18,7 +18,7 @@ import {
     scrambleAndImage,
 } from "./mock/tnoodle.api.test.mock";
 import { axiosResponse, getNewStore } from "./mock/util.test.mock";
-import { competitions } from "./mock/wca.api.test.mock";
+import { competitions, wcifs } from "./mock/wca.api.test.mock";
 
 let container = document.createElement("div");
 beforeEach(() => {
@@ -72,11 +72,11 @@ it("Show editing warn if case of competition selected", async () => {
     const store = getNewStore();
 
     // Choose a competition
-    const competitionId = competitions[0].id;
-    store.dispatch(setCompetitionId(competitionId));
+    const competition = wcifs[competitions[0].id];
+    store.dispatch(setWcif(competition));
 
     // Disable editing
-    store.dispatch(setEditingStatus(false));
+    store.dispatch(setIsManualSelection(false));
 
     // Add one more round
     const newEvent = {
@@ -113,7 +113,7 @@ it("Show editing warn if case of competition selected", async () => {
     // Show link to edit events
     const link = paragraphs[1].querySelector("a")!;
     expect(link.href).toContain(
-        `https://www.worldcubeassociation.org/competitions/${competitionId}/events/edit`
+        `https://www.worldcubeassociation.org/competitions/${competition.id}/events/edit`
     );
 
     // Disabled events should not appear
@@ -121,15 +121,15 @@ it("Show editing warn if case of competition selected", async () => {
     expect(tables.length).toBe(store.getState().wcifSlice.wcif.events.length);
 });
 
-it("Singular event", async () => {
+it("Plural events", async () => {
     const store = getNewStore();
 
     // Choose a competition
-    const competitionId = competitions[0].id;
-    store.dispatch(setCompetitionId(competitionId));
+    const competition = wcifs[competitions[0].id];
+    store.dispatch(setWcif(competition));
 
     // Disable editing
-    store.dispatch(setEditingStatus(false));
+    store.dispatch(setIsManualSelection(false));
 
     // Render component
     await act(async () => {
@@ -143,8 +143,8 @@ it("Singular event", async () => {
         );
     });
 
-    // Singular for 1 event
-    expect(container.querySelector("p")!.innerHTML).toContain("event ");
+    // Plural for multiple events
+    expect(container.querySelector("p")!.innerHTML).toContain("events ");
 });
 
 it("Changes in MBLD should go to the store", async () => {

@@ -7,7 +7,7 @@ import {
     setScramblingProgressCurrentEvent,
     setScramblingProgressTarget,
 } from "../main/redux/slice/ScramblingSlice";
-import { setEditingStatus } from "../main/redux/slice/WcifSlice";
+import { setIsManualSelection } from "../main/redux/slice/InformationSlice";
 import store from "../main/redux/Store";
 import { defaultWcif } from "../main/util/wcif.util";
 import {
@@ -53,7 +53,7 @@ it("Changing values from event", async () => {
     const wcifEvent = defaultWcif.events[0]; // This is one round of 333
 
     // Enforce that fields are not disabled
-    store.dispatch(setEditingStatus(true));
+    store.dispatch(setIsManualSelection(true));
 
     // Render component
     await act(async () => {
@@ -137,7 +137,7 @@ it("Editing disabled", async () => {
     const wcifEvent = defaultWcif.events[0]; // This is one round of 333
 
     // Disable inputs
-    store.dispatch(setEditingStatus(false));
+    store.dispatch(setIsManualSelection(false));
 
     // Render component
     await act(async () => {
@@ -167,7 +167,7 @@ it("Progress Bar showing/hiding", async () => {
     const wcifEvent = defaultWcif.events[0]; // This is one round of 333
 
     // Disable inputs
-    store.dispatch(setEditingStatus(false));
+    store.dispatch(setIsManualSelection(false));
 
     // Render component
     await act(async () => {

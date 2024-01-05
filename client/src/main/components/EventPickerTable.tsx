@@ -10,15 +10,12 @@ import EventPicker from "./EventPicker";
 const EVENTS_PER_LINE = 2;
 
 const EventPickerTable = () => {
-    const competitionId = useSelector(
-        (state: RootState) => state.competitionSlice.competitionId
+    const isManualSelection = useSelector(
+        (state: RootState) => state.informationSlice.isManualSelection
     );
     const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
     const wcaEvents = useSelector(
         (state: RootState) => state.wcifSlice.wcaEvents
-    );
-    const editingStatus = useSelector(
-        (state: RootState) => state.wcifSlice.editingStatus
     );
 
     const dispatch = useDispatch();
@@ -33,7 +30,7 @@ const EventPickerTable = () => {
     }, [dispatch]);
 
     const maybeShowEditWarning = () => {
-        if (!competitionId) {
+        if (isManualSelection) {
             return;
         }
         return (
@@ -47,7 +44,7 @@ const EventPickerTable = () => {
                         You can view and change the rounds over on{" "}
                         <a
                             href={toWcaUrl(
-                                `/competitions/${competitionId}/events/edit`
+                                `/competitions/${wcif.id}/events/edit`
                             )}
                         >
                             {" "}
@@ -72,7 +69,7 @@ const EventPickerTable = () => {
     // This filters events to show only those in the competition.
     let filteredEvents = wcaEvents.filter(
         (wcaEvent) =>
-            editingStatus || wcif.events.find((item) => item.id === wcaEvent.id)
+            isManualSelection || wcif.events.find((item) => item.id === wcaEvent.id)
     );
 
     let eventChunks = chunk(filteredEvents, EVENTS_PER_LINE);

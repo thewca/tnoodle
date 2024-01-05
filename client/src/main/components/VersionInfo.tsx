@@ -10,8 +10,8 @@ import { setExtensionLazily } from "../util/extension.util";
 
 const VersionInfo = () => {
     const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
-    const competitionId = useSelector(
-        (state: RootState) => state.competitionSlice.competitionId
+    const isManualSelection = useSelector(
+        (state: RootState) => state.informationSlice.isManualSelection
     );
 
     // WCA API response
@@ -49,7 +49,7 @@ const VersionInfo = () => {
             setSignedBuild(response.data.signedBuild);
             setSignatureKeyBytes(response.data.signatureKeyBytes);
         });
-    }, [dispatch]);
+    }, []);
 
     useEffect(() => {
         if (
@@ -82,21 +82,19 @@ const VersionInfo = () => {
             specUrl: "",
             data: {
                 isStaging: isUsingStaging(),
-                isManual: competitionId == null,
+                isManual: isManualSelection,
                 isSignedBuild: signatureValid,
                 isAllowedVersion: versionAllowed,
             },
         };
-    }, [competitionId, signatureValid, versionAllowed]);
+    }, [isManualSelection, signatureValid, versionAllowed]);
 
     useEffect(() => {
         setExtensionLazily(
             wcif,
             frontendStatusExtensionId,
             buildFrontendStatusExtension,
-            (wcif) => {
-                dispatch(setWcif(wcif));
-            }
+            (wcif) => dispatch(setWcif(wcif))
         );
     }, [dispatch, wcif, buildFrontendStatusExtension]);
 

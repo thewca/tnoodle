@@ -1,5 +1,4 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { competitionSlice } from "../../main/redux/slice/CompetitionSlice";
 import { informationSlice } from "../../main/redux/slice/InformationSlice";
 import { scramblingSlice } from "../../main/redux/slice/ScramblingSlice";
 import { wcifSlice } from "../../main/redux/slice/WcifSlice";
@@ -19,7 +18,6 @@ export const axiosResponse = {
 export const getNewStore = () =>
     configureStore({
         reducer: {
-            competitionSlice: competitionSlice.reducer,
             informationSlice: informationSlice.reducer,
             scramblingSlice: scramblingSlice.reducer,
             wcifSlice: wcifSlice.reducer,

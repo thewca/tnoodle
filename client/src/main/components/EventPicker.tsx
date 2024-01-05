@@ -39,8 +39,8 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     const wcifEvents = useSelector(
         (state: RootState) => state.wcifSlice.wcif.events
     );
-    const editingStatus = useSelector(
-        (state: RootState) => state.wcifSlice.editingStatus
+    const isManualSelection = useSelector(
+        (state: RootState) => state.informationSlice.isManualSelection
     );
     const generatingScrambles = useSelector(
         (state: RootState) => state.scramblingSlice.generatingScrambles
@@ -396,7 +396,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                         )
                                     }
                                     disabled={
-                                        !editingStatus || generatingScrambles
+                                        !isManualSelection || generatingScrambles
                                     }
                                 >
                                     {wcaEvent.format_ids.map((format) => (
@@ -422,7 +422,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                     min={1}
                                     required
                                     disabled={
-                                        !editingStatus || generatingScrambles
+                                        !isManualSelection || generatingScrambles
                                     }
                                 />
                             </td>
@@ -549,7 +549,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                     wcifEvent.rounds
                                 )
                             }
-                            disabled={!editingStatus || generatingScrambles}
+                            disabled={!isManualSelection || generatingScrambles}
                         >
                             {Array.from(
                                 { length: MAX_WCA_ROUNDS + 1 },

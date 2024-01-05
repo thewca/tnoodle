@@ -25,8 +25,8 @@ const Main = () => {
         (state: RootState) => state.scramblingSlice.password
     );
     const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
-    const competitionId = useSelector(
-        (state: RootState) => state.competitionSlice.competitionId
+    const isManualSelection = useSelector(
+        (state: RootState) => state.informationSlice.isManualSelection
     );
     const generatingScrambles = useSelector(
         (state: RootState) => state.scramblingSlice.generatingScrambles
@@ -94,7 +94,7 @@ const Main = () => {
         let officialZipStatus = isValidSignedBuild && isAllowedVersion;
 
         let isUnofficialZip =
-            !officialZipStatus || (competitionId != null && isUsingStaging());
+            !officialZipStatus || (!isManualSelection && isUsingStaging());
 
         let fileName =
             (isUnofficialZip ? "[UNOFFICIAL] " : "") +

@@ -1,23 +1,22 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import CachedObject from "../../model/CachedObject";
-import Person from "../../model/Person";
 
 interface InformationState {
     cachedObjects: Record<string, CachedObject>;
-    me?: Person;
+    isManualSelection: boolean;
 }
 
 const initialState: InformationState = {
     cachedObjects: {},
-    me: undefined,
+    isManualSelection: true,
 };
 
 export const informationSlice = createSlice({
     name: "informationSlice",
     initialState,
     reducers: {
-        setMe: (state, action: PayloadAction<Person>) => {
-            state.me = action.payload;
+        setIsManualSelection: (state, action: PayloadAction<boolean>) => {
+            state.isManualSelection = action.payload;
         },
         addCachedObject: (
             state,
@@ -38,4 +37,4 @@ export const informationSlice = createSlice({
     },
 });
 
-export const { setMe, addCachedObject } = informationSlice.actions;
+export const { addCachedObject, setIsManualSelection } = informationSlice.actions;

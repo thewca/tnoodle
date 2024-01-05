@@ -1,15 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Collapse } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import tnoodleApi from "../api/tnoodle.api";
 import wcaApi from "../api/wca.api";
 import logo from "../assets/tnoodle_logo.svg";
 import RootState from "../model/RootState";
-import {
-    setCompetitionId,
-    setCompetitions,
-} from "../redux/slice/CompetitionSlice";
-import { addCachedObject, setMe } from "../redux/slice/InformationSlice";
+import { addCachedObject, setIsManualSelection } from "../redux/slice/InformationSlice";
 import {
     setBestMbldAttempt,
     setSuggestedFmcTranslations,
@@ -17,7 +13,6 @@ import {
 import { setFileZip } from "../redux/slice/ScramblingSlice";
 import {
     setCompetitionName,
-    setEditingStatus,
     setWcif,
 } from "../redux/slice/WcifSlice";
 import { getDefaultCompetitionName } from "../util/competition.name.util";
@@ -31,18 +26,19 @@ import Loading from "./Loading";
 import "./SideBar.css";
 import Wcif from "../model/Wcif";
 import { setShowColorPicker } from "../redux/slice/SettingsSlice";
+import Competition from "../model/Competition";
+import Person from "../model/Person";
 
 const SideBar = () => {
     const [loadingUser, setLoadingUser] = useState(false);
     const [loadingCompetitions, setLoadingCompetitions] = useState(false);
     const [loadingCompetitionInfo, setLoadingCompetitionInfo] = useState(false);
 
-    const me = useSelector((state: RootState) => state.informationSlice.me);
-    const competitions = useSelector(
-        (state: RootState) => state.competitionSlice.competitions
-    );
     const cachedObjects = useSelector(
         (state: RootState) => state.informationSlice.cachedObjects
+    );
+    const wcif = useSelector(
+        (state: RootState) => state.wcifSlice.wcif
     );
     const generatingScrambles = useSelector(
         (state: RootState) => state.scramblingSlice.generatingScrambles
@@ -51,48 +47,72 @@ const SideBar = () => {
         (state: RootState) => state.settingsSlice.showColorPicker
     );
 
-    const dispatch = useDispatch();
+    const [me, setMe] = useState<Person>();
+    const [upcomingCompetitions, setUpcomingCompetitions] = useState<Competition[]>();
 
     const [isOpen, setIsOpen] = useState(true);
 
-    const handleIsOpen = () => setIsOpen(window.innerWidth > 992);
+    const handleIsOpen = useCallback(() => setIsOpen(window.innerWidth > 992), [setIsOpen]);
 
-    const init = () => {
+    useEffect(() => {
         window.addEventListener("resize", handleIsOpen);
 
+        return () => window.removeEventListener("resize", handleIsOpen)
+    }, [handleIsOpen]);
+
+    useEffect(() => {
         if (!wcaApi.isLogged()) {
             return;
         }
 
         if (!me) {
             setLoadingUser(true);
+
             wcaApi
                 .fetchMe()
-                .then((response) => dispatch(setMe(response.data.me)))
+                .then((response) => setMe(response.data.me))
                 .finally(() => setLoadingUser(false));
         }
 
-        if (!competitions) {
+        if (!upcomingCompetitions) {
             setLoadingCompetitions(true);
+
             wcaApi
                 .getUpcomingManageableCompetitions()
-                .then((response) => dispatch(setCompetitions(response.data)))
+                .then((response) => setUpcomingCompetitions(response.data))
                 .finally(() => setLoadingCompetitions(false));
         }
+    }, [upcomingCompetitions, me]);
 
-        let competitionId = getQueryParameter("competitionId");
-
-        if (!!competitionId) {
-            handleCompetitionSelection(competitionId);
+    const competitions = useMemo(() => {
+        if (wcif.id === defaultWcif.id || wcif.name === getDefaultCompetitionName()) {
+            return upcomingCompetitions || [];
         }
-    };
+
+        if (upcomingCompetitions === undefined) {
+            return [{ id: wcif.id, name: wcif.name }];
+        }
+
+        const queryParamId = getQueryParameter("competitionId");
+        const isUpcoming = upcomingCompetitions.some((comp) => comp.id === queryParamId);
+
+        if (isUpcoming) {
+            return upcomingCompetitions;
+        } else {
+            return [
+                ...upcomingCompetitions,
+                { id: wcif.id, name: wcif.name }
+            ]
+        }
+    }, [wcif, upcomingCompetitions]);
+
+    const dispatch = useDispatch();
 
     const pluralize = (string: string, number: number) =>
         string + (number > 1 ? "s" : "");
 
     const handleManualSelection = () => {
-        dispatch(setEditingStatus(true));
-        dispatch(setCompetitionId());
+        dispatch(setIsManualSelection(true));
         dispatch(setWcif({ ...defaultWcif }));
         dispatch(setBestMbldAttempt());
         dispatch(setCompetitionName(getDefaultCompetitionName()));
@@ -105,15 +125,18 @@ const SideBar = () => {
     const getAndCacheBestMbldAttempt = useCallback(
         (wcif: Wcif) => {
             tnoodleApi.fetchBestMbldAttempt(wcif).then((response) => {
-                let attempted = response.data.attempted;
-                dispatch(
-                    addCachedObject({
-                        competitionId: wcif.id,
-                        identifier: "bestMbldAttempt",
-                        object: attempted,
-                    })
-                );
-                dispatch(setBestMbldAttempt(attempted));
+                const attempted = response.data?.attempted;
+
+                if (!!attempted) {
+                    dispatch(
+                        addCachedObject({
+                            competitionId: wcif.id,
+                            identifier: "bestMbldAttempt",
+                            object: attempted,
+                        })
+                    );
+                    dispatch(setBestMbldAttempt(attempted));
+                }
             });
         },
         [dispatch]
@@ -135,56 +158,34 @@ const SideBar = () => {
         [dispatch]
     );
 
-    // In case we use competitionId from query params, it's not fetched.
-    // We add it to the list.
-    const maybeAddCompetition = useCallback(
-        (competitionId: string, competitionName: string) => {
-            if (!competitions) {
-                return;
-            }
-            if (
-                !competitions.find(
-                    (competition) => competition.name === competitionName
-                )
-            ) {
-                dispatch(
-                    setCompetitions([
-                        ...competitions,
-                        { id: competitionId, name: competitionName },
-                    ])
-                );
-            }
-        },
-        [dispatch, competitions]
-    );
-
     const updateWcif = useCallback(
         (wcif: Wcif) => {
-            dispatch(setEditingStatus(false));
+            dispatch(setIsManualSelection(false));
             dispatch(setWcif(wcif));
-            dispatch(setCompetitionId(wcif.id));
             dispatch(setCompetitionName(wcif.name));
             dispatch(setFileZip());
         },
         [dispatch]
     );
 
-    const handleCompetitionSelection = useCallback(
-        (competitionId: string) => {
-            setQueryParameter("competitionId", competitionId);
+    const loadCompetition = useCallback(
+        (competitionId: string | null) => {
+            if (competitionId === null) {
+                return;
+            }
+
+            if (wcif.id === competitionId) {
+                return;
+            }
 
             // For quick switching between competitions.
             let cachedObject = cachedObjects[competitionId];
-            if (!!cachedObject) {
-                let cachedWcif = cachedObject.wcif;
-                updateWcif(cachedWcif);
-                maybeAddCompetition(cachedWcif.id, cachedWcif.name);
 
-                let cachedSuggestedFmcTranslations =
-                    cachedObject.suggestedFmcTranslations;
-                dispatch(
-                    setSuggestedFmcTranslations(cachedSuggestedFmcTranslations)
-                );
+            if (!!cachedObject) {
+                updateWcif(cachedObject.wcif);
+
+                let cachedSuggestedFmcTranslations = cachedObject.suggestedFmcTranslations;
+                dispatch(setSuggestedFmcTranslations(cachedSuggestedFmcTranslations));
 
                 let cachedBestMbldAttempt = cachedObject.bestMbldAttempt;
                 dispatch(setBestMbldAttempt(cachedBestMbldAttempt));
@@ -202,10 +203,6 @@ const SideBar = () => {
                                 object: response.data,
                             })
                         );
-                        maybeAddCompetition(
-                            response.data.id,
-                            response.data.name
-                        );
                         getAndCacheSuggestedFmcTranslations(response.data);
                         getAndCacheBestMbldAttempt(response.data);
                     })
@@ -213,16 +210,27 @@ const SideBar = () => {
             }
         },
         [
-            cachedObjects,
             dispatch,
+            wcif.id,
+            cachedObjects,
             getAndCacheBestMbldAttempt,
             getAndCacheSuggestedFmcTranslations,
-            maybeAddCompetition,
             updateWcif,
         ]
     );
 
-    useEffect(init, [competitions, dispatch, handleCompetitionSelection, me]);
+    useEffect(() => {
+        const queryParamId = getQueryParameter("competitionId");
+
+        if (wcif.id !== queryParamId) {
+            loadCompetition(queryParamId);
+        }
+    }, [loadCompetition, wcif.id]);
+
+    const handleCompetitionSelection = useCallback((competitionId: string) => {
+        setQueryParameter("competitionId", competitionId);
+        loadCompetition(competitionId);
+    }, [loadCompetition]);
 
     const logInButton = () => {
         return (
@@ -347,11 +355,7 @@ const SideBar = () => {
                                             type="button"
                                             className="btn btn-primary btn-lg btn-block m-1"
                                             disabled={generatingScrambles}
-                                            onClick={() =>
-                                                handleCompetitionSelection(
-                                                    competition.id
-                                                )
-                                            }
+                                            onClick={() => handleCompetitionSelection(competition.id)}
                                         >
                                             {competition.name}
                                         </button>
