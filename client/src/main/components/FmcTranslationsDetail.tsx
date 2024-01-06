@@ -74,12 +74,22 @@ const FmcTranslationsDetail = ({
     );
 
     useEffect(() => {
-        const wcifExtension = findExtension(fmcWcifEvent, fmcTranslationsExtensionId);
+        const wcifExtension = findExtension(
+            fmcWcifEvent,
+            fmcTranslationsExtensionId
+        );
 
-        if (wcifExtension === undefined && suggestedFmcTranslations !== undefined) {
+        if (
+            wcifExtension === undefined &&
+            suggestedFmcTranslations !== undefined
+        ) {
             updateEventSelectedTranslations(suggestedFmcTranslations);
         }
-    }, [fmcWcifEvent, updateEventSelectedTranslations, suggestedFmcTranslations]);
+    }, [
+        fmcWcifEvent,
+        updateEventSelectedTranslations,
+        suggestedFmcTranslations,
+    ]);
 
     const handleTranslation = (id: string, status: boolean) => {
         let newSelectedTranslations = selectedTranslations.filter(

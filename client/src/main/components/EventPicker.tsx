@@ -396,7 +396,8 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                         )
                                     }
                                     disabled={
-                                        !isManualSelection || generatingScrambles
+                                        !isManualSelection ||
+                                        generatingScrambles
                                     }
                                 >
                                     {wcaEvent.format_ids.map((format) => (
@@ -422,7 +423,8 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                     min={1}
                                     required
                                     disabled={
-                                        !isManualSelection || generatingScrambles
+                                        !isManualSelection ||
+                                        generatingScrambles
                                     }
                                 />
                             </td>

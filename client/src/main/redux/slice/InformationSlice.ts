@@ -37,4 +37,5 @@ export const informationSlice = createSlice({
     },
 });
 
-export const { addCachedObject, setIsManualSelection } = informationSlice.actions;
+export const { addCachedObject, setIsManualSelection } =
+    informationSlice.actions;

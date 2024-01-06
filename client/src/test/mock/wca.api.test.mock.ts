@@ -688,7 +688,7 @@ export const wcifs: Record<string, Wcif> = {
                         },
                         id: "org.worldcubeassociation.tnoodle.FmcLanguages",
                         specUrl: "",
-                    }
+                    },
                 ],
             },
             {
@@ -724,7 +724,7 @@ export const wcifs: Record<string, Wcif> = {
                         },
                         id: "org.worldcubeassociation.tnoodle.MultiScrambleCount",
                         specUrl: "",
-                    }
+                    },
                 ],
             },
         ],

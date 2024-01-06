@@ -69,7 +69,8 @@ const EventPickerTable = () => {
     // This filters events to show only those in the competition.
     let filteredEvents = wcaEvents.filter(
         (wcaEvent) =>
-            isManualSelection || wcif.events.find((item) => item.id === wcaEvent.id)
+            isManualSelection ||
+            wcif.events.find((item) => item.id === wcaEvent.id)
     );
 
     let eventChunks = chunk(filteredEvents, EVENTS_PER_LINE);

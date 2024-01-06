@@ -43,7 +43,10 @@ const SchemeColorPicker = ({
         >
             <span
                 className={"color-bubble"}
-                style={{ backgroundColor: colorValue, pointerEvents: generatingScrambles ? 'none' : 'inherit' }}
+                style={{
+                    backgroundColor: colorValue,
+                    pointerEvents: generatingScrambles ? "none" : "inherit",
+                }}
             >
                 {colorKey}
             </span>

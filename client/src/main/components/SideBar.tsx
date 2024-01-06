@@ -5,16 +5,16 @@ import tnoodleApi from "../api/tnoodle.api";
 import wcaApi from "../api/wca.api";
 import logo from "../assets/tnoodle_logo.svg";
 import RootState from "../model/RootState";
-import { addCachedObject, setIsManualSelection } from "../redux/slice/InformationSlice";
+import {
+    addCachedObject,
+    setIsManualSelection,
+} from "../redux/slice/InformationSlice";
 import {
     setBestMbldAttempt,
     setSuggestedFmcTranslations,
 } from "../redux/slice/EventDataSlice";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
-import {
-    setCompetitionName,
-    setWcif,
-} from "../redux/slice/WcifSlice";
+import { setCompetitionName, setWcif } from "../redux/slice/WcifSlice";
 import { getDefaultCompetitionName } from "../util/competition.name.util";
 import {
     deleteParameter,
@@ -37,9 +37,7 @@ const SideBar = () => {
     const cachedObjects = useSelector(
         (state: RootState) => state.informationSlice.cachedObjects
     );
-    const wcif = useSelector(
-        (state: RootState) => state.wcifSlice.wcif
-    );
+    const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
     const generatingScrambles = useSelector(
         (state: RootState) => state.scramblingSlice.generatingScrambles
     );
@@ -48,16 +46,20 @@ const SideBar = () => {
     );
 
     const [me, setMe] = useState<Person>();
-    const [upcomingCompetitions, setUpcomingCompetitions] = useState<Competition[]>();
+    const [upcomingCompetitions, setUpcomingCompetitions] =
+        useState<Competition[]>();
 
     const [isOpen, setIsOpen] = useState(true);
 
-    const handleIsOpen = useCallback(() => setIsOpen(window.innerWidth > 992), [setIsOpen]);
+    const handleIsOpen = useCallback(
+        () => setIsOpen(window.innerWidth > 992),
+        [setIsOpen]
+    );
 
     useEffect(() => {
         window.addEventListener("resize", handleIsOpen);
 
-        return () => window.removeEventListener("resize", handleIsOpen)
+        return () => window.removeEventListener("resize", handleIsOpen);
     }, [handleIsOpen]);
 
     useEffect(() => {
@@ -85,7 +87,10 @@ const SideBar = () => {
     }, [upcomingCompetitions, me]);
 
     const competitions = useMemo(() => {
-        if (wcif.id === defaultWcif.id || wcif.name === getDefaultCompetitionName()) {
+        if (
+            wcif.id === defaultWcif.id ||
+            wcif.name === getDefaultCompetitionName()
+        ) {
             return upcomingCompetitions || [];
         }
 
@@ -94,15 +99,14 @@ const SideBar = () => {
         }
 
         const queryParamId = getQueryParameter("competitionId");
-        const isUpcoming = upcomingCompetitions.some((comp) => comp.id === queryParamId);
+        const isUpcoming = upcomingCompetitions.some(
+            (comp) => comp.id === queryParamId
+        );
 
         if (isUpcoming) {
             return upcomingCompetitions;
         } else {
-            return [
-                ...upcomingCompetitions,
-                { id: wcif.id, name: wcif.name }
-            ]
+            return [...upcomingCompetitions, { id: wcif.id, name: wcif.name }];
         }
     }, [wcif, upcomingCompetitions]);
 
@@ -184,8 +188,11 @@ const SideBar = () => {
             if (!!cachedObject) {
                 updateWcif(cachedObject.wcif);
 
-                let cachedSuggestedFmcTranslations = cachedObject.suggestedFmcTranslations;
-                dispatch(setSuggestedFmcTranslations(cachedSuggestedFmcTranslations));
+                let cachedSuggestedFmcTranslations =
+                    cachedObject.suggestedFmcTranslations;
+                dispatch(
+                    setSuggestedFmcTranslations(cachedSuggestedFmcTranslations)
+                );
 
                 let cachedBestMbldAttempt = cachedObject.bestMbldAttempt;
                 dispatch(setBestMbldAttempt(cachedBestMbldAttempt));
@@ -227,10 +234,13 @@ const SideBar = () => {
         }
     }, [loadCompetition, wcif.id]);
 
-    const handleCompetitionSelection = useCallback((competitionId: string) => {
-        setQueryParameter("competitionId", competitionId);
-        loadCompetition(competitionId);
-    }, [loadCompetition]);
+    const handleCompetitionSelection = useCallback(
+        (competitionId: string) => {
+            setQueryParameter("competitionId", competitionId);
+            loadCompetition(competitionId);
+        },
+        [loadCompetition]
+    );
 
     const logInButton = () => {
         return (
@@ -355,7 +365,11 @@ const SideBar = () => {
                                             type="button"
                                             className="btn btn-primary btn-lg btn-block m-1"
                                             disabled={generatingScrambles}
-                                            onClick={() => handleCompetitionSelection(competition.id)}
+                                            onClick={() =>
+                                                handleCompetitionSelection(
+                                                    competition.id
+                                                )
+                                            }
                                         >
                                             {competition.name}
                                         </button>

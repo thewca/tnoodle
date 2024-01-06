@@ -70,7 +70,10 @@ const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
     );
 
     useEffect(() => {
-        const wcifExtension = findExtension(mbldWcifEvent, mbldCubesExtensionId);
+        const wcifExtension = findExtension(
+            mbldWcifEvent,
+            mbldCubesExtensionId
+        );
 
         if (wcifExtension === undefined && bestMbldAttempt !== undefined) {
             updateEventMbld(bestMbldAttempt);
