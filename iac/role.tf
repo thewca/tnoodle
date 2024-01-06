@@ -26,6 +26,11 @@ resource "aws_iam_role" "ecs_task_execution_role" {
           Action   = ["logs:*"]
           Effect   = "Allow"
           Resource = "*"
+        },
+        {
+          Action   = ["ecr:GetAuthorizationToken"]
+          Effect   = "Allow"
+          Resource = "*"
         }
       ]
     })

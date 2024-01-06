@@ -10,7 +10,8 @@
             "options": {
                 "awslogs-group": "/ecs/${container_name}",
                 "awslogs-region": "${aws_region}",
-                "awslogs-stream-prefix": "ecs"
+                "awslogs-stream-prefix": "ecs",
+                "awslogs-create-group": "true"
             }
         },
         "portMappings": [
