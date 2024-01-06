@@ -29,3 +29,27 @@ variable "fargate_cpu" {
 variable "fargate_memory" {
   default = "2048" # 2 GB
 }
+
+variable "type_subnet" {
+  default = "SUBNET"
+}
+
+variable "type_sg" {
+  default = "SECURITY-GROUP"
+}
+
+variable "type_tg" {
+  default = "TARGET-GROUP"
+}
+
+variable "type_alb" {
+  default = "LOAD-BALANCER"
+}
+
+variable "http_port" {
+  default = "80"
+}
+
+variable "https_port" {
+  default = "443"
+}

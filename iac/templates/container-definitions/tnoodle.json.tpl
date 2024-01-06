@@ -2,8 +2,8 @@
     {
         "name": "${container_name}",
         "image": "${app_image}",
-        "cpu": "${fargate_cpu}",
-        "memory": "${fargate_memory}",
+        "cpu": ${fargate_cpu},
+        "memory": ${fargate_memory},
         "networkMode": "awsvpc",
         "logConfiguration": {
             "logDriver": "awslogs",
@@ -15,8 +15,8 @@
         },
         "portMappings": [
             {
-                "containerPort": "${app_port}",
-                "hostPort": "${app_port}"
+                "containerPort": ${app_port},
+                "hostPort": ${app_port}
             }
         ]
     }
