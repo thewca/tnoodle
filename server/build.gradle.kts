@@ -33,6 +33,7 @@ dependencies {
     api(libs.kotlinx.serialization.json)
     api(libs.tnoodle.scrambles)
 
+    implementation(libs.tnoodle.scrambler.threephase)
     implementation(libs.zip4j)
     implementation(libs.itextpdf)
     implementation(libs.itext7)
