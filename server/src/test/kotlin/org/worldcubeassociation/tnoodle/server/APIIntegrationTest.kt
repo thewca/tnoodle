@@ -3,6 +3,7 @@ package org.worldcubeassociation.tnoodle.server
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.serialization.kotlinx.json.*
@@ -29,9 +30,16 @@ class APIIntegrationTest {
             install(ContentNegotiation) {
                 json(JsonConfig.SERIALIZER)
             }
+
+            install(HttpTimeout) {
+                // This matches the configuration of our monolith at the time of writing this comment
+                requestTimeoutMillis = 60000
+            }
         }
 
-        val upcomingComps = client.get("https://www.worldcubeassociation.org/api/v0/competitions/").body<List<UpcomingCompetition>>().shuffled()
+        val upcomingComps =
+            client.get("https://www.worldcubeassociation.org/api/v0/competitions/").body<List<UpcomingCompetition>>()
+                .shuffled()
 
         val generationDate = LocalDateTime.now()
 
@@ -41,19 +49,28 @@ class APIIntegrationTest {
                 val multiCubes = MultiScrambleCountExtension(Random.nextInt(10, 20))
 
                 val websiteWcif = client.get(url).body<Competition>()
-                val blankWcif = WCIFScrambleMatcher.installExtensionForEvents(websiteWcif, multiCubes, EventData.THREE_MULTI_BLD)
+                val blankWcif =
+                    WCIFScrambleMatcher.installExtensionForEvents(websiteWcif, multiCubes, EventData.THREE_MULTI_BLD)
 
                 println("[$it] Fetched WCIF. On to computing scrambles…")
                 val scrambledWcif = WCIFScrambleMatcher.fillScrambleSets(blankWcif)
 
                 println("[$it] Scrambles generated successfully. On to rendering the PDF…")
                 val sheets = scrambledWcif.toDocuments("JUnit-Test", Translate.DEFAULT_LOCALE)
-                val renderedPdf = Assertions.assertDoesNotThrow(ThrowingSupplier { WCIFDataBuilder.compileOutlinePdf(sheets) })
+                val renderedPdf =
+                    Assertions.assertDoesNotThrow(ThrowingSupplier { WCIFDataBuilder.compileOutlinePdf(sheets) })
                 Assertions.assertTrue(renderedPdf.isNotEmpty())
 
                 val computationTime = measureTimeMillis {
                     println("[$it] Single PDF rendered successfully. On to compiling the ZIP…")
-                    val completeZip = WCIFDataBuilder.wcifToZip(scrambledWcif, null, "JUnit-Test", Translate.DEFAULT_LOCALE, generationDate, "https://test.local")
+                    val completeZip = WCIFDataBuilder.wcifToZip(
+                        scrambledWcif,
+                        null,
+                        "JUnit-Test",
+                        Translate.DEFAULT_LOCALE,
+                        generationDate,
+                        "https://test.local"
+                    )
                     Assertions.assertTrue(completeZip.allFiles.isNotEmpty())
                     val compiledZip = Assertions.assertDoesNotThrow(ThrowingSupplier { completeZip.compress() })
                     Assertions.assertTrue(compiledZip.isNotEmpty())
