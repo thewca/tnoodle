@@ -22,7 +22,7 @@ export const getDefaultCopiesExtension = () => {
         id: copiesExtensionId,
         specUrl: "",
         data: {
-            numCopies: "1",
+            numCopies: 1,
         },
     };
 };
@@ -34,7 +34,7 @@ let default333: WcifEvent = {
         {
             format: "a",
             id: "333-r1",
-            scrambleSetCount: "1",
+            scrambleSetCount: 1,
             extensions: [getDefaultCopiesExtension()],
         },
     ],

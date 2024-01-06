@@ -85,7 +85,7 @@ it("Show editing warn if case of competition selected", async () => {
             {
                 id: "222-r1",
                 format: "a",
-                scrambleSetCount: "5",
+                scrambleSetCount: 5,
                 extensions: [getDefaultCopiesExtension()],
             },
         ],

@@ -80,14 +80,14 @@ it("Changing values from event", async () => {
 
     expect(
         store.getState().wcifSlice.wcif.events[0].rounds[0].scrambleSetCount
-    ).toBe("1");
+    ).toBe(1);
 
     // This should be numberOfRounds * 2, since each round has 2 inputs.
     // It's not, probably because not updating DOM after dispatching
     const inputs = Array.from(container.querySelectorAll("input"));
 
     let roundToChange = 0;
-    let value = "10";
+    let value = 10;
 
     // Change last scramble sets to 10
     fireEvent.change(inputs[roundToChange * 2], { target: { value } });
@@ -111,7 +111,7 @@ it("Changing values from event", async () => {
     expect(copies.disabled).toBe(false);
 
     // Changes to scrambleSet should go to the store
-    const newScrambleSets = "3";
+    const newScrambleSets = 3;
     fireEvent.change(scrambleSets, { target: { value: newScrambleSets } });
     expect(
         store.getState().wcifSlice.wcif.events[0].rounds[0].scrambleSetCount
@@ -121,10 +121,10 @@ it("Changing values from event", async () => {
     expect(
         store.getState().wcifSlice.wcif.events[0].rounds[0].extensions[0].data
             .numCopies
-    ).toBe("1");
+    ).toBe(1);
 
     // Changes to copies should go to the store
-    const newCopies = "5";
+    const newCopies = 5;
     fireEvent.change(copies, { target: { value: newCopies } });
     expect(
         store.getState().wcifSlice.wcif.events[0].rounds[0].extensions[0].data

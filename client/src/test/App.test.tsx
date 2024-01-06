@@ -187,8 +187,8 @@ it("Changes on 333, scramble", async () => {
     let inputs = Array.from(container.querySelectorAll("form input"));
 
     // Change 2nd round
-    let scrambleSets = "6";
-    let copies = "7";
+    let scrambleSets = 6;
+    let copies = 7;
     fireEvent.change(inputs[4], { target: { value: scrambleSets } });
     fireEvent.change(inputs[5], { target: { value: copies } });
 
@@ -216,8 +216,8 @@ it("Changes on 333, scramble", async () => {
             expect(round.extensions[0].data.numCopies).toBe(copies);
         } else {
             expect(round.format).toBe("a");
-            expect(round.scrambleSetCount).toBe("1");
-            expect(round.extensions[0].data.numCopies).toBe("1");
+            expect(round.scrambleSetCount).toBe(1);
+            expect(round.extensions[0].data.numCopies).toBe(1);
         }
 
         expect(round.id).toBe("333-r" + (i + 1));

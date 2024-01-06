@@ -168,7 +168,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             newRounds.push({
                 id: wcaEvent.id + "-r" + (newRounds.length + 1),
                 format: wcaEvent.format_ids[0],
-                scrambleSetCount: "1",
+                scrambleSetCount: 1,
                 extensions: [getDefaultCopiesExtension()],
             });
         }
@@ -181,7 +181,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
 
     const handleGeneralRoundChange = (
         roundNumber: number,
-        value: string,
+        value: string | number,
         rounds: Round[],
         name: "format" | "scrambleSetCount"
     ) => {
@@ -194,7 +194,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
 
     const handleNumberOfCopiesChange = (
         roundNumber: number,
-        numCopies: string,
+        numCopies: number,
         rounds: Round[]
     ) => {
         updateEventRounds(
@@ -414,7 +414,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                     onChange={(evt) =>
                                         handleGeneralRoundChange(
                                             i,
-                                            evt.target.value,
+                                            Number(evt.target.value),
                                             wcifRounds,
                                             "scrambleSetCount"
                                         )
@@ -434,7 +434,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                     onChange={(evt) =>
                                         handleNumberOfCopiesChange(
                                             i,
-                                            evt.target.value,
+                                            Number(evt.target.value),
                                             wcifRounds
                                         )
                                     }

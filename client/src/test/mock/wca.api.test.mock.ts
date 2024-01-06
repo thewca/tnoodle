@@ -46,11 +46,11 @@ export const wcifs: Record<string, Wcif> = {
                     {
                         id: "333-r1",
                         format: "a",
-                        scrambleSetCount: "8",
+                        scrambleSetCount: 8,
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
@@ -60,11 +60,11 @@ export const wcifs: Record<string, Wcif> = {
                     {
                         id: "333-r2",
                         format: "a",
-                        scrambleSetCount: "4",
+                        scrambleSetCount: 4,
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
@@ -74,11 +74,11 @@ export const wcifs: Record<string, Wcif> = {
                     {
                         id: "333-r3",
                         format: "a",
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
@@ -88,11 +88,11 @@ export const wcifs: Record<string, Wcif> = {
                     {
                         id: "333-r4",
                         format: "a",
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
@@ -108,11 +108,11 @@ export const wcifs: Record<string, Wcif> = {
                     {
                         id: "222-r1",
                         format: "a",
-                        scrambleSetCount: "5",
+                        scrambleSetCount: 5,
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
@@ -125,13 +125,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "2",
+                        scrambleSetCount: 2,
                     },
                     {
                         id: "222-r3",
@@ -139,13 +139,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                 ],
                 extensions: [],
@@ -159,13 +159,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "6",
+                        scrambleSetCount: 6,
                     },
                     {
                         id: "444-r2",
@@ -173,13 +173,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "2",
+                        scrambleSetCount: 2,
                     },
                     {
                         id: "444-r3",
@@ -187,13 +187,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                 ],
                 extensions: [],
@@ -207,13 +207,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "3",
+                        scrambleSetCount: 3,
                     },
                     {
                         id: "555-r2",
@@ -221,13 +221,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                     {
                         id: "555-r3",
@@ -235,13 +235,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                 ],
                 extensions: [],
@@ -255,13 +255,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "8",
+                        scrambleSetCount: 8,
                     },
                     {
                         id: "666-r2",
@@ -269,13 +269,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                 ],
                 extensions: [],
@@ -289,13 +289,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "7",
+                        scrambleSetCount: 7,
                     },
                     {
                         id: "777-r2",
@@ -303,13 +303,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                 ],
                 extensions: [],
@@ -323,13 +323,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "3",
+                        scrambleSetCount: 3,
                     },
                     {
                         id: "333bf-r2",
@@ -337,13 +337,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                     {
                         id: "333bf-r3",
@@ -351,13 +351,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                 ],
                 extensions: [],
@@ -371,13 +371,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "4",
+                        scrambleSetCount: 4,
                     },
                     {
                         id: "333oh-r2",
@@ -385,13 +385,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                     {
                         id: "333oh-r3",
@@ -399,13 +399,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                 ],
                 extensions: [],
@@ -419,13 +419,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "2",
+                        scrambleSetCount: 2,
                     },
                     {
                         id: "clock-r2",
@@ -433,13 +433,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                 ],
                 extensions: [],
@@ -453,13 +453,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "2",
+                        scrambleSetCount: 2,
                     },
                     {
                         id: "minx-r2",
@@ -467,13 +467,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                 ],
                 extensions: [],
@@ -487,13 +487,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "6",
+                        scrambleSetCount: 6,
                     },
                     {
                         id: "pyram-r2",
@@ -501,13 +501,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                     {
                         id: "pyram-r3",
@@ -515,13 +515,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                 ],
                 extensions: [],
@@ -535,13 +535,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "4",
+                        scrambleSetCount: 4,
                     },
                     {
                         id: "skewb-r2",
@@ -549,13 +549,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                     {
                         id: "skewb-r3",
@@ -563,13 +563,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                 ],
                 extensions: [],
@@ -583,13 +583,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "3",
+                        scrambleSetCount: 3,
                     },
                     {
                         id: "sq1-r2",
@@ -597,13 +597,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "2",
+                        scrambleSetCount: 2,
                     },
                     {
                         id: "sq1-r3",
@@ -611,13 +611,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                 ],
                 extensions: [],
@@ -631,13 +631,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "3",
+                        scrambleSetCount: 3,
                     },
                 ],
                 extensions: [],
@@ -651,13 +651,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "2",
+                        scrambleSetCount: 2,
                     },
                 ],
                 extensions: [],
@@ -672,13 +672,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                 ],
                 extensions: [
@@ -701,7 +701,7 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
@@ -714,7 +714,7 @@ export const wcifs: Record<string, Wcif> = {
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                 ],
                 extensions: [
@@ -759,13 +759,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "8",
+                        scrambleSetCount: 8,
                     },
                     {
                         id: "333-r2",
@@ -773,13 +773,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "4",
+                        scrambleSetCount: 4,
                     },
                     {
                         id: "333-r3",
@@ -787,13 +787,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                     {
                         id: "333-r4",
@@ -801,13 +801,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                 ],
                 extensions: [],
@@ -821,13 +821,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "5",
+                        scrambleSetCount: 5,
                     },
                     {
                         id: "222-r2",
@@ -835,13 +835,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "2",
+                        scrambleSetCount: 2,
                     },
                     {
                         id: "222-r3",
@@ -849,13 +849,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                 ],
                 extensions: [],
@@ -869,13 +869,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "6",
+                        scrambleSetCount: 6,
                     },
                     {
                         id: "444-r2",
@@ -883,13 +883,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "2",
+                        scrambleSetCount: 2,
                     },
                     {
                         id: "444-r3",
@@ -897,13 +897,13 @@ export const wcifs: Record<string, Wcif> = {
                         extensions: [
                             {
                                 data: {
-                                    numCopies: "1",
+                                    numCopies: 1,
                                 },
                                 id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
-                        scrambleSetCount: "1",
+                        scrambleSetCount: 1,
                     },
                 ],
                 extensions: [],
