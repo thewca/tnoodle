@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
 import org.worldcubeassociation.tnoodle.server.ApplicationHandler
 import org.worldcubeassociation.tnoodle.server.TNoodleServer
 import org.worldcubeassociation.tnoodle.server.ServerEnvironmentConfig
-import org.worldcubeassociation.tnoodle.deployable.jar.config.LocalServerEnvironmentConfig
+import org.worldcubeassociation.tnoodle.server.config.LocalServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.deployable.jar.routing.HomepageHandler
 import org.worldcubeassociation.tnoodle.deployable.jar.routing.IconHandler
 import org.worldcubeassociation.tnoodle.deployable.jar.routing.ReadmeHandler
@@ -58,7 +58,7 @@ class WebscramblesServer(environmentConfig: ServerEnvironmentConfig) : Applicati
             val onlineConfig by parser.flagging("-o", "--online", help = "Change configuration for online mode. This will override port bindings and sun.awt.fontconfig")
 
             val port = System.getenv("PORT")?.takeIf { onlineConfig }?.toIntOrNull() ?: cliPort
-            val offlineHandler = OfflineJarUtils(port)
+            val offlineHandler = OfflineJarUtils(port, LocalServerEnvironmentConfig)
 
             val isWrapped = if (!noReexec) {
                 MainLauncher.wrapMain(args, MIN_HEAP_SIZE_MEGS)

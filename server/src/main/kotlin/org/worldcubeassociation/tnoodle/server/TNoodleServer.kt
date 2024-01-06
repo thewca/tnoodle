@@ -12,6 +12,7 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import kotlinx.serialization.SerializationException
+import org.worldcubeassociation.tnoodle.server.config.LocalServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.exceptions.BadWcifParameterException
 import org.worldcubeassociation.tnoodle.server.exceptions.ScheduleMatchingException
 import org.worldcubeassociation.tnoodle.server.exceptions.ScrambleMatchingException
@@ -30,7 +31,7 @@ import org.worldcubeassociation.tnoodle.server.routing.frontend.WcifDataHandler
 import java.io.DataInputStream
 import java.io.DataOutputStream
 
-class TNoodleServer(val environmentConfig: ServerEnvironmentConfig) : ApplicationHandler {
+class TNoodleServer(val environmentConfig: ServerEnvironmentConfig = LocalServerEnvironmentConfig) : ApplicationHandler {
     override fun spinUp(app: Application) {
         initPruning()
 

@@ -1,10 +1,9 @@
-package org.worldcubeassociation.tnoodle.deployable.jar.config
+package org.worldcubeassociation.tnoodle.server.config
 
 import org.worldcubeassociation.tnoodle.server.ServerEnvironmentConfig
-import org.worldcubeassociation.tnoodle.deployable.jar.server.WebServerUtils.DEVEL_VERSION
-import org.worldcubeassociation.tnoodle.deployable.jar.server.WebServerUtils.PRUNING_FOLDER
-import org.worldcubeassociation.tnoodle.deployable.jar.server.WebServerUtils
-import org.worldcubeassociation.tnoodle.deployable.jar.server.WebServerUtils.jarFile
+import org.worldcubeassociation.tnoodle.server.config.WebServerUtils.DEVEL_VERSION
+import org.worldcubeassociation.tnoodle.server.config.WebServerUtils.PRUNING_FOLDER
+import org.worldcubeassociation.tnoodle.server.config.WebServerUtils.jarFile
 import java.io.File
 import java.io.FileNotFoundException
 

@@ -3,14 +3,14 @@ package org.worldcubeassociation.tnoodle.deployable.jar.server
 import dorkbox.systemTray.SystemTray
 import dorkbox.systemTray.MenuItem
 import org.slf4j.LoggerFactory
-import org.worldcubeassociation.tnoodle.deployable.jar.config.LocalServerEnvironmentConfig
+import org.worldcubeassociation.tnoodle.server.ServerEnvironmentConfig
 import java.awt.*
 import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
 import kotlin.system.exitProcess
 
-data class OfflineJarUtils(val port: Int) {
+data class OfflineJarUtils(val port: Int, val envConfig: ServerEnvironmentConfig) {
     val url = "http://localhost:$port"
 
     fun openTabInBrowser() {
@@ -60,7 +60,7 @@ data class OfflineJarUtils(val port: Int) {
 
         trayAdapter.menu.add(exitItem)
 
-        val tooltip = "${LocalServerEnvironmentConfig.projectName} v${LocalServerEnvironmentConfig.projectVersion}"
+        val tooltip = "${envConfig.projectName} v${envConfig.projectVersion}"
         trayAdapter.setTooltip(tooltip)
         trayAdapter.status = tooltip
 
