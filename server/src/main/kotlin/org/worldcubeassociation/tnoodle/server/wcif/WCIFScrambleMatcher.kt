@@ -119,15 +119,19 @@ object WCIFScrambleMatcher {
             val extraCountPerAttempt = extraScrambleNum / round.expectedAttemptNum
 
             return List(round.expectedAttemptNum) { n ->
-                val scrambles = rawScrambles
+                rawScrambles
                     // drop previous attempts first
                     .drop(n * (standardCountPerAttempt + extraCountPerAttempt))
                     // then slice the relevant scrambles *within* the current attempt
                     .sliceScrambles(standardCountPerAttempt, extraCountPerAttempt, isExtra)
                     .joinToString(Scramble.WCIF_NEWLINE_CHAR)
-
-                Scramble(scrambles)
-            }
+            }.filterNot {
+                // small hack: MultiBLD assumes that we always have "a scramble string", which is then dynamically determined
+                // to be N glued together 3x3x3 strings under the assumption that we will always have *some* amount of scrambles.
+                //
+                // If there are absolutely no extra scrambles requested, we don't need to bother generating empty strings.
+                it.isEmpty() && isExtra
+            }.map(::Scramble)
         } else {
             return rawScrambles.sliceScrambles(standardScrambleNum, extraScrambleNum, isExtra)
                 .map(::Scramble)
