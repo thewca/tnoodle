@@ -1,6 +1,6 @@
 import { OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { MAX_WCA_ROUNDS } from "../constants/wca.constants";
+import { MAX_WCA_ROUNDS, MBLD_DEFAULT } from "../constants/wca.constants";
 import RootState from "../model/RootState";
 import Round from "../model/Round";
 import WcaEvent from "../model/WcaEvent";
@@ -8,9 +8,10 @@ import WcifEvent from "../model/WcifEvent";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
 import { setWcifEvent } from "../redux/slice/WcifSlice";
 import {
+    buildMbldExtension,
     colorSchemeExtensionId,
     copiesExtensionId,
-    getDefaultCopiesExtension,
+    getDefaultCopiesExtension
 } from "../util/wcif.util";
 import tnoodleApi from "../api/tnoodle.api";
 import "./EventPicker.css";
@@ -153,6 +154,17 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         };
     };
 
+    const generateDefaultRound = (wcaEvent: WcaEvent, numZeroBased: number) => {
+        const extensions = wcaEvent.is_multiple_blindfolded ? [getDefaultCopiesExtension(), buildMbldExtension(MBLD_DEFAULT)] : [getDefaultCopiesExtension()]
+
+        return {
+            id: wcaEvent.id + "-r" + (numZeroBased + 1),
+            format: wcaEvent.format_ids[0],
+            scrambleSetCount: 1,
+            extensions,
+        };
+    }
+
     const handleNumberOfRoundsChange = (
         numberOfRounds: number,
         rounds: Round[]
@@ -165,12 +177,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
 
         // case we have to add
         while (newRounds.length < numberOfRounds) {
-            newRounds.push({
-                id: wcaEvent.id + "-r" + (newRounds.length + 1),
-                format: wcaEvent.format_ids[0],
-                scrambleSetCount: 1,
-                extensions: [getDefaultCopiesExtension()],
-            });
+            newRounds.push(generateDefaultRound(wcaEvent, newRounds.length));
         }
         updateEventRounds(newRounds);
 

@@ -27,6 +27,16 @@ export const getDefaultCopiesExtension = () => {
     };
 };
 
+export const buildMbldExtension = (mbld: number) => {
+    return {
+        id: mbldCubesExtensionId,
+        specUrl: "",
+        data: {
+            requestedScrambles: mbld
+        },
+    };
+};
+
 // Add 1 round of 3x3x3
 let default333: WcifEvent = {
     id: "333",

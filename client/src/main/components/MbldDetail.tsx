@@ -4,7 +4,7 @@ import RootState from "../model/RootState";
 import { setWcifEvent } from "../redux/slice/WcifSlice";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
 import WcifEvent from "../model/WcifEvent";
-import { mbldCubesExtensionId } from "../util/wcif.util";
+import { buildMbldExtension, mbldCubesExtensionId } from "../util/wcif.util";
 import { useCallback, useEffect, useMemo } from "react";
 import {
     findExtension,
@@ -34,14 +34,6 @@ const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
     }, [mbldWcifEvent, bestMbldAttempt]);
 
     const dispatch = useDispatch();
-
-    const buildMbldExtension = (mbld: number) => {
-        return {
-            id: mbldCubesExtensionId,
-            specUrl: "",
-            data: { requestedScrambles: mbld },
-        };
-    };
 
     const updateEventMbld = useCallback(
         (mbld: number) => {

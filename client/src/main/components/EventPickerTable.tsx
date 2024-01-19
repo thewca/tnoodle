@@ -6,6 +6,9 @@ import { toWcaUrl } from "../api/wca.api";
 import RootState from "../model/RootState";
 import { setWcaEvents, setWcaFormats } from "../redux/slice/WcifSlice";
 import EventPicker from "./EventPicker";
+import WcaEvent from "../model/WcaEvent";
+import { buildMbldExtension } from "../util/wcif.util";
+import { MBLD_DEFAULT } from "../constants/wca.constants";
 
 const EVENTS_PER_LINE = 2;
 
@@ -13,7 +16,9 @@ const EventPickerTable = () => {
     const isManualSelection = useSelector(
         (state: RootState) => state.informationSlice.isManualSelection
     );
-    const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
+    const wcif = useSelector(
+        (state: RootState) => state.wcifSlice.wcif
+    );
     const wcaEvents = useSelector(
         (state: RootState) => state.wcifSlice.wcaEvents
     );
@@ -29,10 +34,21 @@ const EventPickerTable = () => {
         });
     }, [dispatch]);
 
+    const generateDefaultEvent = (wcaEvent: WcaEvent) => {
+        const extensions = wcaEvent.is_multiple_blindfolded ? [buildMbldExtension(MBLD_DEFAULT)] : [];
+
+        return {
+            id: wcaEvent.id,
+            rounds: [],
+            extensions,
+        };
+    }
+
     const maybeShowEditWarning = () => {
         if (isManualSelection) {
             return;
         }
+
         return (
             <div className="row">
                 <div className="col-12">
@@ -84,15 +100,7 @@ const EventPickerTable = () => {
                         {chunk.map((wcaEvent) => {
                             let wcifEvent = wcif.events.find(
                                 (item) => item.id === wcaEvent.id
-                            );
-
-                            if (wcifEvent === undefined) {
-                                wcifEvent = {
-                                    id: wcaEvent.id,
-                                    rounds: [],
-                                    extensions: [],
-                                };
-                            }
+                            ) || generateDefaultEvent(wcaEvent);
 
                             return (
                                 <div className="col-lg-6" key={wcaEvent.id}>
