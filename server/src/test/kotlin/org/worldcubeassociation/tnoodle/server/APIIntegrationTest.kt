@@ -24,9 +24,8 @@ import kotlin.random.Random
 import kotlin.system.measureTimeMillis
 
 class APIIntegrationTest {
-    @Test
-    fun `test that every upcoming competition produces some output without error`() = runBlocking {
-        val client = HttpClient(CIO) {
+    private fun getClient(): HttpClient {
+        return HttpClient(CIO) {
             install(ContentNegotiation) {
                 json(JsonConfig.SERIALIZER)
             }
@@ -36,10 +35,14 @@ class APIIntegrationTest {
                 requestTimeoutMillis = 60000
             }
         }
+    }
 
+    @Test
+    fun `test that every upcoming competition produces some output without error`() = runBlocking {
         val upcomingComps =
-            client.get("https://www.worldcubeassociation.org/api/v0/competitions/").body<List<UpcomingCompetition>>()
-                .shuffled()
+            getClient().use {
+                it.get("https://www.worldcubeassociation.org/api/v0/competitions/").body<List<UpcomingCompetition>>()
+            }.shuffled()
 
         val generationDate = LocalDateTime.now()
 
@@ -48,7 +51,7 @@ class APIIntegrationTest {
                 val url = "https://www.worldcubeassociation.org/api/v0/competitions/$it/wcif/public"
                 val multiCubes = MultiScrambleCountExtension(Random.nextInt(10, 20))
 
-                val websiteWcif = client.get(url).body<Competition>()
+                val websiteWcif = getClient().use { it.get(url).body<Competition>() }
                 val blankWcif =
                     WCIFScrambleMatcher.installExtensionForEvents(websiteWcif, multiCubes, EventData.THREE_MULTI_BLD)
 
