@@ -5,7 +5,6 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import io.ktor.websocket.*
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
@@ -54,7 +53,7 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
 
         override suspend fun ScramblingJobData.compute(statusBackend: StatusBackend): Pair<ContentType, ByteArray> {
             val wcif = WCIFScrambleMatcher.fillScrambleSetsAsync(request.wcif) { evt, _ ->
-                runBlocking { statusBackend.onProgress(evt.id) }
+                statusBackend.onProgress(evt.id)
             }
 
             return scrambledToResult(this, wcif, statusBackend)
