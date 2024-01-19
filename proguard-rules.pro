@@ -9,6 +9,7 @@
 
 # cf. https://github.com/ktorio/ktor-samples/tree/master/other/proguard
 -keep class org.worldcubeassociation.tnoodle.server.** { *; }
+-keep class org.worldcubeassociation.tnoodle.deployable.jar.** { *; }
 -keep class io.ktor.server.cio.CIO { *; }
 -keep class io.ktor.server.config.** { *; }
 -keep class io.ktor.serialization.** { *; }
@@ -33,16 +34,16 @@
 -keep class sun.awt.SunToolkit { *; }
 
 -keep,includedescriptorclasses class kotlinx.serialization.json.**$$serializer { *; }
--keep,includedescriptorclasses class org.worldcubeassociation.tnoodle.server.**$$serializer { *; }
+-keep,includedescriptorclasses class org.worldcubeassociation.tnoodle.**$$serializer { *; }
 
 -keepattributes *Annotation*
 -keepattributes InnerClasses
 
--keepclasseswithmembers class org.worldcubeassociation.tnoodle.server.** {
+-keepclasseswithmembers class org.worldcubeassociation.tnoodle.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 
--keepclassmembers class org.worldcubeassociation.tnoodle.server.** {
+-keepclassmembers class org.worldcubeassociation.tnoodle.** {
     *** Companion;
 }
 
