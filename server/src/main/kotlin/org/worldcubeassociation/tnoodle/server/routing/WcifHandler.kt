@@ -6,6 +6,7 @@ import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.encodeToString
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 import org.worldcubeassociation.tnoodle.server.ServerEnvironmentConfig
@@ -36,7 +37,7 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
 
         override suspend fun extractFrame(call: ApplicationCall, frame: Frame.Text): ScramblingJobData {
             val frameText = frame.readText()
-            val requestData = JsonConfig.SERIALIZER.decodeFromString(WcifScrambleRequest.serializer(), frameText)
+            val requestData = JsonConfig.SERIALIZER.decodeFromString<WcifScrambleRequest>(frameText)
 
             return call.verifyAndWrapWcifRequest(requestData)
         }
@@ -116,7 +117,7 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
         router.route("wcif") {
             route("scrambles") {
                 val job = ScramblingJob { _, wcif, _ ->
-                    val resultBytes = JsonConfig.SERIALIZER.encodeToString(Competition.serializer(), wcif)
+                    val resultBytes = JsonConfig.SERIALIZER.encodeToString<Competition>(wcif)
                     ContentType.Application.Json to resultBytes.toByteArray()
                 }
 

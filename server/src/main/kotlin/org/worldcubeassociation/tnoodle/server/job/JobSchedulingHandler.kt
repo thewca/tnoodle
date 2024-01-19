@@ -9,6 +9,7 @@ import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.encodeToString
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.crypto.StringEncryption.encodeBase64
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
@@ -110,7 +111,7 @@ object JobSchedulingHandler : RouteHandler {
                         val request = job.extractFrame(call, frame)
 
                         val target = job.getTargetState(request)
-                        val targetEnc = JsonConfig.SERIALIZER.encodeToString(MapSerializer(String.serializer(), Int.serializer()), target)
+                        val targetEnc = JsonConfig.SERIALIZER.encodeToString<Map<String, Int>>(target)
                         send(targetEnc)
 
                         val (type, data) = job.channel(request, this)
@@ -127,7 +128,7 @@ object JobSchedulingHandler : RouteHandler {
                         close()
                     } catch (e: Throwable) {
                         val errorModel = e.asFrontendError()
-                        val errorSerial = JsonConfig.SERIALIZER.encodeToString(FrontendErrorMessage.serializer(), errorModel)
+                        val errorSerial = JsonConfig.SERIALIZER.encodeToString<FrontendErrorMessage>(errorModel)
 
                         send(MARKER_ERROR_MESSAGE)
                         send(errorSerial)

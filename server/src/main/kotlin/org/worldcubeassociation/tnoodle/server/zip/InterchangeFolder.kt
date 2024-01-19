@@ -1,5 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.zip
 
+import kotlinx.serialization.encodeToString
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 import org.worldcubeassociation.tnoodle.server.pdf.ScrambleSheet
 import org.worldcubeassociation.tnoodle.server.zip.util.StringUtil.toFileSafeString
@@ -15,7 +16,7 @@ data class InterchangeFolder(val wcif: Competition, val uniqueTitles: Map<String
         val safeGlobalTitle = globalTitle.toFileSafeString()
 
         val jsonInterchangeData = ZipInterchangeInfo(globalTitle, versionTag, generationDate, generationUrl, wcif)
-        val jsonStr = JsonConfig.SERIALIZER.encodeToString(ZipInterchangeInfo.serializer(), jsonInterchangeData)
+        val jsonStr = JsonConfig.SERIALIZER.encodeToString<ZipInterchangeInfo>(jsonInterchangeData)
 
         val jsonpFileName = "$safeGlobalTitle.jsonp"
         val jsonpStr = "var SCRAMBLES_JSON = $jsonStr;"
