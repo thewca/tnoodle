@@ -40,13 +40,13 @@ export class ScrambleClient {
         this.errorPayload = null;
     }
 
-    handleReject = (executorReject: (reason? : any) => void, event: Event) => {
+    handleReject = (executorReject: (reason?: any) => void, event: Event) => {
         if (this.state === ScramblingState.Error && this.errorPayload) {
             executorReject(this.errorPayload);
         } else {
             executorReject(event);
         }
-    }
+    };
 
     loadScrambles(
         endpoint: String,

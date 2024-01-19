@@ -11,7 +11,7 @@ import {
     buildMbldExtension,
     colorSchemeExtensionId,
     copiesExtensionId,
-    getDefaultCopiesExtension
+    getDefaultCopiesExtension,
 } from "../util/wcif.util";
 import tnoodleApi from "../api/tnoodle.api";
 import "./EventPicker.css";
@@ -155,7 +155,9 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     };
 
     const generateDefaultRound = (wcaEvent: WcaEvent, numZeroBased: number) => {
-        const extensions = wcaEvent.is_multiple_blindfolded ? [getDefaultCopiesExtension(), buildMbldExtension(MBLD_DEFAULT)] : [getDefaultCopiesExtension()]
+        const extensions = wcaEvent.is_multiple_blindfolded
+            ? [getDefaultCopiesExtension(), buildMbldExtension(MBLD_DEFAULT)]
+            : [getDefaultCopiesExtension()];
 
         return {
             id: wcaEvent.id + "-r" + (numZeroBased + 1),
@@ -163,7 +165,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             scrambleSetCount: 1,
             extensions,
         };
-    }
+    };
 
     const handleNumberOfRoundsChange = (
         numberOfRounds: number,

@@ -16,9 +16,7 @@ const EventPickerTable = () => {
     const isManualSelection = useSelector(
         (state: RootState) => state.informationSlice.isManualSelection
     );
-    const wcif = useSelector(
-        (state: RootState) => state.wcifSlice.wcif
-    );
+    const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
     const wcaEvents = useSelector(
         (state: RootState) => state.wcifSlice.wcaEvents
     );
@@ -35,14 +33,16 @@ const EventPickerTable = () => {
     }, [dispatch]);
 
     const generateDefaultEvent = (wcaEvent: WcaEvent) => {
-        const extensions = wcaEvent.is_multiple_blindfolded ? [buildMbldExtension(MBLD_DEFAULT)] : [];
+        const extensions = wcaEvent.is_multiple_blindfolded
+            ? [buildMbldExtension(MBLD_DEFAULT)]
+            : [];
 
         return {
             id: wcaEvent.id,
             rounds: [],
             extensions,
         };
-    }
+    };
 
     const maybeShowEditWarning = () => {
         if (isManualSelection) {
@@ -98,9 +98,10 @@ const EventPickerTable = () => {
                 return (
                     <div className="row p-0" key={i}>
                         {chunk.map((wcaEvent) => {
-                            let wcifEvent = wcif.events.find(
-                                (item) => item.id === wcaEvent.id
-                            ) || generateDefaultEvent(wcaEvent);
+                            let wcifEvent =
+                                wcif.events.find(
+                                    (item) => item.id === wcaEvent.id
+                                ) || generateDefaultEvent(wcaEvent);
 
                             return (
                                 <div className="col-lg-6" key={wcaEvent.id}>

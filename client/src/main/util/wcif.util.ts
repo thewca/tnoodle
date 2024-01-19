@@ -32,7 +32,7 @@ export const buildMbldExtension = (mbld: number) => {
         id: mbldCubesExtensionId,
         specUrl: "",
         data: {
-            requestedScrambles: mbld
+            requestedScrambles: mbld,
         },
     };
 };
