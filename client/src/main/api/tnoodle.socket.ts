@@ -40,6 +40,14 @@ export class ScrambleClient {
         this.errorPayload = null;
     }
 
+    handleReject = (executorReject: (reason? : any) => void, event: Event) => {
+        if (this.state === ScramblingState.Error && this.errorPayload) {
+            executorReject(this.errorPayload);
+        } else {
+            executorReject(event);
+        }
+    }
+
     loadScrambles(
         endpoint: String,
         payload: object,
@@ -53,8 +61,8 @@ export class ScrambleClient {
                 ws.send(JSON.stringify(payload));
             };
 
-            ws.onerror = () => {
-                reject(this.errorPayload);
+            ws.onerror = (err) => {
+                this.handleReject(reject, err);
             };
 
             ws.onclose = (cls) => {
@@ -66,7 +74,7 @@ export class ScrambleClient {
 
                     resolve(resultObject);
                 } else {
-                    reject(this.errorPayload);
+                    this.handleReject(reject, cls);
                 }
             };
 
