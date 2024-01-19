@@ -50,11 +50,27 @@ class FmcSolutionSheet(
             Translate("fmc.double", locale)
         )
 
-        val numColumns = moves.maxOf { it.size } + 1 // plus one for the left-most label column
+        val maxNumMoves = moves.maxOf { it.size }
+        val numColumns = maxNumMoves + 1 // plus one for the left-most label column
+
+        val longestLabel = listOf(title, *directions.toTypedArray()).maxOf { it.length }
+        val longestLabelInterpolation = longestLabel * (if (fontName == Font.CJK) 2.5f else 1f) * 1.5f // a bit of padding backoff
+
+        val longestMove = moves.maxOf { it.maxOf(String::length) }
+        val moveLabelBase = (longestMove * 2f) * 3f // *2 for larger font size, *3 for padding left and right
+
+        val availableColSpace = longestLabelInterpolation + moveLabelBase * maxNumMoves
+
+        val relMoveWidth = moveLabelBase / availableColSpace
+        val repeatMoveWidth = List(maxNumMoves) { relMoveWidth }
+
         val tableRows = directions.zip(moves)
 
         return table(numColumns) {
-            relativeWidths = listOf(5f, 1f, 1f, 1f, 1f, 1f, 1f)
+            relativeWidths = listOf(
+                longestLabelInterpolation / availableColSpace,
+                *repeatMoveWidth.toTypedArray()
+            )
 
             row {
                 cell {
@@ -77,6 +93,7 @@ class FmcSolutionSheet(
                     }
                     for (move in line) {
                         cell {
+                            horizontalAlignment = Alignment.Horizontal.CENTER
                             verticalAlignment = Alignment.Vertical.MIDDLE
 
                             text(move) {
@@ -100,8 +117,8 @@ class FmcSolutionSheet(
 
         val pureMoves = DIRECTION_MODIFIERS.map { mod -> WCA_MOVES.map { mov -> "$mov$mod" } }
         val rotationMoves = DIRECTION_MODIFIERS.map { mod ->
-            WCA_ROTATIONS.map { mov ->
-                "$mov$mod".takeIf { mov.isNotBlank() }.orEmpty()
+            WCA_ROTATIONS.mapNotNull { mov ->
+                "$mov$mod".takeIf { mov.isNotBlank() }
             }
         }
 
@@ -143,7 +160,7 @@ class FmcSolutionSheet(
             for ((moveType, moves) in moveTypes) {
                 row {
                     cell {
-                        fontSize = ruleFontSize * RULES_MOVE_TABLE_FONT_SCALE
+                        fontSize = ruleFontSize
 
                         addNotationTable(moveType, moves)
                     }
@@ -349,7 +366,6 @@ class FmcSolutionSheet(
         const val UPPER_LEFT_RULES_RATIO = 3
 
         const val RULES_MAX_NUMBER_OF_LINES = 10
-        const val RULES_MOVE_TABLE_FONT_SCALE = 0.75f
 
         const val SCRAMBLE_FIELD_LABEL_FONT_SIZE = 9f
         const val SCRAMBLE_FIELD_LEADING = 1f
@@ -372,7 +388,8 @@ class FmcSolutionSheet(
         val WCA_MOVES = arrayOf("R", "U", "F", "L", "D", "B")
         val WCA_ROTATIONS = arrayOf("x", "y", "z", "", "", "")
 
-        val DIRECTION_MODIFIERS = arrayOf("", "'", "2")
+        // we print our moves in Monospace, which means we want the "no modifier" to be aligned with the moves that have a modifier
+        val DIRECTION_MODIFIERS = arrayOf(" ", "'", "2")
 
         private val DUMMY_SCRAMBLE = Scramble("")
         private val DUMMY_ACTIVITY = ActivityCode.compile(EventData.THREE_FM, 0, 0, 0)
