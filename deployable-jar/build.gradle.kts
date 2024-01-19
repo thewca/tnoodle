@@ -26,6 +26,7 @@ dependencies {
     implementation(libs.kotlin.argparser)
     implementation(libs.system.tray)
     implementation(libs.ktor.server.cio)
+    implementation(libs.ktor.server.netty)
 
     runtimeOnly(libs.logback.core)
     runtimeOnly(libs.logback.classic)

@@ -3,7 +3,7 @@ package org.worldcubeassociation.tnoodle.deployable.jar
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.default
 import io.ktor.server.application.*
-import io.ktor.server.cio.*
+import io.ktor.server.netty.*
 import io.ktor.server.engine.commandLineEnvironment
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.routing.*
@@ -84,7 +84,7 @@ class WebscramblesServer(environmentConfig: ServerEnvironmentConfig) : Applicati
             val ktorArgs = args + arrayOf("-port=$port")
 
             val cliEnv = commandLineEnvironment(ktorArgs)
-            embeddedServer(CIO, cliEnv).start(wait = noIconBar)
+            embeddedServer(Netty, cliEnv).start(wait = noIconBar)
 
             if (!noBrowser) {
                 offlineHandler.openTabInBrowser()
