@@ -26,3 +26,5 @@ gradle.properties
 
 .idea/
 .vscode/
+
+.terraform/
