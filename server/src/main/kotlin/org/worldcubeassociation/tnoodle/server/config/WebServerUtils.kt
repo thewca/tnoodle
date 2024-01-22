@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.deployable.jar.server
+package org.worldcubeassociation.tnoodle.server.config
 
 import java.io.*
 import java.net.URISyntaxException
@@ -6,7 +6,8 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
 object WebServerUtils {
-    val DEVEL_VERSION = "devel-TEMP"
+    const val DEVEL_VERSION = "devel-TEMP"
+    const val PRUNING_FOLDER = "pruning-tables"
 
     // Classes that are part of a web app were loaded with the
     // servlet container's classloader, so we can't necessarily
@@ -48,6 +49,12 @@ object WebServerUtils {
 
     val jarFile: File?
         get() = jarFileOrDirectory.takeIf { it.isFile }
+
+    val programDirectory: File
+        get() {
+            val programDirectory = jarFileOrDirectory
+            return programDirectory.takeUnless { it.isFile } ?: programDirectory.parentFile
+        }
 
     fun copyFile(sourceFile: File, destFile: File) =
         Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING)

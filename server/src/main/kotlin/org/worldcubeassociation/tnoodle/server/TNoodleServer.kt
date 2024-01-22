@@ -1,5 +1,6 @@
 package org.worldcubeassociation.tnoodle.server
 
+import cs.threephase.Tools
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -11,6 +12,7 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import kotlinx.serialization.SerializationException
+import org.worldcubeassociation.tnoodle.server.config.LocalServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.exceptions.BadWcifParameterException
 import org.worldcubeassociation.tnoodle.server.exceptions.ScheduleMatchingException
 import org.worldcubeassociation.tnoodle.server.exceptions.ScrambleMatchingException
@@ -26,9 +28,13 @@ import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 import org.worldcubeassociation.tnoodle.server.routing.frontend.ApplicationDataHandler
 import org.worldcubeassociation.tnoodle.server.routing.frontend.PuzzleDrawingHandler
 import org.worldcubeassociation.tnoodle.server.routing.frontend.WcifDataHandler
+import java.io.DataInputStream
+import java.io.DataOutputStream
 
-class TNoodleServer(val environmentConfig: ServerEnvironmentConfig = TNoodleServer) : ApplicationHandler {
+class TNoodleServer(val environmentConfig: ServerEnvironmentConfig = LocalServerEnvironmentConfig) : ApplicationHandler {
     override fun spinUp(app: Application) {
+        initPruning()
+
         val versionHandler = VersionHandler(environmentConfig)
         val wcifHandler = WcifHandler(environmentConfig)
 
@@ -86,10 +92,23 @@ class TNoodleServer(val environmentConfig: ServerEnvironmentConfig = TNoodleServ
         }
     }
 
-    companion object : ServerEnvironmentConfig {
+    private fun initPruning() {
+        if (environmentConfig.usePruning) {
+            if (environmentConfig.pruningTableExists(THREEPHASE_PRUNING)) {
+                DataInputStream(environmentConfig.getPruningTableInput(THREEPHASE_PRUNING)).use {
+                    Tools.initFrom(it)
+                }
+            } else {
+                DataOutputStream(environmentConfig.getPruningTableOutput(THREEPHASE_PRUNING)).use {
+                    Tools.saveTo(it)
+                }
+            }
+        }
+    }
+
+    companion object {
         const val KILL_URL = "/kill/tnoodle/now"
 
-        override val projectName = "TNoodle-BACKEND"
-        override val projectVersion = "devel-TEMP"
+        const val THREEPHASE_PRUNING = "444-threephase"
     }
 }
