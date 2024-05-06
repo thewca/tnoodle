@@ -28,3 +28,5 @@ gradle.properties
 .vscode/
 
 .terraform/
+
+.DS_Store
