@@ -53,3 +53,12 @@ variable "http_port" {
 variable "https_port" {
   default = "443"
 }
+
+variable "domain_name" {
+  default = "worldcubeassociation.org"
+}
+
+variable "org_name" {
+  description = "Organization's identifier"
+  default     = "wca"
+}

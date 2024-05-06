@@ -1,7 +1,7 @@
-# tnoodle.worldcubeassociation.org
+# tnoodle-api.worldcubeassociation.org
 resource "aws_route53_record" "project_record" {
   zone_id = data.aws_ssm_parameter.wca_zone_id.value
-  name    = var.tnoodle_name
+  name    = "${var.tnoodle_name}-api"
   type    = "A"
 
   alias {
@@ -11,10 +11,10 @@ resource "aws_route53_record" "project_record" {
   }
 }
 
-# scramble.worldcubeassociation.org
-resource "aws_route53_record" "project_record" {
+# scramble-api.worldcubeassociation.org
+resource "aws_route53_record" "alternative_record" {
   zone_id = data.aws_ssm_parameter.wca_zone_id.value
-  name    = "scramble"
+  name    = "scramble-api"
   type    = "A"
 
   alias {
