@@ -22,7 +22,7 @@ data class ComputerDisplayZip(
         return zipArchive {
             for ((uniqueTitle, scrambleDoc) in scrambleSets) {
                 val passcode = passcodes.getValue(uniqueTitle)
-                passcode.activityCode = scrambleDoc
+                passcode.activityCode = scrambleDoc.activityCode
                 passcode.title = uniqueTitle
 
                 val pdfBytes = scrambleDoc.render(passcode.passcode)

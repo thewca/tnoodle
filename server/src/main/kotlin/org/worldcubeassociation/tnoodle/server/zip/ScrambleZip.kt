@@ -35,23 +35,32 @@ data class ScrambleZip(
         val passcodeList = computerDisplayZip.passcodes.entries
             .joinToString("\r\n") { "${it.key}: ${it.value.passcode}" }
 
-        val passcodeListingTxt = this::class.java.getResourceAsStream(TXT_PASSCODE_TEMPLATE)
+        val resourceTemplate = this::class.java.getResourceAsStream(TXT_PASSCODE_TEMPLATE)
             .bufferedReader().readText()
             .replace("%%GLOBAL_TITLE%%", globalTitle)
-            .replace("%%PASSCODES%%", passcodeList)
+
+        val passcodeListingTxt = resourceTemplate.replace("%%PASSCODES%%", passcodeList)
 
         val passcodesOrdered = wcif.schedule.activitiesWithLocalStartTimes.entries
             .sortedBy { it.value }
-            .map { computerDisplayZip.passcodes.entries.find { e -> e.value.activityCode?.activityCodeString == it.key.activityCode.activityCodeString }?.value }
+            .map {
+                computerDisplayZip.passcodes.entries.find { e ->
+                    e.value.activityCode?.activityCodeString == it.key.activityCode.activityCodeString
+                        || e.value.activityCode?.activityCodeString?.replace(
+                        // When the event has attempts split (eg FMC) or only one group,
+                        // activityCodeString hide the -g1, but it is still present in the activityCode.
+                        "-g1",
+                        ""
+                    ) == it.key.activityCode.activityCodeString
+                }?.value
+            }
             .distinct()
         val orderedPasscodeList = passcodesOrdered
             .filterNotNull()
             .joinToString("\r\n") { "${it.title}: ${it.passcode}" }
 
-        val orderedPasscodeListingTxt = this::class.java.getResourceAsStream(TXT_PASSCODE_TEMPLATE)
-            .bufferedReader().readText()
-            .replace("%%GLOBAL_TITLE%%", globalTitle)
-            .replace("%%PASSCODES%%", orderedPasscodeList)
+        val orderedPasscodeListingTxt =
+            resourceTemplate.replace("%%PASSCODES%%", orderedPasscodeList)
 
         val filesafeGlobalTitle = globalTitle.toFileSafeString()
 
