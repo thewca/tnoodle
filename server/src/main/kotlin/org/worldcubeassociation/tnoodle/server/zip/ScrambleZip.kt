@@ -32,14 +32,19 @@ data class ScrambleZip(
         val printingFolder = PrintingFolder(wcif, namedSheets, fmcTranslations, watermark)
         val printingFolderNode = printingFolder.assemble(pdfPassword)
 
-        val passcodeList = computerDisplayZip.passcodes.entries
-            .joinToString("\r\n") { "${it.key}: ${it.value.passcode}" }
 
         val resourceTemplate = this::class.java.getResourceAsStream(TXT_PASSCODE_TEMPLATE)
             .bufferedReader().readText()
             .replace("%%GLOBAL_TITLE%%", globalTitle)
 
+        val passcodeList = computerDisplayZip.passcodes.entries
+            .joinToString("\r\n") { "${it.key}: ${it.value.passcode}" }
+
         val passcodeListingTxt = resourceTemplate.replace("%%PASSCODES%%", passcodeList)
+
+        // This sorts passwords so delegates can linearly read them.
+        // This is inspired by https://github.com/simonkellly/scramble-organizer
+        // which may become deprecated after this so we are giving credit here.
 
         val passcodesOrdered = wcif.schedule.activitiesWithLocalStartTimes.entries
             .sortedBy { it.value }
@@ -55,6 +60,7 @@ data class ScrambleZip(
                 }?.value
             }
             .distinct()
+
         val orderedPasscodeList = passcodesOrdered
             .filterNotNull()
             .joinToString("\r\n") { "${it.title}: ${it.passcode}" }
