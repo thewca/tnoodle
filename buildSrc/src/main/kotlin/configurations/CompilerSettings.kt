@@ -4,7 +4,7 @@ import org.gradle.api.JavaVersion
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 object CompilerSettings {
-    const val JVM_TOOLCHAIN = 25
+    const val JVM_TOOLCHAIN = 21
 
     const val JAVA_TARGET_RELEASE = 8
 
