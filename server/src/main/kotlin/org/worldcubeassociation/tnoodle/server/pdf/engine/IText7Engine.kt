@@ -225,7 +225,7 @@ object IText7Engine {
     }
 
     private fun com.itextpdf.layout.element.Text.setFontStyle(style: Font.Weight) {
-        if (style == Font.Weight.BOLD) simulateBold()
+        if (style == Font.Weight.BOLD) setBold()
     }
 
     private fun PdfCanvas.executeCommand(turtleCmd: TurtleCommand) {
