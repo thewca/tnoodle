@@ -1,8 +1,7 @@
 import configurations.CompilerSettings.KOTLIN_JVM_TOOLCHAIN
-import configurations.Languages.attachRemoteRepositories
+import configurations.Repositories.attachRemoteRepositories
 import configurations.ProjectVersions.tNoodleImplOrDefault
 import configurations.ProjectVersions.tNoodleVersionOrDefault
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 description = "An extension over the core server to expose scrambles in a Google Cloud environment"
 

@@ -1,4 +1,4 @@
-import configurations.Languages.attachLocalRepositories
+import configurations.Repositories.attachLocalRepositories
 import configurations.ProjectVersions.TNOODLE_SYMLINK
 import configurations.ProjectVersions.setTNoodleRelease
 import crypto.BuildVerification.SIGNATURE_PACKAGE

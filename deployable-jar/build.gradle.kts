@@ -3,7 +3,7 @@ import configurations.CompilerSettings.KOTLIN_JVM_TOOLCHAIN
 import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.CompilerSettings.JAVA_BYTECODE_VERSION
 import configurations.FileUtils.symlink
-import configurations.Languages.attachRemoteRepositories
+import configurations.Repositories.attachRemoteRepositories
 import configurations.ProjectVersions.TNOODLE_SYMLINK
 import configurations.ProjectVersions.tNoodleImplOrDefault
 import configurations.ProjectVersions.tNoodleVersionOrDefault

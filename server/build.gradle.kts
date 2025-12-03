@@ -1,7 +1,7 @@
 import configurations.CompilerSettings
 import configurations.CompilerSettings.KOTLIN_JVM_TOOLCHAIN
 import configurations.Frameworks.configureJUnit5
-import configurations.Languages.attachRemoteRepositories
+import configurations.Repositories.attachRemoteRepositories
 
 import crypto.BuildVerification.SIGNATURE_PACKAGE
 import crypto.BuildVerification.SIGNATURE_SUFFIX
