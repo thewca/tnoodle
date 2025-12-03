@@ -24,7 +24,7 @@ plugins {
     kotlin("jvm")
     application
     alias(libs.plugins.kotlin.serialization)
-    id("kotlinx-atomicfu")
+    id("org.jetbrains.kotlinx.atomicfu")
 }
 
 dependencies {
