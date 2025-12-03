@@ -8,8 +8,8 @@ plugins {
 }
 
 configure<NodeExtension> {
-    download.set(true)
-    version.set(libs.versions.nodejs)
+    download = true
+    version = libs.versions.nodejs
 }
 
 val yarnBuild = tasks.named("yarn_build") {
@@ -43,8 +43,8 @@ tasks.getByName("assemble") {
 tasks.register<Zip>("packageReactFrontend") {
     dependsOn(yarnBuild)
 
-    archiveBaseName.set("react-new-frontend")
-    archiveExtension.set("jar")
+    archiveBaseName = "react-new-frontend"
+    archiveExtension = "jar"
 
     from(layout.buildDirectory) {
         include("static/**/*")

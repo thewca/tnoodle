@@ -1,5 +1,7 @@
-import configurations.CompilerSettings
-import configurations.CompilerSettings.KOTLIN_JVM_TOOLCHAIN
+import configurations.CompilerSettings.JVM_TOOLCHAIN
+import configurations.CompilerSettings.KOTLIN_JVM_TARGET
+import configurations.CompilerSettings.JAVA_BYTECODE_VERSION
+import configurations.CompilerSettings.JAVA_TARGET_RELEASE
 import configurations.Frameworks.configureJUnit5
 import configurations.Repositories.attachRemoteRepositories
 
@@ -67,19 +69,23 @@ dependencies {
 configureJUnit5()
 
 kotlin {
-    jvmToolchain(KOTLIN_JVM_TOOLCHAIN)
+    jvmToolchain(JVM_TOOLCHAIN)
 
     compilerOptions {
-        jvmTarget.set(CompilerSettings.KOTLIN_JVM_TARGET)
+        jvmTarget = KOTLIN_JVM_TARGET
     }
 }
 
 java {
-    targetCompatibility = CompilerSettings.JAVA_BYTECODE_VERSION
+    targetCompatibility = JAVA_BYTECODE_VERSION
+}
+
+tasks.compileJava {
+    options.release = JAVA_TARGET_RELEASE
 }
 
 application {
-    mainClass.set("io.ktor.server.cio.EngineMain")
+    mainClass = "io.ktor.server.cio.EngineMain"
 }
 
 tasks.register<JavaExec>("i18nCheck") {
@@ -87,7 +93,7 @@ tasks.register<JavaExec>("i18nCheck") {
         include("i18n/*.yml")
     }.sortedBy { it.nameWithoutExtension != "en" }
 
-    mainClass.set("JarMain") // Warbler gives *fantastic* class names to the jruby bundles :/
+    mainClass = "JarMain" // Warbler gives *fantastic* class names to the jruby bundles :/
     classpath = buildscript.configurations["classpath"]
 
     setArgs(ymlFiles)

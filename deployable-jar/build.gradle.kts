@@ -1,7 +1,8 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import configurations.CompilerSettings.KOTLIN_JVM_TOOLCHAIN
+import configurations.CompilerSettings.JVM_TOOLCHAIN
 import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.CompilerSettings.JAVA_BYTECODE_VERSION
+import configurations.CompilerSettings.JAVA_TARGET_RELEASE
 import configurations.FileUtils.symlink
 import configurations.Repositories.attachRemoteRepositories
 import configurations.ProjectVersions.TNOODLE_SYMLINK
@@ -35,10 +36,10 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(KOTLIN_JVM_TOOLCHAIN)
+    jvmToolchain(JVM_TOOLCHAIN)
 
     compilerOptions {
-        jvmTarget.set(KOTLIN_JVM_TARGET)
+        jvmTarget = KOTLIN_JVM_TARGET
     }
 }
 
@@ -46,8 +47,12 @@ java {
     targetCompatibility = JAVA_BYTECODE_VERSION
 }
 
+tasks.compileJava {
+    options.release = JAVA_TARGET_RELEASE
+}
+
 application {
-    mainClass.set("org.worldcubeassociation.tnoodle.deployable.jar.WebscramblesServer")
+    mainClass = "org.worldcubeassociation.tnoodle.deployable.jar.WebscramblesServer"
 }
 
 tasks.create("registerManifest") {

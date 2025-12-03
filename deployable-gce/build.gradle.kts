@@ -1,4 +1,4 @@
-import configurations.CompilerSettings.KOTLIN_JVM_TOOLCHAIN
+import configurations.CompilerSettings.JVM_TOOLCHAIN
 import configurations.Repositories.attachRemoteRepositories
 import configurations.ProjectVersions.tNoodleImplOrDefault
 import configurations.ProjectVersions.tNoodleVersionOrDefault
@@ -20,7 +20,7 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(KOTLIN_JVM_TOOLCHAIN)
+    jvmToolchain(JVM_TOOLCHAIN)
 }
 
 appengine {

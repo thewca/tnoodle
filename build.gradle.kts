@@ -103,7 +103,7 @@ tasks.register<JavaExec>("runOfficial") {
 
     dependsOn("buildOfficial", "minifyRelease")
 
-    mainClass.set("-jar")
+    mainClass = "-jar"
     args = listOf("$releasePrefix-$version.jar")
 }
 
