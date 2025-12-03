@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.2.21"
-ktor = "2.3.7"
+ktor = "3.3.3"
 kotless = "0.1.6"
 junit-jupiter = "5.14.1"
 batik = "1.19"

@@ -4,8 +4,9 @@ import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.default
 import io.ktor.server.application.*
 import io.ktor.server.netty.*
-import io.ktor.server.engine.commandLineEnvironment
+import io.ktor.server.engine.CommandLineConfig
 import io.ktor.server.engine.embeddedServer
+import io.ktor.server.engine.loadCommonConfiguration
 import io.ktor.server.routing.*
 import org.slf4j.LoggerFactory
 import org.worldcubeassociation.tnoodle.server.ApplicationHandler
@@ -20,7 +21,7 @@ import org.worldcubeassociation.tnoodle.deployable.jar.server.MainLauncher.NO_RE
 import org.worldcubeassociation.tnoodle.deployable.jar.server.MainLauncher
 import org.worldcubeassociation.tnoodle.deployable.jar.server.OfflineJarUtils
 import java.io.IOException
-import java.net.URL
+import java.net.URI
 
 class WebscramblesServer(environmentConfig: ServerEnvironmentConfig) : ApplicationHandler {
     private val baseServer = TNoodleServer(environmentConfig)
@@ -70,7 +71,7 @@ class WebscramblesServer(environmentConfig: ServerEnvironmentConfig) : Applicati
 
             if (!noUpgrade) {
                 try {
-                    val shutdownMaybe = URL("${offlineHandler.url}${TNoodleServer.KILL_URL}").openStream()
+                    val shutdownMaybe = URI("${offlineHandler.url}${TNoodleServer.KILL_URL}").toURL().openStream()
                     shutdownMaybe.close()
                 } catch (ignored: IOException) {
                     // NOOP. This means we couldn't connect to localhost:$PORT
@@ -82,9 +83,16 @@ class WebscramblesServer(environmentConfig: ServerEnvironmentConfig) : Applicati
 
             // ktor specifically requires ONE dash, but our parsing library specifically requires TWO dashes
             val ktorArgs = args + arrayOf("-port=$port")
+            val cliConfig = CommandLineConfig(ktorArgs)
 
-            val cliEnv = commandLineEnvironment(ktorArgs)
-            embeddedServer(Netty, cliEnv).start(wait = noIconBar)
+            embeddedServer(
+                factory = Netty,
+                environment = cliConfig.environment,
+                configure = {
+                    takeFrom(cliConfig.engineConfig)
+                    loadCommonConfiguration(cliConfig.environment.config)
+                },
+            ).start(wait = noIconBar)
 
             if (!noBrowser) {
                 offlineHandler.openTabInBrowser()
