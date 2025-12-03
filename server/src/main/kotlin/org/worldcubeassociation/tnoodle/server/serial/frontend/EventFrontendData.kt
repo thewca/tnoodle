@@ -26,7 +26,7 @@ data class EventFrontendData(
                 rootScrambler.id,
                 rootScrambler.groupId,
                 event.legalFormats.map { it.key },
-                event !in EventData.ONE_HOUR_EVENTS,
+                event !in EventData.ATTEMPT_BASED_EVENTS,
                 event !in EventData.ONE_HOUR_EVENTS,
                 event == EventData.THREE_FM,
                 event == EventData.THREE_MULTI_BLD
