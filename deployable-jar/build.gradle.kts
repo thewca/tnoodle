@@ -73,6 +73,8 @@ tasks.create("registerManifest") {
 }
 
 tasks.getByName<ShadowJar>("shadowJar") {
+    exclude("META-INF/versions/**")
+
     val targetLn = rootProject.file(TNOODLE_SYMLINK)
     outputs.file(targetLn)
 
