@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.9.21"
+kotlin = "2.2.21"
 ktor = "2.3.7"
 kotless = "0.1.6"
 junit-jupiter = "5.10.1"
@@ -58,12 +58,12 @@ eclipse-jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version = "6.2.0.
 batik = ["batik-transcoder", "batik-codec"]
 
 [plugins]
-shadow = { id = "com.github.johnrengelman.shadow", version = "8.1.1" }
+shadow = { id = "com.gradleup.shadow", version = "9.2.2" }
 nodejs = { id = "com.github.node-gradle.node", version = "7.0.1" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-dependency-versions = { id = "com.github.ben-manes.versions", version = "0.50.0" }
+dependency-versions = { id = "com.github.ben-manes.versions", version = "0.53.0" }
 kotless = { id = "io.kotless", version.ref = "kotless" }
 
 google-appengine = { id = "com.google.cloud.tools.appengine", version = "2.4.2" }

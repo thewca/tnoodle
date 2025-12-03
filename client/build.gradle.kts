@@ -40,7 +40,7 @@ tasks.getByName("assemble") {
     dependsOn("packageReactFrontend")
 }
 
-tasks.create<Zip>("packageReactFrontend") {
+tasks.register<Zip>("packageReactFrontend") {
     dependsOn(yarnBuild)
 
     archiveBaseName.set("react-new-frontend")

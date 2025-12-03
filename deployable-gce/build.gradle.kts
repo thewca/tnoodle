@@ -10,7 +10,7 @@ attachRemoteRepositories()
 
 plugins {
     kotlin("jvm")
-    war
+    //war
     id("com.google.cloud.tools.appengine")
 }
 

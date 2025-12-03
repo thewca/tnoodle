@@ -82,7 +82,7 @@ application {
     mainClass.set("io.ktor.server.cio.EngineMain")
 }
 
-tasks.create<JavaExec>("i18nCheck") {
+tasks.register<JavaExec>("i18nCheck") {
     val ymlFiles = sourceSets.main.get().resources.matching {
         include("i18n/*.yml")
     }.sortedBy { it.nameWithoutExtension != "en" }
@@ -97,7 +97,7 @@ tasks.getByName("check") {
     dependsOn("i18nCheck")
 }
 
-tasks.create("deleteSignatures") {
+tasks.register("deleteSignatures") {
     doLast {
         delete(fileTree("src/main/resources/$SIGNATURE_PACKAGE").matching {
             include("**/*.$SIGNATURE_SUFFIX")

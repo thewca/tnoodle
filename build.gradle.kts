@@ -39,7 +39,7 @@ plugins {
 val releasePrefix = "TNoodle-WCA"
 val releaseProject = "deployable-jar"
 
-tasks.create("registerReleaseTag") {
+tasks.register("registerReleaseTag") {
     val signatureProject = project(":server")
     val filenameToSign = "rsa/tnoodle_public.pem"
 
@@ -63,13 +63,13 @@ tasks.create("registerReleaseTag") {
     }
 }
 
-tasks.create("registerCloudReleaseTag") {
+tasks.register("registerCloudReleaseTag") {
     doFirst {
         setTNoodleRelease(project.ext, "TNoodle-CLOUD")
     }
 }
 
-tasks.create<ProGuardTask>("minifyRelease") {
+tasks.register<ProGuardTask>("minifyRelease") {
     dependsOn("registerReleaseTag", "buildOfficial")
 
     configuration("proguard-rules.pro")
@@ -90,14 +90,14 @@ tasks.create<ProGuardTask>("minifyRelease") {
     printmapping(layout.buildDirectory.file("proguard.map"))
 }
 
-tasks.create("buildOfficial") {
+tasks.register("buildOfficial") {
     description = "Generate an official WCA release artifact."
     group = "WCA"
 
     dependsOn("registerReleaseTag", ":$releaseProject:shadowJar")
 }
 
-tasks.create<JavaExec>("runOfficial") {
+tasks.register<JavaExec>("runOfficial") {
     description = "Starts the TNoodle server from an official release artifact. Builds one if necessary."
     group = "WCA"
 
@@ -107,31 +107,31 @@ tasks.create<JavaExec>("runOfficial") {
     args = listOf("$releasePrefix-$version.jar")
 }
 
-tasks.create("buildDebug") {
+tasks.register("buildDebug") {
     description = "Generate an unofficial JAR for testing purposes"
     group = "Development"
 
     dependsOn(":$releaseProject:shadowJar")
 }
 
-tasks.create("runDebug") {
+tasks.register("runDebug") {
     description = "Run an unofficial JAR for testing purposes"
     group = "Development"
 
     dependsOn(":$releaseProject:runShadow")
 }
 
-tasks.create("runBackend") {
+tasks.register("runBackend") {
     description = "Run an unofficial JAR that only holds the backend and nothing else. Visiting the localhost website WILL NOT WORK"
     group = "Development"
 
     dependsOn(":server:run")
 }
 
-tasks.create("installCloud") {
+tasks.register("installCloud") {
     dependsOn("registerCloudReleaseTag", ":cloudscrambles:appengineDeploy")
 }
 
-tasks.create("emulateCloud") {
+tasks.register("emulateCloud") {
     dependsOn("registerCloudReleaseTag", ":cloudscrambles:appengineRun")
 }
