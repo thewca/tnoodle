@@ -51,15 +51,9 @@ data class ScrambleZip(
         val passcodesOrdered = wcif.schedule.activitiesWithLocalStartTimes.entries
             .sortedBy { it.value }
             .mapNotNull {
-                sheetsWithRandomCode.entries.find { e ->
-                    e.value.first.activityCode.activityCodeString == it.key.activityCode.activityCodeString
-                        || e.value.first.activityCode.activityCodeString.replace(
-                        // When the event has attempts split (eg FMC) or only one group,
-                        // activityCodeString hide the -g1, but it is still present in the activityCode.
-                        "-g1",
-                        ""
-                    ) == it.key.activityCode.activityCodeString
-                }?.value
+                sheetsWithRandomCode.values.find { v ->
+                    v.first.scrambleSetId == it.key.scrambleSetId
+                }
             }
             .distinct()
 
@@ -75,18 +69,9 @@ data class ScrambleZip(
             folder(printingFolderNode)
             folder(interchangeFolderNode)
 
-            file(
-                "$filesafeGlobalTitle - Computer Display PDFs.zip",
-                computerDisplayZipBytes.compress()
-            )
-            file(
-                "$filesafeGlobalTitle - Computer Display PDF Passcodes - SECRET.txt",
-                passcodeListingTxt
-            )
-            file(
-                "$filesafeGlobalTitle - Ordered Computer Display PDF Passcodes - SECRET.txt",
-                orderedPasscodeListingTxt
-            )
+            file("$filesafeGlobalTitle - Computer Display PDFs.zip", computerDisplayZipBytes.compress())
+            file("$filesafeGlobalTitle - Computer Display PDF Passcodes - SECRET.txt", passcodeListingTxt)
+            file("$filesafeGlobalTitle - Ordered Computer Display PDF Passcodes - SECRET.txt", orderedPasscodeListingTxt)
         }
     }
 
