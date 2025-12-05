@@ -11,13 +11,13 @@
         "lodash": "^4.17.21",
         "react": "^18.2.0",
         "react-bootstrap": "^2.10.2",
+        "react-color": "^2.19.3",
         "react-dom": "^18.2.0",
         "react-icons": "^4.12.0",
+        "react-inlinesvg": "^3.0.2",
         "react-redux": "^9.0.4",
         "react-scripts": "5.0.1",
-        "web-vitals": "^3.5.1",
-        "react-inlinesvg": "^3.0.2",
-        "react-color": "^2.19.3"
+        "web-vitals": "^3.5.1"
     },
     "scripts": {
         "start": "react-scripts start",
@@ -67,9 +67,10 @@
         "@types/lodash": "^4.17.0",
         "@types/node": "^24.10.1",
         "@types/react": "^18.2.46",
-        "@types/react-dom": "^18.2.17",
         "@types/react-color": "^3.0.6",
+        "@types/react-dom": "^18.2.17",
         "prettier": "^2.8.8",
         "typescript": "^4.9.4"
-    }
+    },
+    "packageManager": "yarn@1.22.22"
 }
