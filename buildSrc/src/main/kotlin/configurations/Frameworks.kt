@@ -21,6 +21,7 @@ object Frameworks {
         dependencies {
             add("testImplementation", libs.junit.jupiter.api)
             add("testRuntimeOnly", libs.junit.jupiter.engine)
+            add("testRuntimeOnly", libs.junit.platform.launcher)
         }
 
         tasks.withType<Test> {
