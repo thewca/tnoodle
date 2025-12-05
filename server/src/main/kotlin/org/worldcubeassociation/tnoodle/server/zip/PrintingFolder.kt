@@ -10,7 +10,6 @@ import org.worldcubeassociation.tnoodle.server.pdf.model.Document
 import org.worldcubeassociation.tnoodle.server.zip.util.StringUtil.toFileSafeString
 import org.worldcubeassociation.tnoodle.server.wcif.WCIFDataBuilder
 import org.worldcubeassociation.tnoodle.server.wcif.model.Competition
-import org.worldcubeassociation.tnoodle.server.wcif.model.Schedule
 import org.worldcubeassociation.tnoodle.server.wcif.model.extension.SheetCopyCountExtension
 import org.worldcubeassociation.tnoodle.server.zip.model.Folder
 import org.worldcubeassociation.tnoodle.server.zip.model.dsl.folder
@@ -77,20 +76,21 @@ data class PrintingFolder(
                 }
             }
 
-            if (wcifSchedule.isNotEmpty()) {
+            if (wcifSchedule.leafActivities.isNotEmpty()) {
                 val drawingScrambleSetIds = scrambleSheetsFlat.map { it.scrambleSetId }
+                val scheduleMatchedIds = wcifSchedule.allActivities.mapNotNull { it.scrambleSetId }
 
-                if (wcifSchedule.containsAll(drawingScrambleSetIds)) {
+                if (scheduleMatchedIds.containsAll(drawingScrambleSetIds)) {
                     val orderedScramblesFolder = OrderedScramblesFolder(competitionName, scrambleSheetsFlat)
                     val orderedScramblesNode = orderedScramblesFolder.assemble(wcifSchedule, pdfPassword)
 
                     folder(orderedScramblesNode)
                 } else {
-                    val unmatchedActivities = wcifSchedule.leafActivities
-                        .filter { it.activityCode.eventModel != null } // don't want to report that "lunch" or "other" is unmatched
-                        .filter { it.scrambleSetId !in drawingScrambleSetIds }
+                    val unmatchedScrambleSets = scrambleSheetsFlat
+                        .filter { it.scrambleSetId !in scheduleMatchedIds }
 
-                    LOGGER.warn("Skipping OrderedScrambles because there are unmatched activities: $unmatchedActivities")
+                    val unmatchedSetInfo = unmatchedScrambleSets.joinToString { "${it.scrambleSetId} for ${it.activityCode}" }
+                    LOGGER.warn("Skipping OrderedScrambles because the following sheets are not matched to the schedule: $unmatchedSetInfo")
                 }
             }
 
@@ -114,12 +114,5 @@ data class PrintingFolder(
 
     companion object {
         val LOGGER = LoggerFactory.getLogger(PrintingFolder::class.java)
-
-        private fun Schedule.isNotEmpty() = leafActivities.isNotEmpty()
-
-        private fun Schedule.containsAll(scrambleSetIds: Collection<Int>): Boolean {
-            val scheduleMatchedIds = allActivities.mapNotNull { it.scrambleSetId }
-            return scheduleMatchedIds.containsAll(scrambleSetIds)
-        }
     }
 }

@@ -57,6 +57,8 @@ data class ActivityCode(val activityCodeString: String) : EventIdProvider {
         return "$prefix $parts"
     }
 
+    override fun toString() = this.activityCodeString
+
     companion object : SingletonStringEncoder<ActivityCode>("ActivityCode") {
         // Currently, we mark not cubing related activities as other-lunch or other-speech, for example.
         // If we ever accept any other such ignorable key, it should be added here.
