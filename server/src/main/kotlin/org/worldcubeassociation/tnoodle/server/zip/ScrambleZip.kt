@@ -4,6 +4,7 @@ import org.worldcubeassociation.tnoodle.server.pdf.ScrambleSheet
 import org.worldcubeassociation.tnoodle.server.wcif.model.Competition
 import org.worldcubeassociation.tnoodle.server.zip.model.ZipArchive
 import org.worldcubeassociation.tnoodle.server.zip.model.dsl.zipArchive
+import org.worldcubeassociation.tnoodle.server.zip.util.StringUtil.randomPasscode
 import org.worldcubeassociation.tnoodle.server.zip.util.StringUtil.toFileSafeString
 import java.time.LocalDateTime
 import java.util.*
@@ -22,25 +23,26 @@ data class ScrambleZip(
         pdfPassword: String?,
         generationUrl: String?
     ): ZipArchive {
-        val computerDisplayZip = ComputerDisplayZip(namedSheets, globalTitle)
+        val sheetsWithRandomCode = namedSheets.mapValues { it.value to randomPasscode() }
+
+        val computerDisplayZip = ComputerDisplayZip(sheetsWithRandomCode, globalTitle)
         val computerDisplayZipBytes = computerDisplayZip.assemble()
 
         val interchangeFolder = InterchangeFolder(wcif, namedSheets, globalTitle)
-        val interchangeFolderNode =
-            interchangeFolder.assemble(generationDate, versionTag, generationUrl)
+        val interchangeFolderNode = interchangeFolder.assemble(generationDate, versionTag, generationUrl)
 
         val printingFolder = PrintingFolder(wcif, namedSheets, fmcTranslations, watermark)
         val printingFolderNode = printingFolder.assemble(pdfPassword)
-
 
         val resourceTemplate = this::class.java.getResourceAsStream(TXT_PASSCODE_TEMPLATE)
             .bufferedReader().readText()
             .replace("%%GLOBAL_TITLE%%", globalTitle)
 
-        val passcodeList = computerDisplayZip.passcodes.entries
-            .joinToString("\r\n") { "${it.key}: ${it.value.passcode}" }
+        val passcodeList = sheetsWithRandomCode.entries
+            .joinToString("\r\n") { "${it.key}: ${it.value.second}" }
 
-        val passcodeListingTxt = resourceTemplate.replace("%%PASSCODES%%", passcodeList)
+        val passcodeListingTxt =
+            resourceTemplate.replace("%%PASSCODES%%", passcodeList)
 
         // This sorts passwords so delegates can linearly read them.
         // This is inspired by https://github.com/simonkellly/scramble-organizer
@@ -48,10 +50,10 @@ data class ScrambleZip(
 
         val passcodesOrdered = wcif.schedule.activitiesWithLocalStartTimes.entries
             .sortedBy { it.value }
-            .map {
-                computerDisplayZip.passcodes.entries.find { e ->
-                    e.value.activityCode?.activityCodeString == it.key.activityCode.activityCodeString
-                        || e.value.activityCode?.activityCodeString?.replace(
+            .mapNotNull {
+                sheetsWithRandomCode.entries.find { e ->
+                    e.value.first.activityCode.activityCodeString == it.key.activityCode.activityCodeString
+                        || e.value.first.activityCode.activityCodeString.replace(
                         // When the event has attempts split (eg FMC) or only one group,
                         // activityCodeString hide the -g1, but it is still present in the activityCode.
                         "-g1",
@@ -62,8 +64,7 @@ data class ScrambleZip(
             .distinct()
 
         val orderedPasscodeList = passcodesOrdered
-            .filterNotNull()
-            .joinToString("\r\n") { "${it.title}: ${it.passcode}" }
+            .joinToString("\r\n") { "${it.first.title}: ${it.second}" }
 
         val orderedPasscodeListingTxt =
             resourceTemplate.replace("%%PASSCODES%%", orderedPasscodeList)

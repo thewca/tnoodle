@@ -3,14 +3,11 @@ package org.worldcubeassociation.tnoodle.server.zip
 import org.worldcubeassociation.tnoodle.server.pdf.ScrambleSheet
 import org.worldcubeassociation.tnoodle.server.zip.model.ZipArchive
 import org.worldcubeassociation.tnoodle.server.zip.model.dsl.zipArchive
-import org.worldcubeassociation.tnoodle.server.zip.util.StringUtil.randomPasscode
 
 data class ComputerDisplayZip(
-    val scrambleSets: Map<String, ScrambleSheet>,
+    val scrambleSheetsWithCode: Map<String, Pair<ScrambleSheet, String>>,
     val competitionTitle: String
 ) {
-    val passcodes = scrambleSets.mapValues { ActivityPasscode(randomPasscode()) }
-
     /**
      * Computer display zip
      *
@@ -20,12 +17,9 @@ data class ComputerDisplayZip(
      */
     fun assemble(): ZipArchive {
         return zipArchive {
-            for ((uniqueTitle, scrambleDoc) in scrambleSets) {
-                val passcode = passcodes.getValue(uniqueTitle)
-                passcode.activityCode = scrambleDoc.activityCode
-                passcode.title = uniqueTitle
-
-                val pdfBytes = scrambleDoc.render(passcode.passcode)
+            for ((uniqueTitle, scrambleDocWithCode) in scrambleSheetsWithCode) {
+                val (scrambleDoc, passcode) = scrambleDocWithCode
+                val pdfBytes = scrambleDoc.render(passcode)
 
                 file("$uniqueTitle.pdf", pdfBytes)
             }
