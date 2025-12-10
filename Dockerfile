@@ -1,7 +1,15 @@
+# global build args shared across all steps
+ARG ONLINE
+
 FROM gradle:9.2-jdk21 AS build
 
 COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
+
+# allow the frontend to run in restricted mode
+# needs to be present at build time because CRA injects a "fake" process.env into the React code
+ARG ONLINE
+ENV REACT_APP_TNOODLE_ONLINE_MODE=${ONLINE:+"--online"}
 
 RUN gradle buildOfficial --no-daemon
 
@@ -31,14 +39,13 @@ WORKDIR /app
 # allow deployments to online Docker containers
 # (requires TNoodle to mangle with Java runtime, see WebscramblesServer#main for details)
 ARG ONLINE
-# If the arg ONLINE was passed, add flag
 ENV REACT_APP_TNOODLE_ONLINE_MODE=${ONLINE:+"--online"}
-# If no flag is present yet, explicitly assign an empty string
-ENV REACT_APP_TNOODLE_ONLINE_MODE=${REACT_APP_TNOODLE_ONLINE_MODE:-""}
 
 ARG PORT
 # Set the port for the application to detect
 ENV PORT=${PORT:-2014}
+
+EXPOSE $PORT
 
 # We launch java to execute the jar, with good defauls intended for containers.
 CMD ["java", "-server", "-XX:InitialRAMPercentage=75.0", "-XX:MinRAMPercentage=75.0", "-XX:MaxRAMPercentage=75.0", "-XX:MaxGCPauseMillis=100", "-XX:+UseStringDeduplication", "-jar", "tnoodle-application.jar", "-b"]
