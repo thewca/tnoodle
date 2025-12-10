@@ -56,9 +56,15 @@ class WebscramblesServer(environmentConfig: ServerEnvironmentConfig) : Applicati
             val noIconBar by parser.flagging("-b", "--noiconbar", help = "Don't add an icon to the system bar")
             val noUpgrade by parser.flagging("-u", "--noupgrade", help = "If an instance of TNoodle is running on the desired port(s), do not attempt to kill it and start up")
             val noReexec by parser.flagging(NO_REEXEC_OPT, help = "Do not reexec. This is sometimes done to rename java.exe on Windows, or to get a larger heap size.")
-            val onlineConfig by parser.flagging("-o", "--online", help = "Change configuration for online mode. This will override port bindings and sun.awt.fontconfig")
 
-            val port = System.getenv("PORT")?.takeIf { onlineConfig }?.toIntOrNull() ?: cliPort
+            val onlineModeEnv = System.getenv("REACT_APP_TNOODLE_ONLINE_MODE")
+            val isEnvOnlineMode = onlineModeEnv != null && onlineModeEnv.isNotEmpty()
+
+            val isCliOnlineMode by parser.flagging("-o", "--online", help = "Change configuration for online mode. This will override port bindings and sun.awt.fontconfig")
+
+            val isOnlineMode = isCliOnlineMode || isEnvOnlineMode
+
+            val port = System.getenv("PORT")?.takeIf { isOnlineMode }?.toIntOrNull() ?: cliPort
             val offlineHandler = OfflineJarUtils(port)
 
             val isWrapped = if (!noReexec) {
@@ -79,7 +85,7 @@ class WebscramblesServer(environmentConfig: ServerEnvironmentConfig) : Applicati
                 }
             }
 
-            LOG.info("${LocalServerEnvironmentConfig.title} started")
+            LOG.info("${LocalServerEnvironmentConfig.title} started${if (isOnlineMode) " in online mode" else ""}")
 
             // ktor specifically requires ONE dash, but our parsing library specifically requires TWO dashes
             val ktorArgs = args + arrayOf("-port=$port")
