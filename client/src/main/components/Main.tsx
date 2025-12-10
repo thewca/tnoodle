@@ -1,6 +1,7 @@
 import { SyntheticEvent, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import tnoodleApi from "../api/tnoodle.api";
+import wcaApi from "../api/wca.api";
 import { ScrambleClient } from "../api/tnoodle.socket";
 import { isUsingStaging } from "../api/wca.api";
 import RootState from "../model/RootState";
@@ -114,6 +115,8 @@ const Main = () => {
         link.remove();
     };
 
+    const appOnlineMode = !!process.env.REACT_APP_TNOODLE_ONLINE_MODE;
+
     const scrambleButton = () => {
         if (generatingScrambles) {
             return (
@@ -135,20 +138,32 @@ const Main = () => {
         }
 
         // At least 1 events must have at least 1 round.
-        let disableScrambleButton = !wcif.events
-            .map((event) => event.rounds.length > 0)
-            .reduce((flag1, flag2) => flag1 || flag2, false);
+        let anyEventHasRounds = wcif.events.some(
+            (event) => event.rounds.length > 0
+        );
+
+        let isLoggedCompSelection = !isManualSelection && wcaApi.isLogged();
+        let isOnlineLocked = appOnlineMode && !isLoggedCompSelection;
+
+        let disableScrambleButton = !anyEventHasRounds || isOnlineLocked;
 
         // In case the user did not select any events, we make the button a little more transparent than disabled
         let btnClass =
             "btn btn-primary form-control" +
             (disableScrambleButton ? " button-transparent" : "");
+
         return (
             <button
                 type="submit"
                 className={btnClass}
                 disabled={disableScrambleButton}
-                title={disableScrambleButton ? "No events selected." : ""}
+                title={
+                    !anyEventHasRounds
+                        ? "No events selected."
+                        : isOnlineLocked
+                        ? "You must be logged in and pick a competition"
+                        : ""
+                }
             >
                 Generate Scrambles
             </button>
