@@ -12,7 +12,6 @@ import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import kotlinx.serialization.SerializationException
 import org.worldcubeassociation.tnoodle.server.exceptions.BadWcifParameterException
-import org.worldcubeassociation.tnoodle.server.exceptions.ScheduleMatchingException
 import org.worldcubeassociation.tnoodle.server.exceptions.ScrambleMatchingException
 import org.worldcubeassociation.tnoodle.server.exceptions.TranslationException
 import org.worldcubeassociation.tnoodle.server.job.JobSchedulingHandler
@@ -58,7 +57,6 @@ class TNoodleServer(val environmentConfig: ServerEnvironmentConfig = TNoodleServ
         }
 
         app.install(StatusPages) {
-            frontendException<ScheduleMatchingException>(HttpStatusCode.BadRequest)
             frontendException<ScrambleMatchingException>(HttpStatusCode.BadRequest)
             frontendException<BadWcifParameterException>(HttpStatusCode.BadRequest)
 

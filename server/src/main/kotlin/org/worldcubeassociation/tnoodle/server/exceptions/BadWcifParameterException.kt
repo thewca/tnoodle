@@ -5,4 +5,3 @@ class BadWcifParameterException(message: String) : Exception(message) {
         fun error(message: String): Nothing = throw BadWcifParameterException(message)
     }
 }
-

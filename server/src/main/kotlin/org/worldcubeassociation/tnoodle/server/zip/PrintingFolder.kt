@@ -11,6 +11,7 @@ import org.worldcubeassociation.tnoodle.server.zip.util.StringUtil.toFileSafeStr
 import org.worldcubeassociation.tnoodle.server.wcif.WCIFDataBuilder
 import org.worldcubeassociation.tnoodle.server.wcif.model.Competition
 import org.worldcubeassociation.tnoodle.server.wcif.model.extension.SheetCopyCountExtension
+import org.worldcubeassociation.tnoodle.server.wcif.util.MatchedActivity
 import org.worldcubeassociation.tnoodle.server.zip.model.Folder
 import org.worldcubeassociation.tnoodle.server.zip.model.dsl.folder
 import java.util.*
@@ -22,6 +23,7 @@ data class PrintingFolder(
     val watermark: String?
 ) {
     val scrambleSheetsFlat = uniqueTitles.values.toList()
+
     val competitionName get() = competition.shortName
     val wcifSchedule get() = competition.schedule
 
@@ -76,13 +78,15 @@ data class PrintingFolder(
                 }
             }
 
-            if (wcifSchedule.leafActivities.isNotEmpty()) {
+            val matchedScrambleSheets = MatchedActivity.matchActivities(wcifSchedule, scrambleSheetsFlat)
+
+            if (matchedScrambleSheets.isNotEmpty()) {
                 val drawingScrambleSetIds = scrambleSheetsFlat.map { it.scrambleSetId }
-                val scheduleMatchedIds = wcifSchedule.leafActivities.mapNotNull { it.scrambleSetId }
+                val scheduleMatchedIds = matchedScrambleSheets.mapNotNull { it.activity.scrambleSetId }
 
                 if (scheduleMatchedIds.containsAll(drawingScrambleSetIds)) {
-                    val orderedScramblesFolder = OrderedScramblesFolder(competitionName, scrambleSheetsFlat)
-                    val orderedScramblesNode = orderedScramblesFolder.assemble(wcifSchedule, pdfPassword)
+                    val orderedScramblesFolder = OrderedScramblesFolder(competitionName, matchedScrambleSheets)
+                    val orderedScramblesNode = orderedScramblesFolder.assemble(pdfPassword)
 
                     folder(orderedScramblesNode)
                 } else {
