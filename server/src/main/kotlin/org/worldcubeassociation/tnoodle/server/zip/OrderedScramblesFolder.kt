@@ -38,65 +38,67 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleSheets: L
         // We consider the competition start date as the earlier activity from the schedule.
         // This prevents miscalculation of dates for multiple timezones.
         val competitionStartActivity = allActivityCoordinates.minBy { it.localStartTime }.activity
+        val leafActivityCoordinates = wcifSchedule.activityCoordinates { leafChildActivities }
+
+        val matchingFilenames = leafActivityCoordinates.groupBy { coord ->
+            val (venue, room, activity) = coord
+
+            val venueName = venue.fileSafeName
+            val hasMultipleRooms = venue.hasMultipleRooms
+
+            val timezone = venue.dateTimeZone
+            val competitionStartDate = competitionStartActivity.getLocalStartTime(timezone)
+
+            val roomName = room.fileSafeName
+
+            val nthDay = Period.between(
+                competitionStartDate.atLocalStartOfDay(),
+                activity.getLocalStartTime(timezone).atLocalStartOfDay(),
+            ).days
+
+            // The distance between the competition start date and this activity's start date may be 0.
+            //   This means that the activity is happening on the same day as the competition start,
+            //   which should be rendered to humans as "Day 1".
+            val filenameDay = nthDay + 1
+
+            // The folder structure is only grouped by venue and day.
+            //   The WCIF schedule logic implies venue -> room -> day, but in reality,
+            //   printed scramble sheets are often managed centrally per venue.
+            // So we include the room information only in the filename.
+            val folderParts = listOfNotNull(
+                "$venueName/".takeIf { hasMultipleVenues },
+                "Day $filenameDay/".takeIf { hasMultipleDays },
+            )
+
+            // We stamp all relevant information into the filename again,
+            //   to prevent accidental duplicate names. The "worst" possible case is:
+            //   1 venue, 1 day, 1 room. In which case, there will only be one file anyway.
+            val fileParts = listOfNotNull(
+                "Ordered Scrambles",
+                " - $venueName".takeIf { hasMultipleVenues },
+                " - Day $filenameDay".takeIf { hasMultipleDays },
+                " - $roomName".takeIf { hasMultipleRooms },
+                ".pdf"
+            )
+
+            val parts = folderParts + fileParts
+            parts.joinToString("")
+        }
 
         return folder("Ordered Scrambles") {
-            for (venue in wcifSchedule.venues) {
-                val venueName = venue.fileSafeName
-                val hasMultipleRooms = venue.hasMultipleRooms
+            for ((pdfFileName, activityCoords) in matchingFilenames) {
+                val sortedScrambles = activityCoords
+                    .sortedBy { it.localStartTime }
+                    .mapNotNull { wcifBindings[it.activity] }
+                    .flatten()
+                    .distinct()
 
-                val timezone = venue.dateTimeZone
-                val competitionStartDate = competitionStartActivity.getLocalStartTime(timezone)
-
-                for (room in venue.rooms) {
-                    val roomName = room.fileSafeName
-
-                    val activitiesPerDay = room.activities
-                        .flatMap { it.leafChildActivities }
-                        .groupBy {
-                            Period.between(
-                                competitionStartDate.atLocalStartOfDay(),
-                                it.getLocalStartTime(timezone).atLocalStartOfDay()
-                            ).days
-                        }
-
-                    for ((nthDay, activities) in activitiesPerDay) {
-                        val scrambles = activities.associateWith(wcifBindings::get)
-                            .filterValuesNotNull()
-
-                        val activitiesHaveScrambles = scrambles.values.flatten().isNotEmpty()
-
-                        if (activitiesHaveScrambles) {
-                            val filenameDay = nthDay + 1
-
-                            val parts = listOfNotNull(
-                                "$venueName/".takeIf { hasMultipleVenues },
-                                "Day $filenameDay/".takeIf { hasMultipleDays },
-                                "Ordered Scrambles",
-                                " - $venueName".takeIf { hasMultipleVenues },
-                                " - Day $filenameDay".takeIf { hasMultipleDays },
-                                " - $roomName".takeIf { hasMultipleRooms },
-                                ".pdf"
-                            )
-
-                            if (hasMultipleVenues || hasMultipleDays || hasMultipleRooms) {
-                                // In addition to different folders, we stamp venue, day and room in the PDF's name
-                                // to prevent different files with the same name.
-                                val pdfFileName = parts.joinToString("")
-
-                                val sortedScrambles = scrambles.entries
-                                    .sortedBy { it.key.getLocalStartTime(timezone) }
-                                    .flatMap { it.value }
-
-                                val sheet = WCIFDataBuilder.compileOutlinePdf(sortedScrambles, pdfPassword)
-                                file(pdfFileName, sheet)
-                            }
-                        }
-                    }
-                }
+                val sheet = WCIFDataBuilder.compileOutlinePdf(sortedScrambles, pdfPassword)
+                file(pdfFileName, sheet)
             }
 
             // Generate all scrambles ordered
-            val allScramblesOrdered = wcifSchedule.activityCoordinates { leafChildActivities }
+            val allScramblesOrdered = leafActivityCoordinates
                 .sortedBy { it.localStartTime }
                 // the notNull will effectively never happen, because we guarantee that all relevant activities are indexed
                 .mapNotNull { wcifBindings[it.activity] }
@@ -106,14 +108,13 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleSheets: L
             val completeOrderedPdf = WCIFDataBuilder.compileOutlinePdf(allScramblesOrdered, pdfPassword)
 
             val safeGlobalTitle = globalTitle.toFileSafeString()
-            file("Ordered $safeGlobalTitle - All Scrambles.pdf", completeOrderedPdf)
+            file("$safeGlobalTitle - Ordered Scrambles.pdf", completeOrderedPdf)
         }
     }
 
     companion object {
         fun ZonedDateTime.atLocalStartOfDay() = toLocalDate().atStartOfDay(zone).toLocalDate()
 
-        fun <K, V> Map<K, V?>.filterValuesNotNull(): Map<K, V> = mapNotNull { (k, v) -> v?.let { k to it } }.toMap()
         fun <T, C : Collection<T>> C.unlessEmpty(): C? = takeIf { it.isNotEmpty() }
     }
 }
