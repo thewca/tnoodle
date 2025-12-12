@@ -22,7 +22,7 @@ buildscript {
 
 allprojects {
     group = "org.worldcubeassociation.tnoodle"
-    version = "1.2.2"
+    version = "1.2.3"
 
     attachLocalRepositories()
 
