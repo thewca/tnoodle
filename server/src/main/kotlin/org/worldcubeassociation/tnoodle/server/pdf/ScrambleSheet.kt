@@ -7,6 +7,7 @@ import org.worldcubeassociation.tnoodle.server.pdf.model.dsl.DocumentBuilder
 import org.worldcubeassociation.tnoodle.server.pdf.model.dsl.document
 import org.worldcubeassociation.tnoodle.server.wcif.model.ActivityCode
 import org.worldcubeassociation.tnoodle.server.wcif.model.Scramble
+import org.worldcubeassociation.tnoodle.server.zip.util.StringUtil.randomPasscode
 import org.worldcubeassociation.tnoodle.svglite.Color
 import java.util.*
 import kotlin.collections.HashMap
@@ -23,6 +24,7 @@ abstract class ScrambleSheet(
     abstract val scrambleSetId: Int // the scramble set this sheet refers to
 
     val document by lazy { compile() }
+    val localPasscode by lazy { randomPasscode() }
 
     val title get() = activityCode.compileTitleString(locale)
 

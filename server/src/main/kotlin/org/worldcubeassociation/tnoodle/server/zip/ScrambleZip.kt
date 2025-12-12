@@ -4,7 +4,6 @@ import org.worldcubeassociation.tnoodle.server.pdf.ScrambleSheet
 import org.worldcubeassociation.tnoodle.server.wcif.model.Competition
 import org.worldcubeassociation.tnoodle.server.zip.model.ZipArchive
 import org.worldcubeassociation.tnoodle.server.zip.model.dsl.zipArchive
-import org.worldcubeassociation.tnoodle.server.zip.util.StringUtil.randomPasscode
 import org.worldcubeassociation.tnoodle.server.zip.util.StringUtil.toFileSafeString
 import java.time.LocalDateTime
 import java.util.*
@@ -23,9 +22,7 @@ data class ScrambleZip(
         pdfPassword: String?,
         generationUrl: String?
     ): ZipArchive {
-        val sheetsWithRandomCode = namedSheets.mapValues { it.value to randomPasscode() }
-
-        val computerDisplayZip = ComputerDisplayZip(sheetsWithRandomCode, globalTitle)
+        val computerDisplayZip = ComputerDisplayZip(namedSheets, globalTitle)
         val computerDisplayZipBytes = computerDisplayZip.assemble()
 
         val interchangeFolder = InterchangeFolder(wcif, namedSheets, globalTitle)
@@ -38,8 +35,8 @@ data class ScrambleZip(
             .bufferedReader().readText()
             .replace("%%GLOBAL_TITLE%%", globalTitle)
 
-        val passcodeList = sheetsWithRandomCode.entries
-            .joinToString("\r\n") { "${it.key}: ${it.value.second}" }
+        val passcodeList = namedSheets.entries
+            .joinToString("\r\n") { "${it.key}: ${it.value.localPasscode}" }
 
         val passcodeListingTxt =
             resourceTemplate.replace("%%PASSCODES%%", passcodeList)
@@ -48,17 +45,17 @@ data class ScrambleZip(
         // This is inspired by https://github.com/simonkellly/scramble-organizer
         // which may become deprecated after this so we are giving credit here.
 
-        val passcodesOrdered = wcif.schedule.activitiesWithLocalStartTimes.entries
-            .sortedBy { it.value }
+        val passcodesOrdered = wcif.schedule.activityCoordinates()
+            .sortedBy { it.localStartTime }
             .mapNotNull {
-                sheetsWithRandomCode.values.find { v ->
-                    v.first.scrambleSetId == it.key.scrambleSetId
+                namedSheets.values.find { sheet ->
+                    sheet.scrambleSetId == it.activity.scrambleSetId
                 }
             }
             .distinct()
 
         val orderedPasscodeList = passcodesOrdered
-            .joinToString("\r\n") { "${it.first.title}: ${it.second}" }
+            .joinToString("\r\n") { "${it.title}: ${it.localPasscode}" }
 
         val orderedPasscodeListingTxt =
             resourceTemplate.replace("%%PASSCODES%%", orderedPasscodeList)

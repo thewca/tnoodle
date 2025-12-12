@@ -78,7 +78,7 @@ data class PrintingFolder(
 
             if (wcifSchedule.leafActivities.isNotEmpty()) {
                 val drawingScrambleSetIds = scrambleSheetsFlat.map { it.scrambleSetId }
-                val scheduleMatchedIds = wcifSchedule.allActivities.mapNotNull { it.scrambleSetId }
+                val scheduleMatchedIds = wcifSchedule.leafActivities.mapNotNull { it.scrambleSetId }
 
                 if (scheduleMatchedIds.containsAll(drawingScrambleSetIds)) {
                     val orderedScramblesFolder = OrderedScramblesFolder(competitionName, scrambleSheetsFlat)

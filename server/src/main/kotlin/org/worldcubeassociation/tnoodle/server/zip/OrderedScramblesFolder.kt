@@ -12,30 +12,32 @@ import java.time.ZonedDateTime
 
 data class OrderedScramblesFolder(val globalTitle: String, val scrambleSheets: List<ScrambleSheet>) {
     fun assemble(wcifSchedule: Schedule, pdfPassword: String?): Folder {
-        val wcifBindings = wcifSchedule.allActivities
-            // scrambleSetId as assigned by WCIFScrambleMatcher#matchActivity
-            .filter { it.scrambleSetId != null }
-            .associateWith { act ->
-                scrambleSheets.filter { it.scrambleSetId == act.scrambleSetId }.unlessEmpty()
-                    ?: ScheduleMatchingException.error("Ordered Scrambles: Could not find ScrambleSet ${act.scrambleSetId} associated with Activity $act")
-            }.mapValues { (act, scrs) ->
-                scrs.filter { act.activityCode.isParentOf(it.activityCode) }.unlessEmpty()
-                    ?: ScheduleMatchingException.error("Ordered Scrambles: Could not find any activity for scramble sheets affiliated with ScrambleSet ${act.scrambleSetId}")
-            }
+        val allActivityCoordinates = wcifSchedule.activityCoordinates { selfAndChildActivities }
 
-        val activityDays = wcifSchedule.activitiesWithLocalStartTimes
-            .map { it.value.dayOfYear }
+        val wcifBindings = allActivityCoordinates
+            // scrambleSetId as assigned by WCIFScrambleMatcher#matchActivity
+            .filter { it.activity.scrambleSetId != null }
+            .associateWith { coord ->
+                scrambleSheets.filter { it.scrambleSetId == coord.activity.scrambleSetId }.unlessEmpty()
+                    ?: ScheduleMatchingException.error("Ordered Scrambles: Could not find ScrambleSet ${coord.activity.scrambleSetId} associated with Activity ${coord.activity}")
+            }.mapValues { (coord, sheets) ->
+                sheets.filter { coord.activity.activityCode.isParentOf(it.activityCode) }.unlessEmpty()
+                    ?: ScheduleMatchingException.error("Ordered Scrambles: Could not find any activity for scramble sheets affiliated with ScrambleSet ${coord.activity.scrambleSetId}")
+            }.mapKeys { it.key.activity }
+
+        val activityDays = allActivityCoordinates
+            .map { it.localStartTime.dayOfYear }
             .distinct()
 
         // hasMultipleDays gets a variable assigned on the competition creation using the website's form.
-        // Online schedule fit to it and the user should not be able to put events outside it, but we double check here.
-        // The next assignment fix possible mistakes (eg. a competition is assigned with 1 day, but events are spread among 2 days).
+        // Online schedule fit to it and the user should not be able to put events outside it, but we double-check here.
+        // The next assignment fix possible mistakes (e.g. a competition is assigned with 1 day, but events are spread among 2 days).
         val hasMultipleDays = wcifSchedule.hasMultipleDays || activityDays.size > 1
         val hasMultipleVenues = wcifSchedule.hasMultipleVenues
 
         // We consider the competition start date as the earlier activity from the schedule.
         // This prevents miscalculation of dates for multiple timezones.
-        val competitionStartActivity = wcifSchedule.earliestActivity
+        val competitionStartActivity = allActivityCoordinates.minBy { it.localStartTime }.activity
 
         return folder("Ordered Scrambles") {
             for (venue in wcifSchedule.venues) {
@@ -94,10 +96,10 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleSheets: L
             }
 
             // Generate all scrambles ordered
-            val allScramblesOrdered = wcifSchedule.activitiesWithLocalStartTimes.entries
-                .sortedBy { it.value }
+            val allScramblesOrdered = wcifSchedule.activityCoordinates { leafChildActivities }
+                .sortedBy { it.localStartTime }
                 // the notNull will effectively never happen, because we guarantee that all relevant activities are indexed
-                .mapNotNull { wcifBindings[it.key] }
+                .mapNotNull { wcifBindings[it.activity] }
                 .flatten()
                 .distinct()
 

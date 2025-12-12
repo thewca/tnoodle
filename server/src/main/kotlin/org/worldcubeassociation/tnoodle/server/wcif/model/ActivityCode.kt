@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.wcif.model
 
-import kotlinx.serialization.*
+import kotlinx.serialization.Serializable
 import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.serial.types.SingletonStringEncoder
 import org.worldcubeassociation.tnoodle.server.Translate
@@ -11,11 +11,9 @@ import kotlin.math.*
 
 @Serializable
 data class ActivityCode(val activityCodeString: String) : EventIdProvider {
-    @Transient
-    private val activityParts = activityCodeString.split(WCIF_DELIMITER)
+    private val activityParts get() = activityCodeString.split(WCIF_DELIMITER)
 
-    @Transient
-    private val structureParts = activityParts
+    private val structureParts get() = activityParts
         .drop(1) // drop eventId prefix
         .associateBy { it.first() }
         .mapValues { it.value.drop(1) }
