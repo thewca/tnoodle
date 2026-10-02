@@ -92,10 +92,11 @@ class Interceptor extends Component<{}, InterceptorState> {
         });
     };
 
-    render = () => {
+    override render = () => {
         if (!this.state.message) {
             return null;
         }
+
         return (
             <div className="container-fluid">
                 <div className="row">
