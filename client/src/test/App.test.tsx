@@ -375,8 +375,12 @@ it("Logged user", async () => {
         );
     });
 
+    let manualSelectionButton = container.querySelector(
+        "#manual-selection-button",
+    );
+
     let competitionButtons = Array.from(
-        container.querySelectorAll("ul button"),
+        container.querySelectorAll(".btn-group-vertical button"),
     );
 
     let scrambleButton = container.querySelector("form button")!;
@@ -385,8 +389,7 @@ it("Logged user", async () => {
     for (let i = 0; i < competitions.length; i++) {
         // Select current competition
         await act(async () => {
-            // +1 to skip manual selection
-            competitionButtons[i + 1].dispatchEvent(
+            competitionButtons[i].dispatchEvent(
                 new MouseEvent("click", { bubbles: true }),
             );
         });
@@ -424,7 +427,7 @@ it("Logged user", async () => {
 
     // Get back to manual selection
     await act(async () => {
-        competitionButtons[0].dispatchEvent(
+        manualSelectionButton.dispatchEvent(
             new MouseEvent("click", { bubbles: true }),
         );
     });

@@ -348,6 +348,7 @@ const SideBar = () => {
                         <div className="vstack gap-2">
                             {competitions.length > 0 && (
                                 <button
+                                    id="manual-selection-button"
                                     type="button"
                                     className="btn btn-primary btn-lg btn-outline-light"
                                     onClick={handleManualSelection}

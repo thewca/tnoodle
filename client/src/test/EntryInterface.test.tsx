@@ -60,7 +60,7 @@ it("Password should toggle and changes to it should go to the store", async () =
     });
 
     const input = container.querySelector("#password")! as HTMLInputElement;
-    const passwordToggler = container.querySelector(".input-group-prepend")!;
+    const passwordToggler = container.querySelector(".input-group-text")!;
 
     expect(store.getState().scramblingSlice.password).toBe("");
 
