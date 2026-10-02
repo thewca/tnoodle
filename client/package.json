@@ -60,7 +60,6 @@
         }
     },
     "devDependencies": {
-        "@babel/plugin-transform-private-property-in-object": "^7.29.7",
         "@testing-library/jest-dom": "^6.10.0",
         "@testing-library/react": "^15.0.7",
         "@types/jest": "^29.5.14",
