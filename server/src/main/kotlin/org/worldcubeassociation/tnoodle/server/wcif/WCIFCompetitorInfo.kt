@@ -42,7 +42,7 @@ object WCIFCompetitorInfo {
             .filter { it.registration?.status == RegistrationStatus.ACCEPTED }
             .flatMap { it.personalBests }
             .filter { it.eventModel == EventData.THREE_MULTI_BLD }
-            .mapNotNull { it.best.asMultiResult }
+            .mapNotNull { it.value.asMultiResult }
 
         return mbldResults.maxByOrNull(comparator)
     }

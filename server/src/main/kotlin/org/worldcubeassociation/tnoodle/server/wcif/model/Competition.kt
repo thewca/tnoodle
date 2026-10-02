@@ -5,7 +5,7 @@ import org.worldcubeassociation.tnoodle.server.wcif.model.extension.ExtensionPro
 
 @Serializable
 data class Competition(
-    val formatVersion: String,
+    val formatVersion: String = FORMAT_VERSION,
     val id: String,
     val name: String,
     val shortName: String,
@@ -13,4 +13,8 @@ data class Competition(
     val events: List<Event>,
     val schedule: Schedule,
     override val extensions: List<Extension> = emptyList()
-) : ExtensionProvider()
+) : ExtensionProvider() {
+    companion object {
+        const val FORMAT_VERSION = "2.2.0"
+    }
+}
