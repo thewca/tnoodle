@@ -8891,10 +8891,10 @@ react-from-dom@^0.6.2:
   resolved "https://registry.yarnpkg.com/react-from-dom/-/react-from-dom-0.6.2.tgz#9da903a508c91c013b55afcd59348b8b0a39bdb4"
   integrity sha512-qvWWTL/4xw4k/Dywd41RBpLQUSq97csuv15qrxN+izNeLYlD9wn5W8LspbfYe5CWbaSdkZ72BsaYBPQf2x4VbQ==
 
-react-icons@^4.12.0:
-  version "4.12.0"
-  resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-4.12.0.tgz#54806159a966961bfd5cdb26e492f4dafd6a8d78"
-  integrity sha512-IBaDuHiShdZqmfc/TwHu6+d6k2ltNCf3AszxNmjJc1KUfXdEeRJOKyNvLmAHaarhzGmTSVygNdyu8/opXv2gaw==
+react-icons@^5.7.0:
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-5.7.0.tgz#8969db00968ffdfc57fdc2ec9dd1ed88e35b3de9"
+  integrity sha512-LBLy340Rzqy6+/yVhZKT3B/QpP1BZaesGqasf09HPOBzRarcDIFH0WwXlXQfE7q7ipxK4MSiC5DIBWURCny6fw==
 
 react-inlinesvg@^3.0.3:
   version "3.0.3"
