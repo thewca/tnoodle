@@ -278,7 +278,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             }) ?? [];
 
         return (
-            <tr className="thead-light">
+            <tr className="table-light">
                 <th scope="col" colSpan={4}>
                     <table className={"table table-borderless"}>
                         <tbody>
@@ -307,7 +307,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                 <td colSpan={defaultColors.length}>
                                     <button
                                         type="button"
-                                        className="btn btn-warning mr-4"
+                                        className="btn btn-warning me-4"
                                         onClick={() =>
                                             updateEventColorScheme(
                                                 defaultColorScheme
@@ -320,7 +320,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                     {samePuzzleEvents.length > 0 && (
                                         <button
                                             type="button"
-                                            className="btn btn-secondary mr-1"
+                                            className="btn btn-secondary me-1"
                                             onClick={() =>
                                                 samePuzzleEvents.forEach(
                                                     (wcaEvent) =>
@@ -337,7 +337,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                     {samePuzzleGroupEvents.length > 0 && (
                                         <button
                                             type="button"
-                                            className="btn btn-secondary mr-1"
+                                            className="btn btn-secondary me-1"
                                             onClick={() =>
                                                 samePuzzleGroupEvents.forEach(
                                                     (wcaEvent) =>
@@ -365,7 +365,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             return;
         }
         return (
-            <tr className="thead-light">
+            <tr className="table-light">
                 <th scope="col">#</th>
                 <th scope="col">Format</th>
                 <th scope="col">Scramble Sets</th>
@@ -387,8 +387,9 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                     let copies = wcifRounds[i].extensions.find(
                         (extension) => extension.id === copiesExtensionId
                     )?.data.numCopies;
+
                     return (
-                        <tr key={i} className="form-group">
+                        <tr key={i}>
                             <th scope="row" className="align-middle">
                                 {i + 1}
                             </th>
@@ -492,13 +493,13 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     };
 
     return (
-        <table className="table table-sm shadow rounded">
+        <table className="table table-sm shadow rounded overflow-hidden">
             <thead>
                 <tr
                     className={
                         wcifEvent.rounds.length === 0
-                            ? "thead-dark text-white"
-                            : "thead-light"
+                            ? "table-dark text-white"
+                            : "table-light"
                     }
                 >
                     <th className="firstColumn" scope="col" />
@@ -509,7 +510,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                         />
                     </th>
                     <th className="align-middle lastTwoColumns" scope="col">
-                        <h5 className="font-weight-bold">{wcaEvent.name}</h5>
+                        <h5 className="fw-bold">{wcaEvent.name}</h5>
                         {maybeShowProgressBar()}
                     </th>
                     <th className="lastTwoColumns" scope="col">
@@ -550,9 +551,9 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                     </OverlayTrigger>
                                 </div>
                             )}
-                        <label>Rounds</label>
+                        <label className="form-label">Rounds</label>
                         <select
-                            className="form-control"
+                            className="form-select"
                             value={wcifEvent.rounds.length}
                             onChange={(evt) =>
                                 handleNumberOfRoundsChange(

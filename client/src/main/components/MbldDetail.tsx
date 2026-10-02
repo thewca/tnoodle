@@ -75,11 +75,14 @@ const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
     return (
         <tfoot>
             <tr>
-                <th colSpan={3}>
-                    <p className="text-right">Select the number of scrambles</p>
+                <th colSpan={3} className="text-end">
+                    <label className="col-form-label" htmlFor="mbld-scrambles-amount">
+                        Select the number of scrambles
+                    </label>
                 </th>
                 <td>
                     <input
+                        id="mbld-scrambles-amount"
                         className="form-control bg-dark text-white"
                         type="number"
                         value={mbld}

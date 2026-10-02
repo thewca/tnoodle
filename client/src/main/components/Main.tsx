@@ -176,10 +176,9 @@ const Main = () => {
                 <Interceptor ref={interceptorRef} />
                 <VersionInfo />
                 <div className="container-fluid pt-2">
-                    <div className="row">
+                    <div className="row g-3 pb-3 align-items-end">
                         <EntryInterface />
-                        <div className="col-sm-4 form-group">
-                            <label>&nbsp;</label>
+                        <div className="col-sm-4">
                             {scrambleButton()}
                         </div>
                     </div>

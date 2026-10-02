@@ -39,8 +39,11 @@ const EntryInterface = () => {
 
     return (
         <>
-            <div className="col-sm-4 text-left form-group">
-                <label className="font-weight-bold" htmlFor="competition-name">
+            <div className="col-sm-4 text-start">
+                <label
+                    className="form-label fw-bold"
+                    htmlFor="competition-name"
+                >
                     Competition Name
                 </label>
                 <input
@@ -56,8 +59,8 @@ const EntryInterface = () => {
                 />
             </div>
 
-            <div className="col-sm-4 text-left form-group">
-                <label className="font-weight-bold" htmlFor="password">
+            <div className="col-sm-4 text-start">
+                <label className="form-label fw-bold" htmlFor="password">
                     Password
                 </label>
                 <div className="input-group">
@@ -70,14 +73,9 @@ const EntryInterface = () => {
                         value={password}
                         disabled={generatingScrambles}
                     />
-                    <div
-                        className="input-group-prepend"
-                        onClick={() => setShowPassword(!showPassword)}
-                    >
-                        <span className="input-group-text">
-                            {showPassword ? <FaEye /> : <FaEyeSlash />}
-                        </span>
-                    </div>
+                    <span className="input-group-text" onClick={() => setShowPassword(!showPassword)}>
+                        {showPassword ? <FaEye /> : <FaEyeSlash />}
+                    </span>
                 </div>
             </div>
         </>

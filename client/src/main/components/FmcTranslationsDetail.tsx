@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import RootState from "../model/RootState";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
-import "./FmcTranslationsDetail.css";
 import tnoodleApi from "../api/tnoodle.api";
 import WcifEvent from "../model/WcifEvent";
 import { fmcTranslationsExtensionId } from "../util/wcif.util";
@@ -142,7 +141,7 @@ const FmcTranslationsDetail = ({
                         <React.Fragment key={j}>
                             <th>
                                 <label
-                                    className="fmc-label"
+                                    className="form-label text-capitalize"
                                     htmlFor={checkboxId}
                                 >
                                     {availableTranslations[translation]}
