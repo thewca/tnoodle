@@ -26,15 +26,15 @@ beforeEach(() => {
     document.body.appendChild(container);
 
     jest.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockImplementation(() =>
-        Promise.resolve({ data: colorScheme, ...axiosResponse })
+        Promise.resolve({ data: colorScheme, ...axiosResponse }),
     );
 
     jest.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockImplementation(() =>
-        Promise.resolve({ data: scrambleAndImage, ...axiosResponse })
+        Promise.resolve({ data: scrambleAndImage, ...axiosResponse }),
     );
 
     jest.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockImplementation(() =>
-        Promise.resolve({ data: emptySvg, ...axiosResponse })
+        Promise.resolve({ data: emptySvg, ...axiosResponse }),
     );
 });
 
@@ -63,7 +63,7 @@ it("Changing values from event", async () => {
                     <EventPicker wcaEvent={event} wcifEvent={wcifEvent} />
                 </Provider>
             </React.StrictMode>,
-            { container }
+            { container },
         );
     });
 
@@ -75,11 +75,11 @@ it("Changing values from event", async () => {
     });
 
     expect(store.getState().wcifSlice.wcif.events[0].rounds.length).toEqual(
-        numberOfRounds
+        numberOfRounds,
     );
 
     expect(
-        store.getState().wcifSlice.wcif.events[0].rounds[0].scrambleSetCount
+        store.getState().wcifSlice.wcif.events[0].rounds[0].scrambleSetCount,
     ).toBe(1);
 
     // This should be numberOfRounds * 2, since each round has 2 inputs.
@@ -93,14 +93,14 @@ it("Changing values from event", async () => {
     fireEvent.change(inputs[roundToChange * 2], { target: { value } });
     expect(
         store.getState().wcifSlice.wcif.events[0].rounds[roundToChange]
-            .scrambleSetCount
+            .scrambleSetCount,
     ).toEqual(value);
 
     // Remove 1 round
     numberOfRounds--;
     fireEvent.change(roundsSelector, { target: { value: numberOfRounds } });
     expect(store.getState().wcifSlice.wcif.events[0].rounds.length).toEqual(
-        numberOfRounds
+        numberOfRounds,
     );
 
     const scrambleSets = inputs[0];
@@ -114,13 +114,13 @@ it("Changing values from event", async () => {
     const newScrambleSets = 3;
     fireEvent.change(scrambleSets, { target: { value: newScrambleSets } });
     expect(
-        store.getState().wcifSlice.wcif.events[0].rounds[0].scrambleSetCount
+        store.getState().wcifSlice.wcif.events[0].rounds[0].scrambleSetCount,
     ).toBe(newScrambleSets);
 
     // Initial value should be 1
     expect(
         store.getState().wcifSlice.wcif.events[0].rounds[0].extensions[0].data
-            .numCopies
+            .numCopies,
     ).toBe(1);
 
     // Changes to copies should go to the store
@@ -128,7 +128,7 @@ it("Changing values from event", async () => {
     fireEvent.change(copies, { target: { value: newCopies } });
     expect(
         store.getState().wcifSlice.wcif.events[0].rounds[0].extensions[0].data
-            .numCopies
+            .numCopies,
     ).toBe(newCopies);
 });
 
@@ -147,7 +147,7 @@ it("Editing disabled", async () => {
                     <EventPicker wcaEvent={event} wcifEvent={wcifEvent} />
                 </Provider>
             </React.StrictMode>,
-            { container }
+            { container },
         );
     });
 
@@ -177,12 +177,12 @@ it("Progress Bar showing/hiding", async () => {
                     <EventPicker wcaEvent={event} wcifEvent={wcifEvent} />
                 </Provider>
             </React.StrictMode>,
-            { container }
+            { container },
         );
     });
 
     const progressBefore = Array.from(
-        container.querySelectorAll("div.progress")
+        container.querySelectorAll("div.progress"),
     );
 
     expect(progressBefore.length).toBe(0);
@@ -193,7 +193,7 @@ it("Progress Bar showing/hiding", async () => {
     });
 
     const progressDuringEarly = Array.from(
-        container.querySelectorAll("div.progress>div")
+        container.querySelectorAll("div.progress>div"),
     );
 
     expect(progressDuringEarly.length).toBe(1);
@@ -204,12 +204,12 @@ it("Progress Bar showing/hiding", async () => {
     });
 
     const progressDuringLate = Array.from(
-        container.querySelectorAll("div.progress>div")
+        container.querySelectorAll("div.progress>div"),
     );
 
     expect(progressDuringLate.length).toBe(1);
     const lateProgress = parseFloat(
-        progressDuringLate[0].getAttribute("aria-valuenow")!
+        progressDuringLate[0].getAttribute("aria-valuenow")!,
     );
     expect(Math.trunc(lateProgress)).toBe(66);
 
@@ -218,12 +218,12 @@ it("Progress Bar showing/hiding", async () => {
     });
 
     const progressAfter = Array.from(
-        container.querySelectorAll("div.progress>div")
+        container.querySelectorAll("div.progress>div"),
     );
 
     expect(progressAfter.length).toBe(1);
     const completeProgress = parseInt(
-        progressAfter[0].getAttribute("aria-valuenow")!
+        progressAfter[0].getAttribute("aria-valuenow")!,
     );
     expect(completeProgress).toBe(100);
 

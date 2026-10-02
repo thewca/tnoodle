@@ -94,7 +94,7 @@ class WcaApi {
             sort: "start_date",
         });
         return this.wcaApiFetch<Competition[]>(
-            `/competitions?${params.toString()}`
+            `/competitions?${params.toString()}`,
         );
     };
 
@@ -114,7 +114,7 @@ class WcaApi {
 
         let redirectUri = window.location.origin + BASE_PATH + "/oauth/wca";
         let logInUrl = toWcaUrl(
-            `/oauth/authorize?client_id=${getTnoodleAppId()}&redirect_uri=${redirectUri}&response_type=token&scope=public+manage_competitions`
+            `/oauth/authorize?client_id=${getTnoodleAppId()}&redirect_uri=${redirectUri}&response_type=token&scope=public+manage_competitions`,
         );
         localStorage["TNoodle.preLoginHref"] = window.location.href;
         window.location.href = logInUrl;

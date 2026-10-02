@@ -18,7 +18,7 @@ const SchemeColorPicker = ({
     onColorChange,
 }: SchemeColorPickerProps) => {
     const generatingScrambles = useSelector(
-        (state: RootState) => state.scramblingSlice.generatingScrambles
+        (state: RootState) => state.scramblingSlice.generatingScrambles,
     );
 
     const handleColorChange = (color: ColorResult) => {

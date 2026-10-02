@@ -11,7 +11,7 @@ import { setExtensionLazily } from "../util/extension.util";
 const VersionInfo = () => {
     const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
     const isManualSelection = useSelector(
-        (state: RootState) => state.informationSlice.isManualSelection
+        (state: RootState) => state.informationSlice.isManualSelection,
     );
 
     // WCA API response
@@ -61,7 +61,7 @@ const VersionInfo = () => {
         }
 
         setSignatureValid(
-            signedBuild && signatureKeyBytes === wcaPublicKeyBytes
+            signedBuild && signatureKeyBytes === wcaPublicKeyBytes,
         );
     }, [signedBuild, signatureKeyBytes, wcaPublicKeyBytes]);
 
@@ -94,7 +94,7 @@ const VersionInfo = () => {
             wcif,
             frontendStatusExtensionId,
             buildFrontendStatusExtension,
-            (wcif) => dispatch(setWcif(wcif))
+            (wcif) => dispatch(setWcif(wcif)),
         );
     }, [dispatch, wcif, buildFrontendStatusExtension]);
 

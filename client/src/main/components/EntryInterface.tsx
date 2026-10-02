@@ -9,16 +9,16 @@ const EntryInterface = () => {
     const [showPassword, setShowPassword] = useState(false);
 
     const isManualSelection = useSelector(
-        (state: RootState) => state.informationSlice.isManualSelection
+        (state: RootState) => state.informationSlice.isManualSelection,
     );
     const password = useSelector(
-        (state: RootState) => state.scramblingSlice.password
+        (state: RootState) => state.scramblingSlice.password,
     );
     const competitionName = useSelector(
-        (state: RootState) => state.wcifSlice.wcif.name
+        (state: RootState) => state.wcifSlice.wcif.name,
     );
     const generatingScrambles = useSelector(
-        (state: RootState) => state.scramblingSlice.generatingScrambles
+        (state: RootState) => state.scramblingSlice.generatingScrambles,
     );
 
     const dispatch = useDispatch();
@@ -73,7 +73,10 @@ const EntryInterface = () => {
                         value={password}
                         disabled={generatingScrambles}
                     />
-                    <span className="input-group-text" onClick={() => setShowPassword(!showPassword)}>
+                    <span
+                        className="input-group-text"
+                        onClick={() => setShowPassword(!showPassword)}
+                    >
                         {showPassword ? <FaEye /> : <FaEyeSlash />}
                     </span>
                 </div>

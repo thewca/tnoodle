@@ -27,7 +27,7 @@ export class ScrambleClient {
 
     constructor(
         onHandshake: ScrambleHandshakeFn,
-        onProgress: ScrambleProgressFn
+        onProgress: ScrambleProgressFn,
     ) {
         this.onHandshake = onHandshake;
         this.onProgress = onProgress;
@@ -51,7 +51,7 @@ export class ScrambleClient {
     loadScrambles(
         endpoint: String,
         payload: object,
-        targetMarker: String
+        targetMarker: String,
     ): Promise<WebsocketBlobResult> {
         return new Promise((resolve, reject) => {
             let ws = new WebSocket(BASE_URL + endpoint);

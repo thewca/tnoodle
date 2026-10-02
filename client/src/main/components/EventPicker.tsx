@@ -32,28 +32,28 @@ interface EventPickerProps {
 
 const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     const wcaFormats = useSelector(
-        (state: RootState) => state.wcifSlice.wcaFormats
+        (state: RootState) => state.wcifSlice.wcaFormats,
     );
     const wcaEvents = useSelector(
-        (state: RootState) => state.wcifSlice.wcaEvents
+        (state: RootState) => state.wcifSlice.wcaEvents,
     );
     const wcifEvents = useSelector(
-        (state: RootState) => state.wcifSlice.wcif.events
+        (state: RootState) => state.wcifSlice.wcif.events,
     );
     const isManualSelection = useSelector(
-        (state: RootState) => state.informationSlice.isManualSelection
+        (state: RootState) => state.informationSlice.isManualSelection,
     );
     const generatingScrambles = useSelector(
-        (state: RootState) => state.scramblingSlice.generatingScrambles
+        (state: RootState) => state.scramblingSlice.generatingScrambles,
     );
     const scramblingProgressCurrent = useSelector(
-        (state: RootState) => state.scramblingSlice.scramblingProgressCurrent
+        (state: RootState) => state.scramblingSlice.scramblingProgressCurrent,
     );
     const scramblingProgressTarget = useSelector(
-        (state: RootState) => state.scramblingSlice.scramblingProgressTarget
+        (state: RootState) => state.scramblingSlice.scramblingProgressTarget,
     );
     const showColorPicker = useSelector(
-        (state: RootState) => state.settingsSlice.showColorPicker
+        (state: RootState) => state.settingsSlice.showColorPicker,
     );
 
     const [puzzleSvg, setPuzzleSvg] = useState<string>();
@@ -85,7 +85,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                     });
             }
         },
-        [wcaEvent.puzzle_id, colorScheme]
+        [wcaEvent.puzzle_id, colorScheme],
     );
 
     useEffect(() => {
@@ -119,7 +119,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             dispatch(setWcifEvent(newWcifEvent));
             dispatch(setFileZip());
         },
-        [dispatch]
+        [dispatch],
     );
 
     const updateEventRounds = (rounds: Round[]) => {
@@ -136,7 +136,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             wcifEvent,
             colorSchemeExtensionId,
             () => buildColorSchemeExtension(colorScheme),
-            dispatchWcifEvent
+            dispatchWcifEvent,
         );
     };
 
@@ -169,7 +169,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
 
     const handleNumberOfRoundsChange = (
         numberOfRounds: number,
-        rounds: Round[]
+        rounds: Round[],
     ) => {
         let newRounds = [...rounds];
         // Ajust the number of rounds in case we have to remove
@@ -192,19 +192,19 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         roundNumber: number,
         value: string | number,
         rounds: Round[],
-        name: "format" | "scrambleSetCount"
+        name: "format" | "scrambleSetCount",
     ) => {
         updateEventRounds(
             rounds.map((round, i) =>
-                i !== roundNumber ? round : { ...round, [name]: value }
-            )
+                i !== roundNumber ? round : { ...round, [name]: value },
+            ),
         );
     };
 
     const handleNumberOfCopiesChange = (
         roundNumber: number,
         numCopies: number,
-        rounds: Round[]
+        rounds: Round[],
     ) => {
         updateEventRounds(
             rounds.map((round, i) =>
@@ -215,10 +215,10 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                           extensions: round.extensions.map((extension) =>
                               extension.id === copiesExtensionId
                                   ? { ...extension, data: { numCopies } }
-                                  : extension
+                                  : extension,
                           ),
-                      }
-            )
+                      },
+            ),
         );
     };
 
@@ -236,7 +236,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
 
     const updateForeignColorScheme = (wcaEvent: WcaEvent) => {
         let wcifEvent = wcifEvents.find(
-            (wcifEvent) => wcifEvent.id === wcaEvent.id
+            (wcifEvent) => wcifEvent.id === wcaEvent.id,
         );
 
         if (wcifEvent !== undefined && colorScheme !== undefined) {
@@ -244,7 +244,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                 wcifEvent,
                 colorSchemeExtensionId,
                 () => buildColorSchemeExtension(colorScheme),
-                dispatchWcifEvent
+                dispatchWcifEvent,
             );
         }
     };
@@ -295,7 +295,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                                 onColorChange={(hexColor) =>
                                                     handleColorSchemeChange(
                                                         colorKey,
-                                                        hexColor
+                                                        hexColor,
                                                     )
                                                 }
                                             />
@@ -310,7 +310,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                         className="btn btn-warning me-4"
                                         onClick={() =>
                                             updateEventColorScheme(
-                                                defaultColorScheme
+                                                defaultColorScheme,
                                             )
                                         }
                                         disabled={generatingScrambles}
@@ -325,8 +325,8 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                                 samePuzzleEvents.forEach(
                                                     (wcaEvent) =>
                                                         updateForeignColorScheme(
-                                                            wcaEvent
-                                                        )
+                                                            wcaEvent,
+                                                        ),
                                                 )
                                             }
                                             disabled={generatingScrambles}
@@ -342,8 +342,8 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                                 samePuzzleGroupEvents.forEach(
                                                     (wcaEvent) =>
                                                         updateForeignColorScheme(
-                                                            wcaEvent
-                                                        )
+                                                            wcaEvent,
+                                                        ),
                                                 )
                                             }
                                             disabled={generatingScrambles}
@@ -385,7 +385,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             <tbody>
                 {Array.from({ length: wcifRounds.length }, (_, i) => {
                     let copies = wcifRounds[i].extensions.find(
-                        (extension) => extension.id === copiesExtensionId
+                        (extension) => extension.id === copiesExtensionId,
                     )?.data.numCopies;
 
                     return (
@@ -402,7 +402,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                             i,
                                             evt.target.value,
                                             wcifRounds,
-                                            "format"
+                                            "format",
                                         )
                                     }
                                     disabled={
@@ -427,7 +427,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                             i,
                                             Number(evt.target.value),
                                             wcifRounds,
-                                            "scrambleSetCount"
+                                            "scrambleSetCount",
                                         )
                                     }
                                     min={1}
@@ -447,7 +447,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                         handleNumberOfCopiesChange(
                                             i,
                                             Number(evt.target.value),
-                                            wcifRounds
+                                            wcifRounds,
                                         )
                                     }
                                     min={1}

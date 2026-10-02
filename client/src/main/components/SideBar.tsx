@@ -34,14 +34,14 @@ const SideBar = () => {
     const [loadingCompetitionInfo, setLoadingCompetitionInfo] = useState(false);
 
     const cachedObjects = useSelector(
-        (state: RootState) => state.informationSlice.cachedObjects
+        (state: RootState) => state.informationSlice.cachedObjects,
     );
     const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
     const generatingScrambles = useSelector(
-        (state: RootState) => state.scramblingSlice.generatingScrambles
+        (state: RootState) => state.scramblingSlice.generatingScrambles,
     );
     const showColorPicker = useSelector(
-        (state: RootState) => state.settingsSlice.showColorPicker
+        (state: RootState) => state.settingsSlice.showColorPicker,
     );
 
     const [me, setMe] = useState<Person>();
@@ -52,7 +52,7 @@ const SideBar = () => {
 
     const handleIsOpen = useCallback(
         () => setIsOpen(window.innerWidth > 992),
-        [setIsOpen]
+        [setIsOpen],
     );
 
     useEffect(() => {
@@ -99,7 +99,7 @@ const SideBar = () => {
 
         const queryParamId = getQueryParameter("competitionId");
         const isUpcoming = upcomingCompetitions.some(
-            (comp) => comp.id === queryParamId
+            (comp) => comp.id === queryParamId,
         );
 
         if (isUpcoming) {
@@ -136,13 +136,13 @@ const SideBar = () => {
                             competitionId: wcif.id,
                             identifier: "bestMbldAttempt",
                             object: attempted,
-                        })
+                        }),
                     );
                     dispatch(setBestMbldAttempt(attempted));
                 }
             });
         },
-        [dispatch]
+        [dispatch],
     );
 
     const getAndCacheSuggestedFmcTranslations = useCallback(
@@ -153,12 +153,12 @@ const SideBar = () => {
                         competitionId: wcif.id,
                         identifier: "suggestedFmcTranslations",
                         object: response.data,
-                    })
+                    }),
                 );
                 dispatch(setSuggestedFmcTranslations(response.data));
             });
         },
-        [dispatch]
+        [dispatch],
     );
 
     const updateWcif = useCallback(
@@ -168,7 +168,7 @@ const SideBar = () => {
             dispatch(setCompetitionName(wcif.name));
             dispatch(setFileZip());
         },
-        [dispatch]
+        [dispatch],
     );
 
     const loadCompetition = useCallback(
@@ -190,7 +190,7 @@ const SideBar = () => {
                 let cachedSuggestedFmcTranslations =
                     cachedObject.suggestedFmcTranslations;
                 dispatch(
-                    setSuggestedFmcTranslations(cachedSuggestedFmcTranslations)
+                    setSuggestedFmcTranslations(cachedSuggestedFmcTranslations),
                 );
 
                 let cachedBestMbldAttempt = cachedObject.bestMbldAttempt;
@@ -207,7 +207,7 @@ const SideBar = () => {
                                 competitionId,
                                 identifier: "wcif",
                                 object: response.data,
-                            })
+                            }),
                         );
                         getAndCacheSuggestedFmcTranslations(response.data);
                         getAndCacheBestMbldAttempt(response.data);
@@ -222,7 +222,7 @@ const SideBar = () => {
             getAndCacheBestMbldAttempt,
             getAndCacheSuggestedFmcTranslations,
             updateWcif,
-        ]
+        ],
     );
 
     useEffect(() => {
@@ -238,7 +238,7 @@ const SideBar = () => {
             setQueryParameter("competitionId", competitionId);
             loadCompetition(competitionId);
         },
-        [loadCompetition]
+        [loadCompetition],
     );
 
     const logInButton = () => {
@@ -260,7 +260,7 @@ const SideBar = () => {
                                 competitions.length
                             } manageable ${pluralize(
                                 " competition",
-                                competitions.length
+                                competitions.length,
                             )} upcoming.`}
                     </p>
                 )}

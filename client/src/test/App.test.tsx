@@ -46,31 +46,31 @@ beforeEach(() => {
         Promise.resolve({
             data: events,
             ...axiosResponse,
-        })
+        }),
     );
 
     jest.spyOn(tnoodleApi, "fetchFormats").mockImplementation(() =>
-        Promise.resolve({ data: formats, ...axiosResponse })
+        Promise.resolve({ data: formats, ...axiosResponse }),
     );
 
     jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockImplementation(
-        () => Promise.resolve({ data: languages, ...axiosResponse })
+        () => Promise.resolve({ data: languages, ...axiosResponse }),
     );
 
     jest.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockImplementation(() =>
-        Promise.resolve({ data: colorScheme, ...axiosResponse })
+        Promise.resolve({ data: colorScheme, ...axiosResponse }),
     );
 
     jest.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockImplementation(() =>
-        Promise.resolve({ data: scrambleAndImage, ...axiosResponse })
+        Promise.resolve({ data: scrambleAndImage, ...axiosResponse }),
     );
 
     jest.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockImplementation(() =>
-        Promise.resolve({ data: emptySvg, ...axiosResponse })
+        Promise.resolve({ data: emptySvg, ...axiosResponse }),
     );
 
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({ data: version, ...axiosResponse })
+        Promise.resolve({ data: version, ...axiosResponse }),
     );
 
     jest.spyOn(tnoodleApi, "fetchZip").mockImplementation(
@@ -79,23 +79,23 @@ beforeEach(() => {
             password = _password;
 
             return Promise.resolve(plainZip);
-        }
+        },
     );
 
     jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
-        Promise.resolve({ data: scrambleProgram, ...axiosResponse })
+        Promise.resolve({ data: scrambleProgram, ...axiosResponse }),
     );
 
     jest.spyOn(wcaApi, "getUpcomingManageableCompetitions").mockImplementation(
-        () => Promise.resolve({ ...axiosResponse, data: competitions })
+        () => Promise.resolve({ ...axiosResponse, data: competitions }),
     );
 
     jest.spyOn(wcaApi, "fetchMe").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: { me } })
+        Promise.resolve({ ...axiosResponse, data: { me } }),
     );
 
     jest.spyOn(tnoodleApi, "convertToBlob").mockImplementation(() =>
-        Promise.resolve(new Blob())
+        Promise.resolve(new Blob()),
     );
 });
 
@@ -133,7 +133,7 @@ it("Just generate scrambles", async () => {
                     <App />
                 </Provider>
             </React.StrictMode>,
-            { container }
+            { container },
         );
     });
     const scrambleButton = container.querySelector("form button")!;
@@ -151,7 +151,7 @@ it("Just generate scrambles", async () => {
 
     let wcifStatus = findExtension(
         store.getState().wcifSlice.wcif,
-        frontendStatusExtensionId
+        frontendStatusExtensionId,
     );
     expect(wcifStatus!.data).toEqual(defaultStatus);
 });
@@ -167,7 +167,7 @@ it("Changes on 333, scramble", async () => {
                     <App />
                 </Provider>
             </React.StrictMode>,
-            { container }
+            { container },
         );
     });
 
@@ -240,7 +240,7 @@ it("Remove 333, add FMC and MBLD", async () => {
                     <App />
                 </Provider>
             </React.StrictMode>,
-            { container }
+            { container },
         );
     });
 
@@ -295,7 +295,7 @@ it("Remove 333, add FMC and MBLD", async () => {
 
             // Deselesect random translations
             let checkboxes = Array.from(
-                event.querySelectorAll("input[type=checkbox]")
+                event.querySelectorAll("input[type=checkbox]"),
             );
 
             for (
@@ -327,14 +327,14 @@ it("Remove 333, add FMC and MBLD", async () => {
 
     // Deselected should be with status false
     expect(selected).toEqual(
-        languagesIndexToSelect.map((index) => languageKeys[index]).sort()
+        languagesIndexToSelect.map((index) => languageKeys[index]).sort(),
     );
 
     let deselected = difference(languageKeys, selected).sort();
 
     // Selected and deselected should cover every languages
     expect([...selected, ...deselected].sort()).toStrictEqual(
-        languageKeys.sort()
+        languageKeys.sort(),
     );
 });
 
@@ -348,18 +348,19 @@ it("Logged user", async () => {
 
     jest.spyOn(wcaApi, "getCompetitionJson").mockImplementation(
         (competitionId) =>
-            Promise.resolve({ ...axiosResponse, data: wcifs[competitionId] })
+            Promise.resolve({ ...axiosResponse, data: wcifs[competitionId] }),
     );
 
     jest.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockImplementation(() =>
         Promise.resolve({
             ...axiosResponse,
             data: bestMbldAttempt,
-        })
+        }),
     );
 
     jest.spyOn(tnoodleApi, "fetchSuggestedFmcTranslations").mockImplementation(
-        () => Promise.resolve({ ...axiosResponse, data: ["de", "es", "pt-BR"] })
+        () =>
+            Promise.resolve({ ...axiosResponse, data: ["de", "es", "pt-BR"] }),
     );
 
     // Render component
@@ -370,12 +371,12 @@ it("Logged user", async () => {
                     <App />
                 </Provider>
             </React.StrictMode>,
-            { container }
+            { container },
         );
     });
 
     let competitionButtons = Array.from(
-        container.querySelectorAll("ul button")
+        container.querySelectorAll("ul button"),
     );
 
     let scrambleButton = container.querySelector("form button")!;
@@ -386,13 +387,13 @@ it("Logged user", async () => {
         await act(async () => {
             // +1 to skip manual selection
             competitionButtons[i + 1].dispatchEvent(
-                new MouseEvent("click", { bubbles: true })
+                new MouseEvent("click", { bubbles: true }),
             );
         });
 
         await act(async () => {
             scrambleButton.dispatchEvent(
-                new MouseEvent("click", { bubbles: true })
+                new MouseEvent("click", { bubbles: true }),
             );
         });
 
@@ -402,7 +403,7 @@ it("Logged user", async () => {
         // Download
         await act(async () => {
             scrambleButton.dispatchEvent(
-                new MouseEvent("click", { bubbles: true })
+                new MouseEvent("click", { bubbles: true }),
             );
         });
 
@@ -416,7 +417,7 @@ it("Logged user", async () => {
         ) {
             let items = container.querySelectorAll("tfoot tr th[colspan]");
             expect(items[items.length - 1].innerHTML).toContain(
-                `a competitor who already tried ${bestMbldAttempt.attempted} at a competition. Proceed if you are really certain of it.`
+                `a competitor who already tried ${bestMbldAttempt.attempted} at a competition. Proceed if you are really certain of it.`,
             );
         }
     }
@@ -424,25 +425,25 @@ it("Logged user", async () => {
     // Get back to manual selection
     await act(async () => {
         competitionButtons[0].dispatchEvent(
-            new MouseEvent("click", { bubbles: true })
+            new MouseEvent("click", { bubbles: true }),
         );
     });
 
     await act(async () => {
         scrambleButton.dispatchEvent(
-            new MouseEvent("click", { bubbles: true })
+            new MouseEvent("click", { bubbles: true }),
         );
     });
 
     // After manual selection, events should be restored
     expect(store.getState().wcifSlice.wcif.events).toStrictEqual(
-        defaultWcif.events
+        defaultWcif.events,
     );
 
     // Wcifs should be cached
     Object.keys(wcifs).forEach((competitionId) => {
         expect(
-            store.getState().informationSlice.cachedObjects[competitionId].wcif
+            store.getState().informationSlice.cachedObjects[competitionId].wcif,
         ).toEqual(wcifs[competitionId]);
     });
 
@@ -450,7 +451,7 @@ it("Logged user", async () => {
     for (let i = 0; i < competitionButtons.length; i++) {
         await act(async () => {
             competitionButtons[i].dispatchEvent(
-                new MouseEvent("click", { bubbles: true })
+                new MouseEvent("click", { bubbles: true }),
             );
         });
     }
@@ -458,7 +459,7 @@ it("Logged user", async () => {
     // On the 2nd competition selection, we should use cached information,
     // so no wcif should be called
     expect(wcaApi.getCompetitionJson).toHaveBeenCalledTimes(
-        competitions.length
+        competitions.length,
     );
 
     jest.spyOn(global.URL, "createObjectURL").mockRestore();
@@ -478,16 +479,16 @@ it("Comfort features should not block zip generation", async () => {
 
     jest.spyOn(wcaApi, "getCompetitionJson").mockImplementation(
         (competitionId) =>
-            Promise.resolve({ ...axiosResponse, data: wcifs[competitionId] })
+            Promise.resolve({ ...axiosResponse, data: wcifs[competitionId] }),
     );
 
     // Comfort features
     jest.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: bestMbldAttempt })
+        Promise.resolve({ ...axiosResponse, data: bestMbldAttempt }),
     );
 
     jest.spyOn(tnoodleApi, "fetchSuggestedFmcTranslations").mockImplementation(
-        () => Promise.resolve({ ...axiosResponse, data: [] })
+        () => Promise.resolve({ ...axiosResponse, data: [] }),
     );
 
     // Render component
@@ -498,12 +499,12 @@ it("Comfort features should not block zip generation", async () => {
                     <App />
                 </Provider>
             </React.StrictMode>,
-            { container }
+            { container },
         );
     });
 
     let competitionButtons = Array.from(
-        container.querySelectorAll("ul button")
+        container.querySelectorAll("ul button"),
     );
 
     let scrambleButton = container.querySelector("form button")!;
@@ -512,7 +513,7 @@ it("Comfort features should not block zip generation", async () => {
     for (let i = 0; i < competitionButtons.length; i++) {
         await act(async () => {
             competitionButtons[i].dispatchEvent(
-                new MouseEvent("click", { bubbles: true })
+                new MouseEvent("click", { bubbles: true }),
             );
         });
 
@@ -527,19 +528,19 @@ it("Comfort features should not block zip generation", async () => {
 
         await act(async () => {
             scrambleButton.dispatchEvent(
-                new MouseEvent("click", { bubbles: true })
+                new MouseEvent("click", { bubbles: true }),
             );
         });
 
         await act(async () => {
             scrambleButton.dispatchEvent(
-                new MouseEvent("click", { bubbles: true })
+                new MouseEvent("click", { bubbles: true }),
             );
         });
     }
 
     expect(tnoodleApi.fetchZip).toHaveBeenCalledTimes(
-        competitionButtons.length
+        competitionButtons.length,
     );
 
     jest.spyOn(global.URL, "createObjectURL").mockRestore();

@@ -23,17 +23,17 @@ import { frontendStatusExtensionId } from "../util/wcif.util";
 const Main = () => {
     const [competitionNameFileZip, setCompetitionNameFileZip] = useState("");
     const password = useSelector(
-        (state: RootState) => state.scramblingSlice.password
+        (state: RootState) => state.scramblingSlice.password,
     );
     const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
     const isManualSelection = useSelector(
-        (state: RootState) => state.informationSlice.isManualSelection
+        (state: RootState) => state.informationSlice.isManualSelection,
     );
     const generatingScrambles = useSelector(
-        (state: RootState) => state.scramblingSlice.generatingScrambles
+        (state: RootState) => state.scramblingSlice.generatingScrambles,
     );
     const fileZip = useSelector(
-        (state: RootState) => state.scramblingSlice.fileZip
+        (state: RootState) => state.scramblingSlice.fileZip,
     );
 
     const interceptorRef = useRef<Interceptor>(null);
@@ -65,13 +65,13 @@ const Main = () => {
 
         let scrambleClient = new ScrambleClient(
             onScrambleHandShake,
-            onScrambleProgress
+            onScrambleProgress,
         );
 
         tnoodleApi
             .fetchZip(scrambleClient, wcif, password)
             .then((plainZip: WebsocketBlobResult) =>
-                dispatch(setFileZip(plainZip))
+                dispatch(setFileZip(plainZip)),
             )
             .catch((err: any) => interceptorRef.current?.updateMessage(err))
             .finally(() => {
@@ -86,7 +86,7 @@ const Main = () => {
         // If TNoodle version is not official (as per VersionInfo) or if we generate scrambles using
         // a competition from staging, add a [Unofficial]
         let frontendStatusExtension = wcif.extensions.find(
-            (ext) => ext.id === frontendStatusExtensionId
+            (ext) => ext.id === frontendStatusExtensionId,
         );
 
         let isValidSignedBuild = frontendStatusExtension?.data.isSignedBuild;
@@ -139,7 +139,7 @@ const Main = () => {
 
         // At least 1 events must have at least 1 round.
         let anyEventHasRounds = wcif.events.some(
-            (event) => event.rounds.length > 0
+            (event) => event.rounds.length > 0,
         );
 
         let isLoggedCompSelection = !isManualSelection && wcaApi.isLogged();
@@ -161,8 +161,8 @@ const Main = () => {
                     !anyEventHasRounds
                         ? "No events selected."
                         : isOnlineLocked
-                        ? "You must be logged in and pick a competition"
-                        : ""
+                          ? "You must be logged in and pick a competition"
+                          : ""
                 }
             >
                 Generate Scrambles
@@ -178,9 +178,7 @@ const Main = () => {
                 <div className="container-fluid pt-2">
                     <div className="row g-3 pb-3 align-items-end">
                         <EntryInterface />
-                        <div className="col-sm-4">
-                            {scrambleButton()}
-                        </div>
+                        <div className="col-sm-4">{scrambleButton()}</div>
                     </div>
                 </div>
             </div>

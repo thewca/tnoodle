@@ -25,11 +25,11 @@ beforeEach(() => {
     document.body.appendChild(container);
 
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({ data: version, ...axiosResponse })
+        Promise.resolve({ data: version, ...axiosResponse }),
     );
 
     jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
-        Promise.resolve({ data: scrambleProgram, ...axiosResponse })
+        Promise.resolve({ data: scrambleProgram, ...axiosResponse }),
     );
 });
 
@@ -53,27 +53,27 @@ it("There should be only 1 button of type submit, check FMC changes", async () =
         Promise.resolve({
             data: events,
             ...axiosResponse,
-        })
+        }),
     );
 
     jest.spyOn(tnoodleApi, "fetchFormats").mockImplementation(() =>
-        Promise.resolve({ data: formats, ...axiosResponse })
+        Promise.resolve({ data: formats, ...axiosResponse }),
     );
 
     jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockImplementation(
-        () => Promise.resolve({ data: languages, ...axiosResponse })
+        () => Promise.resolve({ data: languages, ...axiosResponse }),
     );
 
     jest.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockImplementation(() =>
-        Promise.resolve({ data: colorScheme, ...axiosResponse })
+        Promise.resolve({ data: colorScheme, ...axiosResponse }),
     );
 
     jest.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockImplementation(() =>
-        Promise.resolve({ data: scrambleAndImage, ...axiosResponse })
+        Promise.resolve({ data: scrambleAndImage, ...axiosResponse }),
     );
 
     jest.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockImplementation(() =>
-        Promise.resolve({ data: emptySvg, ...axiosResponse })
+        Promise.resolve({ data: emptySvg, ...axiosResponse }),
     );
 
     // We add suggested FMC so the button Select Suggested appears as well
@@ -88,7 +88,7 @@ it("There should be only 1 button of type submit, check FMC changes", async () =
                     <Main />
                 </Provider>
             </React.StrictMode>,
-            { container }
+            { container },
         );
     });
 
@@ -116,7 +116,7 @@ it("There should be only 1 button of type submit, check FMC changes", async () =
     // By avoiding Generate Scrambles button, we avoid triggering zip generation,
     // therefore button text, which is used later.
     let almostAllButtons = buttons.filter(
-        (button) => button.innerHTML !== "Generate Scrambles"
+        (button) => button.innerHTML !== "Generate Scrambles",
     );
     for (let i = 0; i < almostAllButtons.length; i++) {
         let button = almostAllButtons[i];
@@ -127,7 +127,7 @@ it("There should be only 1 button of type submit, check FMC changes", async () =
 
     const completeButtons = Array.from(form.querySelectorAll("button"));
     const buttonsTypeSubmit = completeButtons.filter(
-        (button) => button.type === "submit"
+        (button) => button.type === "submit",
     );
 
     // There can be only 1 button of type submit inside the form
@@ -164,7 +164,7 @@ it("There should be only 1 button of type submit, check FMC changes", async () =
     let index = Math.floor(Math.random() * Object.keys(languages).length);
     let language = Object.keys(languages)[index];
     const checkbox = Array.from(
-        container.querySelectorAll("input[type=checkbox]")
+        container.querySelectorAll("input[type=checkbox]"),
     )[index] as HTMLInputElement;
     expect(checkbox.id).toBe("fmc-" + language);
 

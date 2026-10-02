@@ -19,10 +19,10 @@ const FmcTranslationsDetail = ({
     fmcWcifEvent,
 }: FmcTranslationsDetailProps) => {
     const suggestedFmcTranslations = useSelector(
-        (state: RootState) => state.eventDataSlice.suggestedFmcTranslations
+        (state: RootState) => state.eventDataSlice.suggestedFmcTranslations,
     );
     const generatingScrambles = useSelector(
-        (state: RootState) => state.scramblingSlice.generatingScrambles
+        (state: RootState) => state.scramblingSlice.generatingScrambles,
     );
 
     const [availableTranslations, setAvailableTranslations] =
@@ -66,16 +66,16 @@ const FmcTranslationsDetail = ({
                 (fmcWcifEvent) => {
                     dispatch(setWcifEvent(fmcWcifEvent));
                     dispatch(setFileZip());
-                }
+                },
             );
         },
-        [dispatch, fmcWcifEvent]
+        [dispatch, fmcWcifEvent],
     );
 
     useEffect(() => {
         const wcifExtension = findExtension(
             fmcWcifEvent,
-            fmcTranslationsExtensionId
+            fmcTranslationsExtensionId,
         );
 
         if (
@@ -92,7 +92,7 @@ const FmcTranslationsDetail = ({
 
     const handleTranslation = (id: string, status: boolean) => {
         let newSelectedTranslations = selectedTranslations.filter(
-            (it) => it !== id || status
+            (it) => it !== id || status,
         );
 
         if (status && !newSelectedTranslations.includes(id)) {
@@ -127,7 +127,7 @@ const FmcTranslationsDetail = ({
 
         let translationsChunks = chunk(
             availableTranslationKeys,
-            TRANSLATIONS_PER_LINE
+            TRANSLATIONS_PER_LINE,
         );
 
         return translationsChunks.map((translationsChunk, i) => (
@@ -156,7 +156,7 @@ const FmcTranslationsDetail = ({
                                     onChange={(e) =>
                                         handleTranslation(
                                             translation,
-                                            e.target.checked
+                                            e.target.checked,
                                         )
                                     }
                                 />

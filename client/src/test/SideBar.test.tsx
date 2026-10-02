@@ -29,11 +29,11 @@ it("Each competition fetched from the website must become a button", async () =>
     jest.spyOn(wcaApi, "isLogged").mockImplementation(() => true);
 
     jest.spyOn(wcaApi, "getUpcomingManageableCompetitions").mockImplementation(
-        () => Promise.resolve({ ...axiosResponse, data: competitions })
+        () => Promise.resolve({ ...axiosResponse, data: competitions }),
     );
 
     jest.spyOn(wcaApi, "fetchMe").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: { me } })
+        Promise.resolve({ ...axiosResponse, data: { me } }),
     );
 
     // Render component
@@ -42,7 +42,7 @@ it("Each competition fetched from the website must become a button", async () =>
             <Provider store={store}>
                 <SideBar />
             </Provider>,
-            { container }
+            { container },
         );
     });
 
@@ -50,7 +50,7 @@ it("Each competition fetched from the website must become a button", async () =>
 
     // First button should be the collapse button
     expect(buttons[0].innerHTML).toBe(
-        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="30" height="30"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-miterlimit="10" d="M4 7h22M4 15h22M4 23h22"></path></svg>`
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="30" height="30"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-miterlimit="10" d="M4 7h22M4 15h22M4 23h22"></path></svg>`,
     );
 
     // Second button should be manual selection

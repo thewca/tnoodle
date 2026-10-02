@@ -24,7 +24,7 @@ export const informationSlice = createSlice({
                 competitionId: string;
                 identifier: string;
                 object: any;
-            }>
+            }>,
         ) => {
             state.cachedObjects = {
                 ...state.cachedObjects,

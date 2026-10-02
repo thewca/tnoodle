@@ -30,27 +30,27 @@ beforeEach(() => {
         Promise.resolve({
             data: events,
             ...axiosResponse,
-        })
+        }),
     );
 
     jest.spyOn(tnoodleApi, "fetchFormats").mockImplementation(() =>
-        Promise.resolve({ data: formats, ...axiosResponse })
+        Promise.resolve({ data: formats, ...axiosResponse }),
     );
 
     jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockImplementation(
-        () => Promise.resolve({ data: languages, ...axiosResponse })
+        () => Promise.resolve({ data: languages, ...axiosResponse }),
     );
 
     jest.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockImplementation(() =>
-        Promise.resolve({ data: colorScheme, ...axiosResponse })
+        Promise.resolve({ data: colorScheme, ...axiosResponse }),
     );
 
     jest.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockImplementation(() =>
-        Promise.resolve({ data: scrambleAndImage, ...axiosResponse })
+        Promise.resolve({ data: scrambleAndImage, ...axiosResponse }),
     );
 
     jest.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockImplementation(() =>
-        Promise.resolve({ data: emptySvg, ...axiosResponse })
+        Promise.resolve({ data: emptySvg, ...axiosResponse }),
     );
 });
 
@@ -101,7 +101,7 @@ it("Show editing warn if case of competition selected", async () => {
                     <EventPickerTable />
                 </Provider>
             </React.StrictMode>,
-            { container }
+            { container },
         );
     });
 
@@ -113,7 +113,7 @@ it("Show editing warn if case of competition selected", async () => {
     // Show link to edit events
     const link = paragraphs[1].querySelector("a")!;
     expect(link.href).toContain(
-        `https://www.worldcubeassociation.org/competitions/${competition.id}/events/edit`
+        `https://www.worldcubeassociation.org/competitions/${competition.id}/events/edit`,
     );
 
     // Disabled events should not appear
@@ -139,7 +139,7 @@ it("Plural events", async () => {
                     <EventPickerTable />
                 </Provider>
             </React.StrictMode>,
-            { container }
+            { container },
         );
     });
 
@@ -158,7 +158,7 @@ it("Changes in MBLD should go to the store", async () => {
                     <EventPickerTable />
                 </Provider>
             </React.StrictMode>,
-            { container }
+            { container },
         );
     });
     const names = ["3x3x3 Multiple Blindfolded"];
@@ -166,7 +166,7 @@ it("Changes in MBLD should go to the store", async () => {
     // Increase number of rounds from FMC and MBLD
     const tables = Array.from(container.querySelectorAll("table"))
         .filter(
-            (table) => names.indexOf(table.querySelector("h5")!.innerHTML) >= 0
+            (table) => names.indexOf(table.querySelector("h5")!.innerHTML) >= 0,
         )
         .map((table) => {
             let select = table.querySelector("select")!;
@@ -189,7 +189,7 @@ it("Changes in MBLD should go to the store", async () => {
         .getState()
         .wcifSlice.wcif.events.find((event) => event.id === "333mbf");
     let mbldExtensionCubesCount = mbldWcifEvent?.extensions?.find(
-        (extension) => extension.id === mbldCubesExtensionId
+        (extension) => extension.id === mbldCubesExtensionId,
     )?.data["requestedScrambles"];
 
     // It should go to the store

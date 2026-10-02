@@ -11,7 +11,7 @@ const root = createRoot(document.getElementById("root") as HTMLDivElement);
 root.render(
     <Provider store={store}>
         <App />
-    </Provider>
+    </Provider>,
 );
 
 // If you want to start measuring performance in your app, pass a function

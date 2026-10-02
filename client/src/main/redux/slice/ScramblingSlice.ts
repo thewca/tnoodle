@@ -23,7 +23,7 @@ export const scramblingSlice = createSlice({
     reducers: {
         setFileZip: (
             state,
-            action: PayloadAction<WebsocketBlobResult | undefined>
+            action: PayloadAction<WebsocketBlobResult | undefined>,
         ) => {
             state.fileZip = action.payload;
         },
@@ -38,14 +38,14 @@ export const scramblingSlice = createSlice({
         },
         setScramblingProgressCurrentEvent: (
             state,
-            action: PayloadAction<string>
+            action: PayloadAction<string>,
         ) => {
             state.scramblingProgressCurrent[action.payload] =
                 (state.scramblingProgressCurrent[action.payload] || 0) + 1;
         },
         setScramblingProgressTarget: (
             state,
-            action: PayloadAction<Record<string, number>>
+            action: PayloadAction<Record<string, number>>,
         ) => {
             state.scramblingProgressTarget = action.payload;
         },
