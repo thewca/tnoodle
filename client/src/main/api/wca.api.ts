@@ -83,8 +83,16 @@ class WcaApi {
     fetchVersionInfo = () =>
         axios.get<ScrambleProgram>(toWcaUrl("/api/v0/scramble-program"));
 
-    getCompetitionJson = (competitionId: string) =>
-        this.wcaApiFetch<Wcif>(`/competitions/${competitionId}/wcif`);
+    getCompetitionJson = (
+        competitionId: string,
+        formatVersion?: string
+    ) => {
+        if (formatVersion !== undefined) {
+            return this.wcaApiFetch<Wcif>(`/competitions/${competitionId}/wcif/version/${formatVersion}`);
+        }
+
+        return this.wcaApiFetch<Wcif>(`/competitions/${competitionId}/wcif`);
+    };
 
     getUpcomingManageableCompetitions = () => {
         const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);

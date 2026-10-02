@@ -37,6 +37,7 @@ const SideBar = () => {
         (state: RootState) => state.informationSlice.cachedObjects,
     );
     const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
+    const backendWcifVersion = useSelector((state: RootState) => state.wcifSlice.backendWcifVersion);
     const generatingScrambles = useSelector(
         (state: RootState) => state.scramblingSlice.generatingScrambles,
     );
@@ -199,7 +200,7 @@ const SideBar = () => {
                 setLoadingCompetitionInfo(true);
 
                 wcaApi
-                    .getCompetitionJson(competitionId)
+                    .getCompetitionJson(competitionId, backendWcifVersion)
                     .then((response) => {
                         updateWcif(response.data);
                         dispatch(
