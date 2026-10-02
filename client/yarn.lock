@@ -1982,10 +1982,10 @@
   dependencies:
     postcss-value-parser "^4.2.0"
 
-"@cubing/icons@^1.1.2":
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/@cubing/icons/-/icons-1.1.2.tgz#f3212a635ee80a966945554485f9725bd2c8a387"
-  integrity sha512-YP86cLWK2N3Kn5RwZjooy1YfWrFwehcgb+R9WNHtx5n8wb1wNxTwuSs+iqc4EeW3DPjZwW+2LgH7L76+f3UVkg==
+"@cubing/icons@^3.0.5":
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/@cubing/icons/-/icons-3.0.5.tgz#10ab68657ebf33a6c3883260ea95db46dd9d2f51"
+  integrity sha512-LA3BW9vf012HSN1FyeKXuDnOOnMeUXDDaXfAn4V9l06BFeMaHWiQGFF1Zod22r24TG/imQVhl4env1+jpkDzAw==
 
 "@eslint/eslintrc@^1.0.5":
   version "1.0.5"
