@@ -518,12 +518,12 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                             puzzleSvg !== undefined &&
                             randomSampleScramble !== undefined &&
                             showColorPicker && (
-                                <div className={"mb-2"}>
+                                <div className="mb-2">
                                     <OverlayTrigger
-                                        placement={"left"}
+                                        placement="left"
                                         onToggle={fetchDisplayScramble}
                                         overlay={
-                                            <Tooltip className={"fit-content"}>
+                                            <Tooltip className="fit-content">
                                                 <SVG
                                                     src={
                                                         randomSampleScramble.svgImage
@@ -538,16 +538,20 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                             </Tooltip>
                                         }
                                     >
-                                        <SVG
-                                            className={"lastTwoColumns"}
-                                            src={puzzleSvg}
-                                            height={50}
-                                            onClick={() =>
-                                                setShowColorSchemeConfig(
-                                                    !showColorSchemeConfig
-                                                )
-                                            }
-                                        />
+                                        {({ ref, ...triggerHandler }) => (
+                                            <SVG
+                                                innerRef={ref}
+                                                className={"lastTwoColumns"}
+                                                src={puzzleSvg}
+                                                height={50}
+                                                onClick={() =>
+                                                    setShowColorSchemeConfig(
+                                                        !showColorSchemeConfig,
+                                                    )
+                                                }
+                                                {...triggerHandler}
+                                            />
+                                        )}
                                     </OverlayTrigger>
                                 </div>
                             )}
@@ -558,7 +562,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                             onChange={(evt) =>
                                 handleNumberOfRoundsChange(
                                     Number(evt.target.value),
-                                    wcifEvent.rounds
+                                    wcifEvent.rounds,
                                 )
                             }
                             disabled={!isManualSelection || generatingScrambles}
@@ -569,7 +573,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                     <option key={i} value={i}>
                                         {i}
                                     </option>
-                                )
+                                ),
                             )}
                         </select>
                     </th>
