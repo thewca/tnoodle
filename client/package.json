@@ -17,7 +17,7 @@
         "react-inlinesvg": "^4.5.0",
         "react-redux": "^9.3.0",
         "react-scripts": "5.0.1",
-        "web-vitals": "^3.5.2"
+        "web-vitals": "^6.2.2"
     },
     "scripts": {
         "start": "react-scripts start",
