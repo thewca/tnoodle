@@ -41,7 +41,7 @@ ktor-server-status-pages = { module = "io.ktor:ktor-server-status-pages", versio
 ktor-server-cors = { module = "io.ktor:ktor-server-cors", version.ref = "ktor" }
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
-slf4j-api = { module = "org.slf4j:slf4j-api", version = "2.0.17" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version = "2.0.20" }
 logback-core = { module = "ch.qos.logback:logback-core", version.ref = "logback" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 kotlin-argparser = { module = "com.xenomachina:kotlin-argparser", version = "2.0.7" }
