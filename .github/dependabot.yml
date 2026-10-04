@@ -29,7 +29,7 @@ updates:
       interval: "monthly"
     open-pull-requests-limit: 10
     ignore:
-      - dependency-name: "junit-jupiter"
+      - dependency-name: "org.junit.jupiter:junit-jupiter-*"
         versions:
           - ">= 6"
       - dependency-name: "org.junit.platform:junit-platform-launcher"
