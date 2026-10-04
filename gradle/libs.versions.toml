@@ -50,7 +50,7 @@ wca-i18n = { module = "com.github.thewca:wca_i18n", version = "0.4.3" }
 google-appengine-gradle = { module = "com.google.cloud.tools:appengine-gradle-plugin", version = "2.8.6" }
 google-cloud-storage = { module = "com.google.cloud:google-cloud-storage", version = "2.60.0" }
 tnoodle-scrambles = { module = "org.worldcubeassociation.tnoodle:lib-scrambles", version = "0.20.0" }
-apache-commons-lang3 = { module = "org.apache.commons:commons-lang3", version = "3.20.0" }
+apache-commons-lang3 = { module = "org.apache.commons:commons-lang3", version = "3.21.0" }
 kotless-ktor = { module = "io.kotless:ktor-lang", version.ref = "kotless" }
 mockk = { module = "io.mockk:mockk", version = "1.14.11" }
 eclipse-jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version = "7.8.0.202609011348-r" }
