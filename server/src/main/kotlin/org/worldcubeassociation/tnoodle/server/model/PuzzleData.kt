@@ -25,7 +25,8 @@ enum class PuzzleData(
     SQ1(PuzzleRegistry.SQ1),
     MEGA(PuzzleRegistry.MEGA),
     CLOCK(PuzzleRegistry.CLOCK),
-    SKEWB(PuzzleRegistry.SKEWB);
+    SKEWB(PuzzleRegistry.SKEWB),
+    FTO(PuzzleRegistry.FTO);
 
     // TODO have tnoodle-lib provide an interface that this stuff can be delegated to
     val id get() = registry.key

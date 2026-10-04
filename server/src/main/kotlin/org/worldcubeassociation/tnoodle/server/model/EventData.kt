@@ -11,6 +11,7 @@ enum class EventData(val id: String, val description: String, val scrambler: Puz
     THREE_FM(PuzzleData.THREE_FMC, FormatData.SMALL_AVERAGE_FORMATS),
     THREE_OH("333oh", "3x3x3 One-Handed", PuzzleData.THREE, FormatData.BIG_AVERAGE_FORMATS),
     CLOCK(PuzzleData.CLOCK, FormatData.BIG_AVERAGE_FORMATS),
+    FTO(PuzzleData.FTO, FormatData.BIG_AVERAGE_FORMATS),
     MEGA(PuzzleData.MEGA, FormatData.BIG_AVERAGE_FORMATS),
     PYRA(PuzzleData.PYRA, FormatData.BIG_AVERAGE_FORMATS),
     SKEWB(PuzzleData.SKEWB, FormatData.BIG_AVERAGE_FORMATS),
