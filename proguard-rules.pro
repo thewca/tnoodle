@@ -16,6 +16,7 @@
 -keep class kotlin.reflect.jvm.internal.** { *; }
 -keep class kotlin.text.RegexOption { *; }
 -keep class io.ktor.serialization.kotlinx.json.KotlinxSerializationJsonExtensionProvider { *; }
+-keep class io.netty.util.concurrent.** { *; }
 -keep class com.itextpdf.kernel.utils.RegisterDefaultDiContainer { *; }
 
 # CSS rendering uses reflection black magic, so static bytecode optimisers need a little help
