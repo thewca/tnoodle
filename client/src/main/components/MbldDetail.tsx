@@ -18,10 +18,10 @@ interface MbldDetailProps {
 
 const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
     const bestMbldAttempt = useSelector(
-        (state: RootState) => state.eventDataSlice.bestMbldAttempt
+        (state: RootState) => state.eventDataSlice.bestMbldAttempt,
     );
     const generatingScrambles = useSelector(
-        (state: RootState) => state.scramblingSlice.generatingScrambles
+        (state: RootState) => state.scramblingSlice.generatingScrambles,
     );
 
     const mbld = useMemo(() => {
@@ -48,23 +48,23 @@ const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
 
                             return upsertExtension(
                                 wcifRound,
-                                overrideExtension
+                                overrideExtension,
                             );
-                        }
+                        },
                     );
 
                     dispatch(setWcifEvent(newWcifEvent));
                     dispatch(setFileZip());
-                }
+                },
             );
         },
-        [dispatch, mbldWcifEvent]
+        [dispatch, mbldWcifEvent],
     );
 
     useEffect(() => {
         const wcifExtension = findExtension(
             mbldWcifEvent,
-            mbldCubesExtensionId
+            mbldCubesExtensionId,
         );
 
         if (wcifExtension === undefined && bestMbldAttempt !== undefined) {
@@ -75,11 +75,17 @@ const MbldDetail = ({ mbldWcifEvent }: MbldDetailProps) => {
     return (
         <tfoot>
             <tr>
-                <th colSpan={3}>
-                    <p className="text-right">Select the number of scrambles</p>
+                <th colSpan={3} className="text-end">
+                    <label
+                        className="col-form-label"
+                        htmlFor="mbld-scrambles-amount"
+                    >
+                        Select the number of scrambles
+                    </label>
                 </th>
                 <td>
                     <input
+                        id="mbld-scrambles-amount"
                         className="form-control bg-dark text-white"
                         type="number"
                         value={mbld}

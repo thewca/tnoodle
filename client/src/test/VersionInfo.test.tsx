@@ -46,11 +46,11 @@ it("Current version is the correct one", async () => {
 
     // Turn on mocking behavior
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: version })
+        Promise.resolve({ ...axiosResponse, data: version }),
     );
 
     jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: scrambleProgram })
+        Promise.resolve({ ...axiosResponse, data: scrambleProgram }),
     );
 
     // Render component
@@ -59,7 +59,7 @@ it("Current version is the correct one", async () => {
             <Provider store={store}>
                 <VersionInfo />
             </Provider>,
-            { container }
+            { container },
         );
     });
 
@@ -99,11 +99,11 @@ it("Current version is allowed, but it's not the latest one", async () => {
     };
 
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: version })
+        Promise.resolve({ ...axiosResponse, data: version }),
     );
 
     jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: scrambleProgram })
+        Promise.resolve({ ...axiosResponse, data: scrambleProgram }),
     );
 
     await act(async () => {
@@ -111,14 +111,14 @@ it("Current version is allowed, but it's not the latest one", async () => {
             <Provider store={store}>
                 <VersionInfo />
             </Provider>,
-            { container }
+            { container },
         );
     });
 
     // The warning should be "your version is ok, but please upgrade"
     const alert = container.querySelector(".alert-info")!;
     expect(alert.textContent).toContain(
-        "which is still allowed, but you should upgrade to"
+        "which is still allowed, but you should upgrade to",
     );
 
     const downloadLink = container.querySelector("a")!.href;
@@ -155,11 +155,11 @@ it("Not signed version alert", async () => {
     };
 
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: version })
+        Promise.resolve({ ...axiosResponse, data: version }),
     );
 
     jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: scrambleProgram })
+        Promise.resolve({ ...axiosResponse, data: scrambleProgram }),
     );
 
     await act(async () => {
@@ -167,14 +167,14 @@ it("Not signed version alert", async () => {
             <Provider store={store}>
                 <VersionInfo />
             </Provider>,
-            { container }
+            { container },
         );
     });
 
     // The warning should be "do not use this"
     const alert = container.querySelector(".alert-danger")!;
     expect(alert.textContent).toContain(
-        "You are running an unsigned TNoodle release."
+        "You are running an unsigned TNoodle release.",
     );
 
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
@@ -208,11 +208,11 @@ it("Signed with different key", async () => {
     };
 
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: version })
+        Promise.resolve({ ...axiosResponse, data: version }),
     );
 
     jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: scrambleProgram })
+        Promise.resolve({ ...axiosResponse, data: scrambleProgram }),
     );
 
     await act(async () => {
@@ -220,14 +220,14 @@ it("Signed with different key", async () => {
             <Provider store={store}>
                 <VersionInfo />
             </Provider>,
-            { container }
+            { container },
         );
     });
 
     // The warning should be "do not use this"
     const alert = container.querySelector(".alert-danger")!;
     expect(alert.textContent).toContain(
-        "You are running an unsigned TNoodle release."
+        "You are running an unsigned TNoodle release.",
     );
 
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
@@ -261,11 +261,11 @@ it("Not allowed TNoodle version, despite it's official", async () => {
     };
 
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: version })
+        Promise.resolve({ ...axiosResponse, data: version }),
     );
 
     jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: scrambleProgram })
+        Promise.resolve({ ...axiosResponse, data: scrambleProgram }),
     );
 
     await act(async () => {
@@ -273,7 +273,7 @@ it("Not allowed TNoodle version, despite it's official", async () => {
             <Provider store={store}>
                 <VersionInfo />
             </Provider>,
-            { container }
+            { container },
         );
     });
 
@@ -307,11 +307,11 @@ it("Do not bother the user if we can't be sure", async () => {
     };
 
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: version })
+        Promise.resolve({ ...axiosResponse, data: version }),
     );
 
     jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: scrambleProgram })
+        Promise.resolve({ ...axiosResponse, data: scrambleProgram }),
     );
 
     await act(async () => {
@@ -319,7 +319,7 @@ it("Do not bother the user if we can't be sure", async () => {
             <Provider store={store}>
                 <VersionInfo />
             </Provider>,
-            { container }
+            { container },
         );
     });
 

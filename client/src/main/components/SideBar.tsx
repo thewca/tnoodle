@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Collapse } from "react-bootstrap";
+import { Collapse, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import tnoodleApi from "../api/tnoodle.api";
 import wcaApi from "../api/wca.api";
@@ -22,7 +22,6 @@ import {
     setQueryParameter,
 } from "../util/query.param.util";
 import { defaultWcif } from "../util/wcif.util";
-import Loading from "./Loading";
 import "./SideBar.css";
 import Wcif from "../model/Wcif";
 import { setShowColorPicker } from "../redux/slice/SettingsSlice";
@@ -35,14 +34,14 @@ const SideBar = () => {
     const [loadingCompetitionInfo, setLoadingCompetitionInfo] = useState(false);
 
     const cachedObjects = useSelector(
-        (state: RootState) => state.informationSlice.cachedObjects
+        (state: RootState) => state.informationSlice.cachedObjects,
     );
     const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
     const generatingScrambles = useSelector(
-        (state: RootState) => state.scramblingSlice.generatingScrambles
+        (state: RootState) => state.scramblingSlice.generatingScrambles,
     );
     const showColorPicker = useSelector(
-        (state: RootState) => state.settingsSlice.showColorPicker
+        (state: RootState) => state.settingsSlice.showColorPicker,
     );
 
     const [me, setMe] = useState<Person>();
@@ -53,7 +52,7 @@ const SideBar = () => {
 
     const handleIsOpen = useCallback(
         () => setIsOpen(window.innerWidth > 992),
-        [setIsOpen]
+        [setIsOpen],
     );
 
     useEffect(() => {
@@ -100,7 +99,7 @@ const SideBar = () => {
 
         const queryParamId = getQueryParameter("competitionId");
         const isUpcoming = upcomingCompetitions.some(
-            (comp) => comp.id === queryParamId
+            (comp) => comp.id === queryParamId,
         );
 
         if (isUpcoming) {
@@ -137,13 +136,13 @@ const SideBar = () => {
                             competitionId: wcif.id,
                             identifier: "bestMbldAttempt",
                             object: attempted,
-                        })
+                        }),
                     );
                     dispatch(setBestMbldAttempt(attempted));
                 }
             });
         },
-        [dispatch]
+        [dispatch],
     );
 
     const getAndCacheSuggestedFmcTranslations = useCallback(
@@ -154,12 +153,12 @@ const SideBar = () => {
                         competitionId: wcif.id,
                         identifier: "suggestedFmcTranslations",
                         object: response.data,
-                    })
+                    }),
                 );
                 dispatch(setSuggestedFmcTranslations(response.data));
             });
         },
-        [dispatch]
+        [dispatch],
     );
 
     const updateWcif = useCallback(
@@ -169,7 +168,7 @@ const SideBar = () => {
             dispatch(setCompetitionName(wcif.name));
             dispatch(setFileZip());
         },
-        [dispatch]
+        [dispatch],
     );
 
     const loadCompetition = useCallback(
@@ -191,7 +190,7 @@ const SideBar = () => {
                 let cachedSuggestedFmcTranslations =
                     cachedObject.suggestedFmcTranslations;
                 dispatch(
-                    setSuggestedFmcTranslations(cachedSuggestedFmcTranslations)
+                    setSuggestedFmcTranslations(cachedSuggestedFmcTranslations),
                 );
 
                 let cachedBestMbldAttempt = cachedObject.bestMbldAttempt;
@@ -208,7 +207,7 @@ const SideBar = () => {
                                 competitionId,
                                 identifier: "wcif",
                                 object: response.data,
-                            })
+                            }),
                         );
                         getAndCacheSuggestedFmcTranslations(response.data);
                         getAndCacheBestMbldAttempt(response.data);
@@ -223,7 +222,7 @@ const SideBar = () => {
             getAndCacheBestMbldAttempt,
             getAndCacheSuggestedFmcTranslations,
             updateWcif,
-        ]
+        ],
     );
 
     useEffect(() => {
@@ -239,29 +238,29 @@ const SideBar = () => {
             setQueryParameter("competitionId", competitionId);
             loadCompetition(competitionId);
         },
-        [loadCompetition]
+        [loadCompetition],
     );
 
     const logInButton = () => {
         return (
-            <div id="login-area" className="w-100 mt-1">
+            <div className="vstack gap-2">
                 <button
                     type="button"
-                    className="btn btn-primary btn-lg btn-block"
+                    className="btn btn-primary btn-lg"
                     onClick={wcaApi.isLogged() ? wcaApi.logOut : wcaApi.logIn}
                     disabled={generatingScrambles}
                 >
                     {wcaApi.isLogged() ? "Log Out" : "Log In"}
                 </button>
                 {!!me && (
-                    <p className="text-white mt-2">
+                    <p className="text-white">
                         Welcome, {me.name}.
                         {!!competitions &&
                             ` You have ${
                                 competitions.length
                             } manageable ${pluralize(
                                 " competition",
-                                competitions.length
+                                competitions.length,
                             )} upcoming.`}
                     </p>
                 )}
@@ -271,7 +270,7 @@ const SideBar = () => {
 
     const loadingElement = (text: string) => (
         <div className="text-white">
-            <Loading />
+            <Spinner animation="border" role="status" />
             <p>{text}...</p>
         </div>
     );
@@ -291,16 +290,17 @@ const SideBar = () => {
     };
 
     const settingsArea = () => (
-        <div className="custom-control custom-switch text-white">
+        <div className="form-check form-switch text-white">
             <input
                 type="checkbox"
-                className="custom-control-input"
+                role="switch"
+                className="form-check-input"
                 id="colorPicker"
                 disabled={generatingScrambles}
                 checked={showColorPicker}
                 onChange={(e) => dispatch(setShowColorPicker(e.target.checked))}
             />
-            <label className="custom-control-label" htmlFor="colorPicker">
+            <label className="form-check-label" htmlFor="colorPicker">
                 Show color scheme pickers
             </label>
         </div>
@@ -319,7 +319,7 @@ const SideBar = () => {
                 </h1>
                 <button
                     type="button"
-                    className="btn btn-primary btn-lg btn-outline-light ml-auto d-lg-none"
+                    className="btn btn-primary btn-lg btn-outline-light ms-auto d-lg-none"
                     onClick={() => setIsOpen(!isOpen)}
                     disabled={generatingScrambles}
                     aria-label="Toggle menu"
@@ -341,43 +341,42 @@ const SideBar = () => {
                     </svg>
                 </button>
             </div>
-            <Collapse in={isOpen}>
-                <div className="pt-2">
+            <Collapse in={isOpen} className="mt-2">
+                <div className="vstack gap-2">
                     {settingsArea()}
-                    <div>
-                        <ul className="list-group">
-                            <li>
-                                {!!competitions && competitions.length > 0 && (
+                    {!!competitions && (
+                        <div className="vstack gap-2">
+                            {competitions.length > 0 && (
+                                <button
+                                    id="manual-selection-button"
+                                    type="button"
+                                    className="btn btn-primary btn-lg btn-outline-light"
+                                    onClick={handleManualSelection}
+                                    disabled={generatingScrambles}
+                                >
+                                    Manual Selection
+                                </button>
+                            )}
+                            <div className="btn-group-vertical" role="group">
+                                {competitions.map((competition) => (
                                     <button
+                                        key={competition.id}
                                         type="button"
-                                        className="btn btn-primary btn-lg btn-block btn-outline-light mb-1"
-                                        onClick={handleManualSelection}
+                                        className="btn btn-primary btn-lg"
                                         disabled={generatingScrambles}
+                                        onClick={() =>
+                                            handleCompetitionSelection(
+                                                competition.id,
+                                            )
+                                        }
                                     >
-                                        Manual Selection
+                                        {competition.name}
                                     </button>
-                                )}
-                            </li>
-                            {!!competitions &&
-                                competitions.map((competition) => (
-                                    <li key={competition.id}>
-                                        <button
-                                            type="button"
-                                            className="btn btn-primary btn-lg btn-block m-1"
-                                            disabled={generatingScrambles}
-                                            onClick={() =>
-                                                handleCompetitionSelection(
-                                                    competition.id
-                                                )
-                                            }
-                                        >
-                                            {competition.name}
-                                        </button>
-                                    </li>
                                 ))}
-                        </ul>
-                        {loadingArea()}
-                    </div>
+                            </div>
+                            {loadingArea()}
+                        </div>
+                    )}
                     {logInButton()}
                 </div>
             </Collapse>

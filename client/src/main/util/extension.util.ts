@@ -3,13 +3,13 @@ import _ from "lodash";
 
 export const findExtension = <T extends Extendable>(
     extendable: T,
-    extensionId: string
+    extensionId: string,
 ) => extendable.extensions.find((ext) => ext.id === extensionId);
 
 export const findAndProcessExtension = <T extends Extendable>(
     extendable: T,
     extensionId: string,
-    processExtension: (extension: Extension) => void
+    processExtension: (extension: Extension) => void,
 ) => {
     let extension = findExtension(extendable, extensionId);
 
@@ -20,7 +20,7 @@ export const findAndProcessExtension = <T extends Extendable>(
 
 export const removeExtension = <T extends Extendable>(
     extendable: T,
-    extensionId: string
+    extensionId: string,
 ) => {
     return {
         ...extendable,
@@ -32,7 +32,7 @@ export const removeExtension = <T extends Extendable>(
 
 export const upsertExtension = <T extends Extendable>(
     extendable: T,
-    extension: Extension
+    extension: Extension,
 ) => {
     let withoutExtension = removeExtension(extendable, extension.id);
 
@@ -46,7 +46,7 @@ export const setExtensionLazily = <T extends Extendable>(
     extendable: T,
     extensionId: string,
     buildExtension: () => Extension | null,
-    handleOnChange: (newExtendable: T) => void
+    handleOnChange: (newExtendable: T) => void,
 ) => {
     let oldExtension = findExtension(extendable, extensionId);
     let newExtension = buildExtension();
@@ -61,7 +61,7 @@ export const setExtensionLazily = <T extends Extendable>(
     } else {
         let extensionDataEqual = _.isEqual(
             oldExtension?.data,
-            newExtension.data
+            newExtension.data,
         );
 
         // did the extension data update?

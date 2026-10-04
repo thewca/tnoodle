@@ -8,7 +8,7 @@ import {
 export const getExtensionFromStore = (
     testStore: typeof store,
     eventId: string,
-    extensionId: string
+    extensionId: string,
 ) => {
     let wcifEvent = testStore
         .getState()

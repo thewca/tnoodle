@@ -26,14 +26,14 @@ it("Competition name should be already filled with current date and changes shou
                     <EntryInterface />
                 </Provider>
             </React.StrictMode>,
-            { container }
+            { container },
         );
     });
 
     const today = new Date().toISOString().split("T")[0];
 
     const input = document.getElementById(
-        "competition-name"
+        "competition-name",
     )! as HTMLInputElement;
     const expected = "Scrambles for " + today;
     expect(input.value).toEqual(expected);
@@ -55,12 +55,12 @@ it("Password should toggle and changes to it should go to the store", async () =
                     <EntryInterface />
                 </Provider>
             </React.StrictMode>,
-            { container }
+            { container },
         );
     });
 
     const input = container.querySelector("#password")! as HTMLInputElement;
-    const passwordToggler = container.querySelector(".input-group-prepend")!;
+    const passwordToggler = container.querySelector(".input-group-text")!;
 
     expect(store.getState().scramblingSlice.password).toBe("");
 

@@ -9,16 +9,16 @@ const EntryInterface = () => {
     const [showPassword, setShowPassword] = useState(false);
 
     const isManualSelection = useSelector(
-        (state: RootState) => state.informationSlice.isManualSelection
+        (state: RootState) => state.informationSlice.isManualSelection,
     );
     const password = useSelector(
-        (state: RootState) => state.scramblingSlice.password
+        (state: RootState) => state.scramblingSlice.password,
     );
     const competitionName = useSelector(
-        (state: RootState) => state.wcifSlice.wcif.name
+        (state: RootState) => state.wcifSlice.wcif.name,
     );
     const generatingScrambles = useSelector(
-        (state: RootState) => state.scramblingSlice.generatingScrambles
+        (state: RootState) => state.scramblingSlice.generatingScrambles,
     );
 
     const dispatch = useDispatch();
@@ -39,8 +39,11 @@ const EntryInterface = () => {
 
     return (
         <>
-            <div className="col-sm-4 text-left form-group">
-                <label className="font-weight-bold" htmlFor="competition-name">
+            <div className="col-sm-4 text-start">
+                <label
+                    className="form-label fw-bold"
+                    htmlFor="competition-name"
+                >
                     Competition Name
                 </label>
                 <input
@@ -56,8 +59,8 @@ const EntryInterface = () => {
                 />
             </div>
 
-            <div className="col-sm-4 text-left form-group">
-                <label className="font-weight-bold" htmlFor="password">
+            <div className="col-sm-4 text-start">
+                <label className="form-label fw-bold" htmlFor="password">
                     Password
                 </label>
                 <div className="input-group">
@@ -70,14 +73,12 @@ const EntryInterface = () => {
                         value={password}
                         disabled={generatingScrambles}
                     />
-                    <div
-                        className="input-group-prepend"
+                    <span
+                        className="input-group-text"
                         onClick={() => setShowPassword(!showPassword)}
                     >
-                        <span className="input-group-text">
-                            {showPassword ? <FaEye /> : <FaEyeSlash />}
-                        </span>
-                    </div>
+                        {showPassword ? <FaEye /> : <FaEyeSlash />}
+                    </span>
                 </div>
             </div>
         </>

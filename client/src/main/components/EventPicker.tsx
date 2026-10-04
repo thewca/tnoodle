@@ -32,28 +32,28 @@ interface EventPickerProps {
 
 const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     const wcaFormats = useSelector(
-        (state: RootState) => state.wcifSlice.wcaFormats
+        (state: RootState) => state.wcifSlice.wcaFormats,
     );
     const wcaEvents = useSelector(
-        (state: RootState) => state.wcifSlice.wcaEvents
+        (state: RootState) => state.wcifSlice.wcaEvents,
     );
     const wcifEvents = useSelector(
-        (state: RootState) => state.wcifSlice.wcif.events
+        (state: RootState) => state.wcifSlice.wcif.events,
     );
     const isManualSelection = useSelector(
-        (state: RootState) => state.informationSlice.isManualSelection
+        (state: RootState) => state.informationSlice.isManualSelection,
     );
     const generatingScrambles = useSelector(
-        (state: RootState) => state.scramblingSlice.generatingScrambles
+        (state: RootState) => state.scramblingSlice.generatingScrambles,
     );
     const scramblingProgressCurrent = useSelector(
-        (state: RootState) => state.scramblingSlice.scramblingProgressCurrent
+        (state: RootState) => state.scramblingSlice.scramblingProgressCurrent,
     );
     const scramblingProgressTarget = useSelector(
-        (state: RootState) => state.scramblingSlice.scramblingProgressTarget
+        (state: RootState) => state.scramblingSlice.scramblingProgressTarget,
     );
     const showColorPicker = useSelector(
-        (state: RootState) => state.settingsSlice.showColorPicker
+        (state: RootState) => state.settingsSlice.showColorPicker,
     );
 
     const [puzzleSvg, setPuzzleSvg] = useState<string>();
@@ -85,7 +85,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                     });
             }
         },
-        [wcaEvent.puzzle_id, colorScheme]
+        [wcaEvent.puzzle_id, colorScheme],
     );
 
     useEffect(() => {
@@ -119,7 +119,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             dispatch(setWcifEvent(newWcifEvent));
             dispatch(setFileZip());
         },
-        [dispatch]
+        [dispatch],
     );
 
     const updateEventRounds = (rounds: Round[]) => {
@@ -136,7 +136,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             wcifEvent,
             colorSchemeExtensionId,
             () => buildColorSchemeExtension(colorScheme),
-            dispatchWcifEvent
+            dispatchWcifEvent,
         );
     };
 
@@ -169,7 +169,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
 
     const handleNumberOfRoundsChange = (
         numberOfRounds: number,
-        rounds: Round[]
+        rounds: Round[],
     ) => {
         let newRounds = [...rounds];
         // Ajust the number of rounds in case we have to remove
@@ -192,19 +192,19 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         roundNumber: number,
         value: string | number,
         rounds: Round[],
-        name: "format" | "scrambleSetCount"
+        name: "format" | "scrambleSetCount",
     ) => {
         updateEventRounds(
             rounds.map((round, i) =>
-                i !== roundNumber ? round : { ...round, [name]: value }
-            )
+                i !== roundNumber ? round : { ...round, [name]: value },
+            ),
         );
     };
 
     const handleNumberOfCopiesChange = (
         roundNumber: number,
         numCopies: number,
-        rounds: Round[]
+        rounds: Round[],
     ) => {
         updateEventRounds(
             rounds.map((round, i) =>
@@ -215,10 +215,10 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                           extensions: round.extensions.map((extension) =>
                               extension.id === copiesExtensionId
                                   ? { ...extension, data: { numCopies } }
-                                  : extension
+                                  : extension,
                           ),
-                      }
-            )
+                      },
+            ),
         );
     };
 
@@ -236,7 +236,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
 
     const updateForeignColorScheme = (wcaEvent: WcaEvent) => {
         let wcifEvent = wcifEvents.find(
-            (wcifEvent) => wcifEvent.id === wcaEvent.id
+            (wcifEvent) => wcifEvent.id === wcaEvent.id,
         );
 
         if (wcifEvent !== undefined && colorScheme !== undefined) {
@@ -244,7 +244,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                 wcifEvent,
                 colorSchemeExtensionId,
                 () => buildColorSchemeExtension(colorScheme),
-                dispatchWcifEvent
+                dispatchWcifEvent,
             );
         }
     };
@@ -278,7 +278,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             }) ?? [];
 
         return (
-            <tr className="thead-light">
+            <tr className="table-light">
                 <th scope="col" colSpan={4}>
                     <table className={"table table-borderless"}>
                         <tbody>
@@ -295,7 +295,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                                 onColorChange={(hexColor) =>
                                                     handleColorSchemeChange(
                                                         colorKey,
-                                                        hexColor
+                                                        hexColor,
                                                     )
                                                 }
                                             />
@@ -307,10 +307,10 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                 <td colSpan={defaultColors.length}>
                                     <button
                                         type="button"
-                                        className="btn btn-warning mr-4"
+                                        className="btn btn-warning me-4"
                                         onClick={() =>
                                             updateEventColorScheme(
-                                                defaultColorScheme
+                                                defaultColorScheme,
                                             )
                                         }
                                         disabled={generatingScrambles}
@@ -320,13 +320,13 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                     {samePuzzleEvents.length > 0 && (
                                         <button
                                             type="button"
-                                            className="btn btn-secondary mr-1"
+                                            className="btn btn-secondary me-1"
                                             onClick={() =>
                                                 samePuzzleEvents.forEach(
                                                     (wcaEvent) =>
                                                         updateForeignColorScheme(
-                                                            wcaEvent
-                                                        )
+                                                            wcaEvent,
+                                                        ),
                                                 )
                                             }
                                             disabled={generatingScrambles}
@@ -337,13 +337,13 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                     {samePuzzleGroupEvents.length > 0 && (
                                         <button
                                             type="button"
-                                            className="btn btn-secondary mr-1"
+                                            className="btn btn-secondary me-1"
                                             onClick={() =>
                                                 samePuzzleGroupEvents.forEach(
                                                     (wcaEvent) =>
                                                         updateForeignColorScheme(
-                                                            wcaEvent
-                                                        )
+                                                            wcaEvent,
+                                                        ),
                                                 )
                                             }
                                             disabled={generatingScrambles}
@@ -365,7 +365,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             return;
         }
         return (
-            <tr className="thead-light">
+            <tr className="table-light">
                 <th scope="col">#</th>
                 <th scope="col">Format</th>
                 <th scope="col">Scramble Sets</th>
@@ -385,10 +385,11 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             <tbody>
                 {Array.from({ length: wcifRounds.length }, (_, i) => {
                     let copies = wcifRounds[i].extensions.find(
-                        (extension) => extension.id === copiesExtensionId
+                        (extension) => extension.id === copiesExtensionId,
                     )?.data.numCopies;
+
                     return (
-                        <tr key={i} className="form-group">
+                        <tr key={i}>
                             <th scope="row" className="align-middle">
                                 {i + 1}
                             </th>
@@ -401,7 +402,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                             i,
                                             evt.target.value,
                                             wcifRounds,
-                                            "format"
+                                            "format",
                                         )
                                     }
                                     disabled={
@@ -426,7 +427,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                             i,
                                             Number(evt.target.value),
                                             wcifRounds,
-                                            "scrambleSetCount"
+                                            "scrambleSetCount",
                                         )
                                     }
                                     min={1}
@@ -446,7 +447,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                         handleNumberOfCopiesChange(
                                             i,
                                             Number(evt.target.value),
-                                            wcifRounds
+                                            wcifRounds,
                                         )
                                     }
                                     min={1}
@@ -492,13 +493,13 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     };
 
     return (
-        <table className="table table-sm shadow rounded">
+        <table className="table table-sm shadow rounded overflow-hidden">
             <thead>
                 <tr
                     className={
                         wcifEvent.rounds.length === 0
-                            ? "thead-dark text-white"
-                            : "thead-light"
+                            ? "table-dark text-white"
+                            : "table-light"
                     }
                 >
                     <th className="firstColumn" scope="col" />
@@ -509,7 +510,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                         />
                     </th>
                     <th className="align-middle lastTwoColumns" scope="col">
-                        <h5 className="font-weight-bold">{wcaEvent.name}</h5>
+                        <h5 className="fw-bold">{wcaEvent.name}</h5>
                         {maybeShowProgressBar()}
                     </th>
                     <th className="lastTwoColumns" scope="col">
@@ -517,12 +518,12 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                             puzzleSvg !== undefined &&
                             randomSampleScramble !== undefined &&
                             showColorPicker && (
-                                <div className={"mb-2"}>
+                                <div className="mb-2">
                                     <OverlayTrigger
-                                        placement={"left"}
+                                        placement="left"
                                         onToggle={fetchDisplayScramble}
                                         overlay={
-                                            <Tooltip className={"fit-content"}>
+                                            <Tooltip className="fit-content">
                                                 <SVG
                                                     src={
                                                         randomSampleScramble.svgImage
@@ -537,27 +538,31 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                             </Tooltip>
                                         }
                                     >
-                                        <SVG
-                                            className={"lastTwoColumns"}
-                                            src={puzzleSvg}
-                                            height={50}
-                                            onClick={() =>
-                                                setShowColorSchemeConfig(
-                                                    !showColorSchemeConfig
-                                                )
-                                            }
-                                        />
+                                        {({ ref, ...triggerHandler }) => (
+                                            <SVG
+                                                innerRef={ref}
+                                                className={"lastTwoColumns"}
+                                                src={puzzleSvg}
+                                                height={50}
+                                                onClick={() =>
+                                                    setShowColorSchemeConfig(
+                                                        !showColorSchemeConfig,
+                                                    )
+                                                }
+                                                {...triggerHandler}
+                                            />
+                                        )}
                                     </OverlayTrigger>
                                 </div>
                             )}
-                        <label>Rounds</label>
+                        <label className="form-label">Rounds</label>
                         <select
-                            className="form-control"
+                            className="form-select"
                             value={wcifEvent.rounds.length}
                             onChange={(evt) =>
                                 handleNumberOfRoundsChange(
                                     Number(evt.target.value),
-                                    wcifEvent.rounds
+                                    wcifEvent.rounds,
                                 )
                             }
                             disabled={!isManualSelection || generatingScrambles}
@@ -568,7 +573,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                     <option key={i} value={i}>
                                         {i}
                                     </option>
-                                )
+                                ),
                             )}
                         </select>
                     </th>

@@ -16,13 +16,13 @@ export const eventDataSlice = createSlice({
     reducers: {
         setBestMbldAttempt: (
             state,
-            action: PayloadAction<number | undefined>
+            action: PayloadAction<number | undefined>,
         ) => {
             state.bestMbldAttempt = action.payload;
         },
         setSuggestedFmcTranslations: (
             state,
-            action: PayloadAction<string[] | undefined>
+            action: PayloadAction<string[] | undefined>,
         ) => {
             state.suggestedFmcTranslations = action.payload;
         },

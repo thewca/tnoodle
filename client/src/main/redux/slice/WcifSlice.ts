@@ -44,7 +44,7 @@ export const wcifSlice = createSlice({
                 ...state.wcif,
                 events: [
                     ...state.wcif.events.filter(
-                        (wcaEvent) => wcaEvent.id !== action.payload.id
+                        (wcaEvent) => wcaEvent.id !== action.payload.id,
                     ),
                     action.payload,
                 ],
@@ -55,7 +55,7 @@ export const wcifSlice = createSlice({
         },
         setWcaFormats: (
             state,
-            action: PayloadAction<Record<string, WcaFormat>>
+            action: PayloadAction<Record<string, WcaFormat>>,
         ) => {
             state.wcaFormats = action.payload;
         },
@@ -68,7 +68,7 @@ export const wcifSlice = createSlice({
                         ...round,
                         extensions: [
                             ...round.extensions.filter(
-                                (it) => it.id !== copiesExtensionId // avoid duplicating extension
+                                (it) => it.id !== copiesExtensionId, // avoid duplicating extension
                             ),
                             getDefaultCopiesExtension(),
                         ],
@@ -77,7 +77,7 @@ export const wcifSlice = createSlice({
                         ...event.extensions.filter(
                             (it) =>
                                 it.id !== fmcTranslationsExtensionId &&
-                                it.id !== mbldCubesExtensionId
+                                it.id !== mbldCubesExtensionId,
                         ),
                     ],
                 })),

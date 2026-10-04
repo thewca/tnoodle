@@ -75,7 +75,7 @@ class Interceptor extends Component<{}, InterceptorState> {
             );
         }
         return (
-            <p className="text-right">
+            <p className="text-end">
                 <button className="btn btn-primary" onClick={this.setShowMore}>
                     Show more
                 </button>
@@ -92,10 +92,11 @@ class Interceptor extends Component<{}, InterceptorState> {
         });
     };
 
-    render = () => {
+    override render = () => {
         if (!this.state.message) {
             return null;
         }
+
         return (
             <div className="container-fluid">
                 <div className="row">

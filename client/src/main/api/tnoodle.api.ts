@@ -35,7 +35,7 @@ class TnoodleApi {
     fetchSuggestedFmcTranslations = (wcif: Wcif) =>
         axios.post<string[]>(
             tNoodleBackend + suggestedFmcTranslationsEndpoint,
-            wcif
+            wcif,
         );
 
     fetchBestMbldAttempt = (wcif: Wcif) =>
@@ -43,25 +43,25 @@ class TnoodleApi {
 
     fetchPuzzleColorScheme = (puzzleId: string) =>
         axios.get<Record<string, string>>(
-            tNoodleBackend + puzzleColorSchemeEndpoint(puzzleId)
+            tNoodleBackend + puzzleColorSchemeEndpoint(puzzleId),
         );
 
     fetchPuzzleRandomScramble = (
         puzzleId: string,
-        colorScheme: Record<string, string> = {}
+        colorScheme: Record<string, string> = {},
     ) =>
         axios.post<ScrambleAndImage>(
             tNoodleBackend + puzzleRandomScrambleEndpoint(puzzleId),
-            colorScheme
+            colorScheme,
         );
 
     fetchPuzzleSolvedSvg = (
         puzzleId: string,
-        colorScheme: Record<string, string> = {}
+        colorScheme: Record<string, string> = {},
     ) =>
         axios.post<string>(
             tNoodleBackend + solvedPuzzleSvgEndpoint(puzzleId),
-            colorScheme
+            colorScheme,
         );
 
     fetchRunningVersion = () =>
@@ -69,13 +69,13 @@ class TnoodleApi {
 
     fetchAvailableFmcTranslations = () =>
         axios.get<Record<string, string>>(
-            tNoodleBackend + fmcTranslationsEndpoint
+            tNoodleBackend + fmcTranslationsEndpoint,
         );
 
     fetchZip = (
         scrambleClient: ScrambleClient,
         wcif: Wcif,
-        password: string
+        password: string,
     ) => {
         let payload = {
             wcif,
