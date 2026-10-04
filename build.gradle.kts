@@ -33,7 +33,6 @@ allprojects {
 
 plugins {
     kotlin("jvm") version libs.versions.kotlin apply false
-    alias(libs.plugins.dependency.versions)
 }
 
 val releasePrefix = "TNoodle-WCA"

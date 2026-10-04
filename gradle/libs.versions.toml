@@ -64,7 +64,6 @@ nodejs = { id = "com.github.node-gradle.node", version = "7.1.0" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-dependency-versions = { id = "com.github.ben-manes.versions", version = "0.53.0" }
 kotless = { id = "io.kotless", version.ref = "kotless" }
 
 google-appengine = { id = "com.google.cloud.tools.appengine", version = "2.4.2" }
