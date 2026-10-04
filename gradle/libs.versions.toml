@@ -22,7 +22,7 @@ system-tray = { module = "com.dorkbox:SystemTray", version = "4.4" }
 bouncycastle = { module = "org.bouncycastle:bcprov-jdk15on", version = "1.70" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter" }
-junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version = "1.14.1" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version = "1.14.4" }
 kotlin-gradle-plugin-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlin" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.11.0" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.11.0" }
