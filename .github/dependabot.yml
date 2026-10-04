@@ -10,6 +10,13 @@ updates:
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "typescript"
+        versions:
+          - ">= 5"
+      - dependency-name: "@types/node"
+        versions:
+          - ">= 25"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -20,9 +27,9 @@ updates:
       interval: "monthly"
     open-pull-requests-limit: 10
     ignore:
-      - dependency-name: "junit-jupiter-*"
+      - dependency-name: "junit-jupiter"
         versions:
           - ">= 6"
-      - dependency-name: "junit-platform-launcher"
+      - dependency-name: "org.junit.platform:junit-platform-launcher"
         versions:
           - ">= 2"
