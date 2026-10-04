@@ -65,7 +65,7 @@
         "@testing-library/react": "^15.0.7",
         "@types/jest": "^29.5.14",
         "@types/lodash": "^4.17.25",
-        "@types/node": "^24.19.1",
+        "@types/node": "^26.6.3",
         "@types/react": "^18.3.31",
         "@types/react-color": "^3.0.13",
         "@types/react-dom": "^18.3.7",
