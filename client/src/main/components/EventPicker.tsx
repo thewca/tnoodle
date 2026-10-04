@@ -505,7 +505,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                     <th className="firstColumn" scope="col" />
                     <th scope="col" className="align-middle secondColumn">
                         <span
-                            className={`cubing-icon event-${wcaEvent.id}`}
+                            className={`cubing-icon event-${wcaEvent.id} unofficial-${wcaEvent.id}`}
                             title={wcaEvent.name}
                         />
                     </th>
