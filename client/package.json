@@ -63,7 +63,7 @@
     "devDependencies": {
         "@testing-library/jest-dom": "^6.10.0",
         "@testing-library/react": "^15.0.7",
-        "@types/jest": "^29.5.14",
+        "@types/jest": "^30.0.0",
         "@types/lodash": "^4.17.25",
         "@types/node": "^24.19.1",
         "@types/react": "^18.3.31",
