@@ -2,7 +2,7 @@
 kotlin = "2.4.20"
 ktor = "3.6.0"
 kotless = "0.1.6"
-junit-jupiter = "5.14.1"
+junit-jupiter = "5.14.4"
 batik = "1.19"
 itext7 = "9.8.0"
 logback = "1.6.5"
