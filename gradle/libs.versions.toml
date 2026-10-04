@@ -12,7 +12,7 @@ nodejs = "24.21.0"
 [libraries]
 markdownj-core = { module = "org.markdownj:markdownj-core", version = "0.4" }
 zip4j = { module = "net.lingala.zip4j:zip4j", version = "2.11.6" }
-itextpdf = { module = "com.itextpdf:itextpdf", version = "5.5.13.4" }
+itextpdf = { module = "com.itextpdf:itextpdf", version = "5.5.13.6" }
 itext7 = { module = "com.itextpdf:itext-core", version.ref = "itext7" }
 itext7-bc-adapter = { module = "com.itextpdf:bouncy-castle-adapter", version.ref = "itext7" }
 batik-transcoder = { module = "org.apache.xmlgraphics:batik-transcoder", version.ref = "batik" }
