@@ -17,3 +17,11 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "junit-jupiter-*"
+        versions:
+          - ">= 6"
+      - dependency-name: "junit-platform-launcher"
+        versions:
+          - ">= 2"
