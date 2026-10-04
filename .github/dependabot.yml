@@ -17,6 +17,8 @@ updates:
       - dependency-name: "@types/node"
         versions:
           - ">= 25"
+    cooldown:
+      default-days: 1
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -33,3 +35,5 @@ updates:
       - dependency-name: "org.junit.platform:junit-platform-launcher"
         versions:
           - ">= 2"
+    cooldown:
+      default-days: 1
