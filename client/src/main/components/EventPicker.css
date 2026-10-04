@@ -14,6 +14,16 @@
     font-size: 6em;
 }
 
+.fto-icon {
+    height: 6em;
+    width: 6em;
+    filter: invert(0);
+}
+
+.table-dark .fto-icon {
+    filter: invert(1);
+}
+
 .fit-content .tooltip-inner {
     max-width: fit-content;
 }

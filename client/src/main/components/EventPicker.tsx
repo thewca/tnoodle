@@ -24,6 +24,7 @@ import SchemeColorPicker from "./SchemeColorPicker";
 import ScrambleAndImage from "../model/ScrambleAndImage";
 import _ from "lodash";
 import { setExtensionLazily, findExtension } from "../util/extension.util";
+import ftoIcon from "../assets/fto.svg";
 
 interface EventPickerProps {
     wcaEvent: WcaEvent;
@@ -504,10 +505,19 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                 >
                     <th className="firstColumn" scope="col" />
                     <th scope="col" className="align-middle secondColumn">
-                        <span
-                            className={`cubing-icon event-${wcaEvent.id}`}
-                            title={wcaEvent.name}
-                        />
+                        {wcaEvent.id === "fto" ? (
+                            <img
+                                className="fto-icon"
+                                src={ftoIcon}
+                                alt={wcaEvent.name}
+                                title={wcaEvent.name}
+                            />
+                        ) : (
+                            <span
+                                className={`cubing-icon event-${wcaEvent.id}`}
+                                title={wcaEvent.name}
+                            />
+                        )}
                     </th>
                     <th className="align-middle lastTwoColumns" scope="col">
                         <h5 className="fw-bold">{wcaEvent.name}</h5>
