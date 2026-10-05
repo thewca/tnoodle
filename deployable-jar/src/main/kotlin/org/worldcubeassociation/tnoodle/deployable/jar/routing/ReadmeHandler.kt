@@ -1,9 +1,9 @@
 package org.worldcubeassociation.tnoodle.deployable.jar.routing
 
-import io.ktor.http.ContentType
 import io.ktor.server.application.*
-import io.ktor.server.response.*
+import io.ktor.server.html.*
 import io.ktor.server.routing.*
+import kotlinx.html.*
 import org.markdownj.MarkdownProcessor
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.model.PuzzleData
@@ -24,14 +24,14 @@ object ReadmeHandler : RouteHandler {
 
                 val scramblesReadme = rawReadme.replace("%SCRAMBLE_FILTERING_THRESHOLDS%", scrambleFilteringInfo)
 
-                call.respondText(markdownToHTML(scramblesReadme), ContentType.Text.Html)
+                call.respondMarkdown(scramblesReadme)
             }
 
             get("tnoodle") {
                 val tnoodleReadmeStream = ReadmeHandler.javaClass.getResourceAsStream("/wca/readme-tnoodle.md")
                 val readme = tnoodleReadmeStream.bufferedReader().readText()
 
-                call.respondText(markdownToHTML(readme), ContentType.Text.Html)
+                call.respondMarkdown(readme)
             }
         }
     }
@@ -40,8 +40,8 @@ object ReadmeHandler : RouteHandler {
 
     const val MARKDOWN_TITLE_CHAR = '#'
 
-    fun markdownToHTML(dataString: String): String {
-        val titleLine = dataString.lineSequence()
+    suspend fun ApplicationCall.respondMarkdown(markdownRaw: String) {
+        val titleLine = markdownRaw.lineSequence()
             .firstOrNull()
 
         // We assume that a title line is the first line, starts with one #, and possibly ends with one #
@@ -50,10 +50,26 @@ object ReadmeHandler : RouteHandler {
             ?.trimEnd(MARKDOWN_TITLE_CHAR)
             ?.trim()
 
-        val titleCode = titleContent
-            ?.let { "<title>$it</title>\n" }
-            .orEmpty()
+        return respondHtml {
+            head {
+                if (titleContent != null) {
+                    title {
+                        +titleContent
+                    }
+                }
 
-        return "<html><head>\n$titleCode<link href=\"/css/markdown.css\" rel=\"stylesheet\" type=\"text/css\" />\n</head>\n<body>\n${MD_PROCESSOR.markdown(dataString)}</body>\n</html>\n"
+                link {
+                    rel = "stylesheet"
+                    type = "text/css"
+                    href = "/css/markdown.css"
+                }
+            }
+
+            body {
+                unsafe {
+                    +MD_PROCESSOR.markdown(markdownRaw)
+                }
+            }
+        }
     }
 }

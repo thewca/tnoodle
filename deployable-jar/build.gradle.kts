@@ -28,6 +28,7 @@ dependencies {
     implementation(libs.system.tray)
     implementation(libs.ktor.server.cio)
     implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.html.builder)
 
     runtimeOnly(libs.logback.core)
     runtimeOnly(libs.logback.classic)
