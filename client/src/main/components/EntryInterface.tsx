@@ -3,7 +3,8 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import RootState from "../model/RootState";
 import { setFileZip, setPassword } from "../redux/slice/ScramblingSlice";
-import { setCompetitionName } from "../redux/slice/WcifSlice";
+import { setCompetitionName, setCompetitionId } from "../redux/slice/WcifSlice";
+import { competitionName2Id } from "../util/competition.name.util";
 
 const EntryInterface = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -25,6 +26,7 @@ const EntryInterface = () => {
 
     const handleCompetitionNameChange = (name: string) => {
         dispatch(setCompetitionName(name));
+        dispatch(setCompetitionId(competitionName2Id(name)));
 
         // Require another zip with the new name.
         dispatch(setFileZip());
