@@ -14,8 +14,15 @@ import {
     setSuggestedFmcTranslations,
 } from "../redux/slice/EventDataSlice";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
-import { setCompetitionName, setWcif } from "../redux/slice/WcifSlice";
-import { getDefaultCompetitionName } from "../util/competition.name.util";
+import {
+    setCompetitionName,
+    setWcif,
+    setCompetitionId,
+} from "../redux/slice/WcifSlice";
+import {
+    getDefaultCompetitionName,
+    competitionName2Id,
+} from "../util/competition.name.util";
 import {
     deleteParameter,
     getQueryParameter,
@@ -118,7 +125,9 @@ const SideBar = () => {
         dispatch(setIsManualSelection(true));
         dispatch(setWcif({ ...defaultWcif }));
         dispatch(setBestMbldAttempt());
-        dispatch(setCompetitionName(getDefaultCompetitionName()));
+        const defaultName = getDefaultCompetitionName();
+        dispatch(setCompetitionName(defaultName));
+        dispatch(setCompetitionId(competitionName2Id(defaultName)));
         dispatch(setFileZip());
         dispatch(setSuggestedFmcTranslations());
 
@@ -166,6 +175,7 @@ const SideBar = () => {
             dispatch(setIsManualSelection(false));
             dispatch(setWcif(wcif));
             dispatch(setCompetitionName(wcif.name));
+            dispatch(setCompetitionId(wcif.id));
             dispatch(setFileZip());
         },
         [dispatch],
