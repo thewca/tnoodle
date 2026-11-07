@@ -139,40 +139,44 @@ const SideBar = () => {
 
     const getAndCacheBestMbldAttempt = useCallback(
         (wcif: Wcif) => {
-            client.calculateMbldBest({
-                body: wcif.persons,
-            }).then((response) => {
-                const attempted = response?.attempted;
+            client
+                .calculateMbldBest({
+                    body: wcif.persons,
+                })
+                .then((response) => {
+                    const attempted = response?.attempted;
 
-                if (!!attempted) {
-                    dispatch(
-                        addCachedObject({
-                            competitionId: wcif.id,
-                            identifier: "bestMbldAttempt",
-                            object: attempted,
-                        }),
-                    );
-                    dispatch(setBestMbldAttempt(attempted));
-                }
-            });
+                    if (!!attempted) {
+                        dispatch(
+                            addCachedObject({
+                                competitionId: wcif.id,
+                                identifier: "bestMbldAttempt",
+                                object: attempted,
+                            }),
+                        );
+                        dispatch(setBestMbldAttempt(attempted));
+                    }
+                });
         },
         [dispatch],
     );
 
     const getAndCacheSuggestedFmcTranslations = useCallback(
         (wcif: Wcif) => {
-            client.calculateSuggestedFmcTranslations({
-                body: wcif.persons,
-            }).then((response) => {
-                dispatch(
-                    addCachedObject({
-                        competitionId: wcif.id,
-                        identifier: "suggestedFmcTranslations",
-                        object: response,
-                    }),
-                );
-                dispatch(setSuggestedFmcTranslations(response));
-            });
+            client
+                .calculateSuggestedFmcTranslations({
+                    body: wcif.persons,
+                })
+                .then((response) => {
+                    dispatch(
+                        addCachedObject({
+                            competitionId: wcif.id,
+                            identifier: "suggestedFmcTranslations",
+                            object: response,
+                        }),
+                    );
+                    dispatch(setSuggestedFmcTranslations(response));
+                });
         },
         [dispatch],
     );

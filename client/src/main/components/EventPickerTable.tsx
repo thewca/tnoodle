@@ -20,9 +20,7 @@ const EventPickerTable = () => {
     const isManualSelection = useSelector(
         (state: RootState) => state.informationSlice.isManualSelection,
     );
-    const wcif = useSelector(
-        (state: RootState) => state.wcifSlice.wcif,
-    );
+    const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
     const wcaEvents = useSelector(
         (state: RootState) => state.wcifSlice.wcaEvents,
     );

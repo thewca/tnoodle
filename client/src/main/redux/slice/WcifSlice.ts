@@ -55,10 +55,7 @@ export const wcifSlice = createSlice({
         setWcaEvents: (state, action: PayloadAction<WcaEvent[]>) => {
             state.wcaEvents = action.payload;
         },
-        setWcaFormats: (
-            state,
-            action: PayloadAction<WcaFormat[]>,
-        ) => {
+        setWcaFormats: (state, action: PayloadAction<WcaFormat[]>) => {
             state.wcaFormats = action.payload;
         },
         setBackendWcifVersion: (state, action: PayloadAction<string>) => {

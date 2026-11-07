@@ -57,8 +57,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
 
     const [solvedPuzzleSvg, setSolvedPuzzleSvg] = useState<string>();
 
-    const [scrambledPuzzleSvg, setScrambledPuzzleSvg] =
-        useState<string>();
+    const [scrambledPuzzleSvg, setScrambledPuzzleSvg] = useState<string>();
 
     const [defaultColorScheme, setDefaultColorScheme] =
         useState<Record<string, string>>();
@@ -78,9 +77,10 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             // we need this additional boolean to make sure we can fetch only once
             // when the overlay is hidden, because its callback yields a `show` boolean.
             if (fetchNewScramble && colorScheme !== undefined) {
-                client.getRandomScramble({
-                    path: { puzzleId: wcaEvent.puzzle_id },
-                })
+                client
+                    .getRandomScramble({
+                        path: { puzzleId: wcaEvent.puzzle_id },
+                    })
                     .then((scramble) => {
                         client
                             .paintScramble({
@@ -246,7 +246,9 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     };
 
     const abbreviate = (str: string) =>
-        !!wcaFormats ? wcaFormats.find((format) => format.id === str)?.short_name : "-";
+        !!wcaFormats
+            ? wcaFormats.find((format) => format.id === str)?.short_name
+            : "-";
 
     const updateForeignColorScheme = (wcaEvent: WcaEvent) => {
         let wcifEvent = wcifEvents.find(
@@ -545,9 +547,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                         overlay={
                                             <Tooltip className="fit-content">
                                                 <SVG
-                                                    src={
-                                                        scrambledPuzzleSvg
-                                                    }
+                                                    src={scrambledPuzzleSvg}
                                                     width={200}
                                                     height={200}
                                                 />

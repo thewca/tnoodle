@@ -109,7 +109,9 @@ const FmcTranslationsDetail = ({
         if (availableTranslations === undefined) {
             selectNoneTranslation();
         } else {
-            updateEventSelectedTranslations(availableTranslations.map((trans) => trans.code));
+            updateEventSelectedTranslations(
+                availableTranslations.map((trans) => trans.code),
+            );
         }
     };
 
@@ -135,8 +137,9 @@ const FmcTranslationsDetail = ({
             <tr key={i}>
                 {translationsChunk.map((translation, j) => {
                     let checkboxId = `fmc-${translation}`;
-                    let translationStatus =
-                        selectedTranslations.includes(translation.code);
+                    let translationStatus = selectedTranslations.includes(
+                        translation.code,
+                    );
 
                     return (
                         <React.Fragment key={j}>
