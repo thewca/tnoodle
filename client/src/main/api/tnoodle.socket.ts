@@ -1,4 +1,4 @@
-import { tNoodleBackend } from "./tnoodle.api";
+import { tNoodleBackend } from "../../paths";
 import type WebsocketBlobResult from "../model/WebsocketBlobResult";
 
 export type ScrambleHandshakeFn = (payload: Record<string, number>) => void;

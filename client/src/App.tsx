@@ -17,5 +17,3 @@ const App = () => (
 );
 
 export default App;
-
-export const BASE_PATH = import.meta.env.BASE_URL;

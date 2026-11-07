@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BASE_PATH } from "../../App";
+import { BASE_PATH } from "../../paths";
 import type ScrambleProgram from "../model/ScrambleProgram";
 import type Competition from "../model/Competition";
 import type Person from "../model/Person";

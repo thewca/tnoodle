@@ -7,9 +7,7 @@ import type Wcif from "../model/Wcif";
 import { ScrambleClient } from "./tnoodle.socket";
 import type WebsocketBlobResult from "../model/WebsocketBlobResult";
 import type ScrambleAndImage from "../model/ScrambleAndImage";
-
-let backendUrl = new URL("http://localhost:2014");
-export const tNoodleBackend = backendUrl.toString().replace(/\/$/g, "");
+import { tNoodleBackend } from "../../paths";
 
 let zipEndpoint = "/wcif/zip";
 let versionEndpoint = "/version";
