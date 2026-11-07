@@ -6,7 +6,7 @@
  * Endpoints exposed by the backend server
  */
 
-export type GetVersionResult = {
+export type GetVersionInfoResult = {
     project_name?: string;
     /**
      * @format semver
@@ -19,7 +19,7 @@ export type GetVersionResult = {
     signature_key_bytes?: string;
 };
 
-export type GetFrontendDataEventsResult = {
+export type GetWcaEventsResult = {
     id?: string;
     name?: string;
     puzzle_id?: string;
@@ -29,65 +29,65 @@ export type GetFrontendDataEventsResult = {
     is_multiple_blindfolded?: boolean;
 }[];
 
-export type GetFrontendDataFormatsResult = {
+export type GetWcaFormatsResult = {
     id?: string;
     name?: string;
     short_name?: string;
 }[];
 
-export type GetFrontendDataWcifVersionResult = string;
+export type GetBackendWcifVersionResult = string;
 
-export type GetFrontendPuzzlePuzzleIdColorsResult = Record<string, string>;
+export type GetDefaultColorSchemeResult = Record<string, string>;
 
-export type GetFrontendPuzzlePuzzleIdColorsPath = {
+export type GetDefaultColorSchemePath = {
     /**
      * The ID of the puzzle
      */
     puzzleId: string;
 };
 
-export type GetFrontendPuzzlePuzzleIdColorsVariables = {
-    path: GetFrontendPuzzlePuzzleIdColorsPath;
+export type GetDefaultColorSchemeVariables = {
+    path: GetDefaultColorSchemePath;
 };
 
-export type GetFrontendPuzzlePuzzleIdScrambleResult = string;
+export type GetRandomScrambleResult = string;
 
-export type GetFrontendPuzzlePuzzleIdScramblePath = {
+export type GetRandomScramblePath = {
     /**
      * The ID of the puzzle
      */
     puzzleId: string;
 };
 
-export type GetFrontendPuzzlePuzzleIdScrambleVariables = {
-    path: GetFrontendPuzzlePuzzleIdScramblePath;
+export type GetRandomScrambleVariables = {
+    path: GetRandomScramblePath;
 };
 
-export type PostFrontendPuzzlePuzzleIdSvgResult = Blob;
+export type PaintScrambleResult = Blob;
 
-export type PostFrontendPuzzlePuzzleIdSvgPath = {
+export type PaintScramblePath = {
     /**
      * The ID of the puzzle
      */
     puzzleId: string;
 };
 
-export type PostFrontendPuzzlePuzzleIdSvgQuery = {
+export type PaintScrambleQuery = {
     /**
      * Optional scramble to paint (otherwise paints solved puzzle)
      */
     scramble?: string;
 };
 
-export type PostFrontendPuzzlePuzzleIdSvgBody = Record<string, string>;
+export type PaintScrambleBody = Record<string, string>;
 
-export type PostFrontendPuzzlePuzzleIdSvgVariables = {
-    path: PostFrontendPuzzlePuzzleIdSvgPath;
-    query?: PostFrontendPuzzlePuzzleIdSvgQuery;
-    body?: PostFrontendPuzzlePuzzleIdSvgBody;
+export type PaintScrambleVariables = {
+    path: PaintScramblePath;
+    query?: PaintScrambleQuery;
+    body?: PaintScrambleBody;
 };
 
-export type GetFrontendFmcLanguagesAvailableResult = {
+export type GetFmcSheetLanguagesResult = {
     /**
      * The ISO 639-1 code of the language
      */
@@ -98,9 +98,9 @@ export type GetFrontendFmcLanguagesAvailableResult = {
     name?: string;
 }[];
 
-export type PostFrontendFmcLanguagesCompetitorsResult = string[];
+export type CalculateSuggestedFmcTranslationsResult = string[];
 
-export type PostFrontendFmcLanguagesCompetitorsBody = {
+export type CalculateSuggestedFmcTranslationsBody = {
     registration?: {
         /**
          * The registration status of the competitor
@@ -113,11 +113,11 @@ export type PostFrontendFmcLanguagesCompetitorsBody = {
     countryIso2?: string;
 }[];
 
-export type PostFrontendFmcLanguagesCompetitorsVariables = {
-    body: PostFrontendFmcLanguagesCompetitorsBody;
+export type CalculateSuggestedFmcTranslationsVariables = {
+    body: CalculateSuggestedFmcTranslationsBody;
 };
 
-export type PostFrontendMbldBestResult = {
+export type CalculateMbldBestResult = {
     /**
      * The number of cubes which were solved
      */
@@ -132,7 +132,7 @@ export type PostFrontendMbldBestResult = {
     duration?: number;
 };
 
-export type PostFrontendMbldBestBody = {
+export type CalculateMbldBestBody = {
     registration?: {
         /**
          * The registration status of the competitor
@@ -151,8 +151,8 @@ export type PostFrontendMbldBestBody = {
     }[];
 }[];
 
-export type PostFrontendMbldBestVariables = {
-    body: PostFrontendMbldBestBody;
+export type CalculateMbldBestVariables = {
+    body: CalculateMbldBestBody;
 };
 
 /**
@@ -160,57 +160,57 @@ export type PostFrontendMbldBestVariables = {
  * type-level companion of `OPERATIONS` that gives `createClient<Ops>` its typed methods.
  */
 export type Ops = {
-    getVersion: {
+    getVersionInfo: {
         args: {};
-        result: GetVersionResult;
+        result: GetVersionInfoResult;
     };
-    getFrontendDataEvents: {
+    getWcaEvents: {
         args: {};
-        result: GetFrontendDataEventsResult;
+        result: GetWcaEventsResult;
     };
-    getFrontendDataFormats: {
+    getWcaFormats: {
         args: {};
-        result: GetFrontendDataFormatsResult;
+        result: GetWcaFormatsResult;
     };
-    getFrontendDataWcifVersion: {
+    getBackendWcifVersion: {
         args: {};
-        result: GetFrontendDataWcifVersionResult;
+        result: GetBackendWcifVersionResult;
     };
-    getFrontendPuzzlePuzzleIdColors: {
+    getDefaultColorScheme: {
         args: {
-            path: GetFrontendPuzzlePuzzleIdColorsPath;
+            path: GetDefaultColorSchemePath;
         };
-        result: GetFrontendPuzzlePuzzleIdColorsResult;
+        result: GetDefaultColorSchemeResult;
     };
-    getFrontendPuzzlePuzzleIdScramble: {
+    getRandomScramble: {
         args: {
-            path: GetFrontendPuzzlePuzzleIdScramblePath;
+            path: GetRandomScramblePath;
         };
-        result: GetFrontendPuzzlePuzzleIdScrambleResult;
+        result: GetRandomScrambleResult;
     };
-    postFrontendPuzzlePuzzleIdSvg: {
+    paintScramble: {
         args: {
-            path: PostFrontendPuzzlePuzzleIdSvgPath;
-            query?: PostFrontendPuzzlePuzzleIdSvgQuery;
-            body?: PostFrontendPuzzlePuzzleIdSvgBody;
+            path: PaintScramblePath;
+            query?: PaintScrambleQuery;
+            body?: PaintScrambleBody;
         };
-        result: PostFrontendPuzzlePuzzleIdSvgResult;
+        result: PaintScrambleResult;
     };
-    getFrontendFmcLanguagesAvailable: {
+    getFmcSheetLanguages: {
         args: {};
-        result: GetFrontendFmcLanguagesAvailableResult;
+        result: GetFmcSheetLanguagesResult;
     };
-    postFrontendFmcLanguagesCompetitors: {
+    calculateSuggestedFmcTranslations: {
         args: {
-            body: PostFrontendFmcLanguagesCompetitorsBody;
+            body: CalculateSuggestedFmcTranslationsBody;
         };
-        result: PostFrontendFmcLanguagesCompetitorsResult;
+        result: CalculateSuggestedFmcTranslationsResult;
     };
-    postFrontendMbldBest: {
+    calculateMbldBest: {
         args: {
-            body: PostFrontendMbldBestBody;
+            body: CalculateMbldBestBody;
         };
-        result: PostFrontendMbldBestResult;
+        result: CalculateMbldBestResult;
     };
 };
 
@@ -220,16 +220,16 @@ export type Ops = {
  * tags) for cache keys, tracing span names, and request logging.
  */
 export const OPERATIONS = {
-    getVersion: { id: "getVersion", method: "GET", path: "/version" },
-    getFrontendDataEvents: { id: "getFrontendDataEvents", method: "GET", path: "/frontend/data/events" },
-    getFrontendDataFormats: { id: "getFrontendDataFormats", method: "GET", path: "/frontend/data/formats" },
-    getFrontendDataWcifVersion: { id: "getFrontendDataWcifVersion", method: "GET", path: "/frontend/data/wcif-version" },
-    getFrontendPuzzlePuzzleIdColors: { id: "getFrontendPuzzlePuzzleIdColors", method: "GET", path: "/frontend/puzzle/{puzzleId}/colors", params: [{ name: "puzzleId", in: "path" }] },
-    getFrontendPuzzlePuzzleIdScramble: { id: "getFrontendPuzzlePuzzleIdScramble", method: "GET", path: "/frontend/puzzle/{puzzleId}/scramble", params: [{ name: "puzzleId", in: "path" }] },
-    postFrontendPuzzlePuzzleIdSvg: { id: "postFrontendPuzzlePuzzleIdSvg", method: "POST", path: "/frontend/puzzle/{puzzleId}/svg", params: [{ name: "puzzleId", in: "path" }, { name: "scramble", in: "query" }], body: { contentType: "application/json" }, responseKind: "blob" },
-    getFrontendFmcLanguagesAvailable: { id: "getFrontendFmcLanguagesAvailable", method: "GET", path: "/frontend/fmc/languages/available" },
-    postFrontendFmcLanguagesCompetitors: { id: "postFrontendFmcLanguagesCompetitors", method: "POST", path: "/frontend/fmc/languages/competitors", body: { contentType: "application/json" } },
-    postFrontendMbldBest: { id: "postFrontendMbldBest", method: "POST", path: "/frontend/mbld/best", body: { contentType: "application/json" } }
+    getVersionInfo: { id: "getVersionInfo", method: "GET", path: "/version" },
+    getWcaEvents: { id: "getWcaEvents", method: "GET", path: "/frontend/data/events" },
+    getWcaFormats: { id: "getWcaFormats", method: "GET", path: "/frontend/data/formats" },
+    getBackendWcifVersion: { id: "getBackendWcifVersion", method: "GET", path: "/frontend/data/wcif-version" },
+    getDefaultColorScheme: { id: "getDefaultColorScheme", method: "GET", path: "/frontend/puzzle/{puzzleId}/colors", params: [{ name: "puzzleId", in: "path" }] },
+    getRandomScramble: { id: "getRandomScramble", method: "GET", path: "/frontend/puzzle/{puzzleId}/scramble", params: [{ name: "puzzleId", in: "path" }] },
+    paintScramble: { id: "paintScramble", method: "POST", path: "/frontend/puzzle/{puzzleId}/svg", params: [{ name: "puzzleId", in: "path" }, { name: "scramble", in: "query" }], body: { contentType: "application/json" }, responseKind: "blob" },
+    getFmcSheetLanguages: { id: "getFmcSheetLanguages", method: "GET", path: "/frontend/fmc/languages/available" },
+    calculateSuggestedFmcTranslations: { id: "calculateSuggestedFmcTranslations", method: "POST", path: "/frontend/fmc/languages/competitors", body: { contentType: "application/json" } },
+    calculateMbldBest: { id: "calculateMbldBest", method: "POST", path: "/frontend/mbld/best", body: { contentType: "application/json" } }
 } as const satisfies Record<string, OperationDescriptor>;
 
 export type OperationId = (typeof OPERATIONS)[keyof typeof OPERATIONS]["id"];
@@ -1798,4 +1798,4 @@ export function createClient<
 export const client = createClient<Ops, OperationId, OperationPath, string>(OPERATIONS, { serverUrl: "http://localhost:2014", clientHeader: "redocly-client-generator" });
 
 export const { configure, use } = client;
-export const { getVersion, getFrontendDataEvents, getFrontendDataFormats, getFrontendDataWcifVersion, getFrontendPuzzlePuzzleIdColors, getFrontendPuzzlePuzzleIdScramble, postFrontendPuzzlePuzzleIdSvg, getFrontendFmcLanguagesAvailable, postFrontendFmcLanguagesCompetitors, postFrontendMbldBest } = client;
+export const { getVersionInfo, getWcaEvents, getWcaFormats, getBackendWcifVersion, getDefaultColorScheme, getRandomScramble, paintScramble, getFmcSheetLanguages, calculateSuggestedFmcTranslations, calculateMbldBest } = client;

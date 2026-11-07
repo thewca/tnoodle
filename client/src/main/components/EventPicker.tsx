@@ -78,12 +78,12 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             // we need this additional boolean to make sure we can fetch only once
             // when the overlay is hidden, because its callback yields a `show` boolean.
             if (fetchNewScramble && colorScheme !== undefined) {
-                client.getFrontendPuzzlePuzzleIdScramble({
+                client.getRandomScramble({
                     path: { puzzleId: wcaEvent.puzzle_id },
                 })
                     .then((scramble) => {
                         client
-                            .postFrontendPuzzlePuzzleIdSvg({
+                            .paintScramble({
                                 path: { puzzleId: wcaEvent.puzzle_id },
                                 query: { scramble },
                             })
@@ -100,7 +100,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     useEffect(() => {
         if (colorScheme !== undefined) {
             client
-                .postFrontendPuzzlePuzzleIdSvg({
+                .paintScramble({
                     path: { puzzleId: wcaEvent.puzzle_id },
                 })
                 .then((response) => response.text())
@@ -118,7 +118,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         if (wcifEvent.rounds.length > 0) {
             if (defaultColorScheme === undefined) {
                 client
-                    .getFrontendPuzzlePuzzleIdColors({
+                    .getDefaultColorScheme({
                         path: { puzzleId: wcaEvent.puzzle_id },
                     })
                     .then((response) => {

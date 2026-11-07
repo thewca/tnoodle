@@ -30,13 +30,13 @@ const EventPickerTable = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        client.getFrontendDataFormats().then((response) => {
+        client.getWcaFormats().then((response) => {
             dispatch(setWcaFormats(response));
         });
-        client.getFrontendDataEvents().then((response) => {
+        client.getWcaEvents().then((response) => {
             dispatch(setWcaEvents(response));
         });
-        client.getFrontendDataWcifVersion().then((response) => {
+        client.getBackendWcifVersion().then((response) => {
             dispatch(setBackendWcifVersion(response));
         });
     }, [dispatch]);

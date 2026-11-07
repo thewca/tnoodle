@@ -40,7 +40,7 @@ const VersionInfo = () => {
             setWcaPublicKeyBytes(response.data.publicKeyBytes);
         });
 
-        client.getVersion().then((response) => {
+        client.getVersionInfo().then((response) => {
             let versionString =
                 !!response.project_name && !!response.project_version
                     ? `${response.project_name}-${response.project_version}`

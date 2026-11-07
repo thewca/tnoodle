@@ -139,7 +139,7 @@ const SideBar = () => {
 
     const getAndCacheBestMbldAttempt = useCallback(
         (wcif: Wcif) => {
-            client.postFrontendMbldBest({
+            client.calculateMbldBest({
                 body: wcif.persons,
             }).then((response) => {
                 const attempted = response?.attempted;
@@ -161,7 +161,7 @@ const SideBar = () => {
 
     const getAndCacheSuggestedFmcTranslations = useCallback(
         (wcif: Wcif) => {
-            client.postFrontendFmcLanguagesCompetitors({
+            client.calculateSuggestedFmcTranslations({
                 body: wcif.persons,
             }).then((response) => {
                 dispatch(

@@ -30,7 +30,7 @@ const FmcTranslationsDetail = ({
 
     useEffect(() => {
         if (availableTranslations === undefined) {
-            client.getFrontendFmcLanguagesAvailable().then((response) => {
+            client.getFmcSheetLanguages().then((response) => {
                 setAvailableTranslations(response);
             });
         }

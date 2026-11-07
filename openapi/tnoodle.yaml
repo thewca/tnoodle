@@ -9,6 +9,7 @@ paths:
     /version:
         get:
             summary: Show version information of the backend
+            operationId: getVersionInfo
             responses:
                 '200':
                     description: The version information object of the backend you're connected to
@@ -32,6 +33,7 @@ paths:
     /frontend/data/events:
         get:
             summary: Get a list of events that the backend can scramble
+            operationId: getWcaEvents
             responses:
                 '200':
                     description: A list of events
@@ -68,6 +70,7 @@ paths:
     /frontend/data/formats:
         get:
             summary: Get a list of formats that the backend knows about
+            operationId: getWcaFormats
             responses:
                 '200':
                     description: A list of formats
@@ -90,6 +93,7 @@ paths:
     /frontend/data/wcif-version:
         get:
             summary: Get the WCIF version that the backend supports
+            operationId: getBackendWcifVersion
             responses:
                 '200':
                     description: The WCIF version that the backend supports
@@ -102,6 +106,7 @@ paths:
     /frontend/puzzle/{puzzleId}/colors:
         get:
             summary: Get the default color scheme for a given puzzle
+            operationId: getDefaultColorScheme
             parameters:
                 - in: path
                   name: puzzleId
@@ -121,6 +126,7 @@ paths:
     /frontend/puzzle/{puzzleId}/scramble:
         get:
             summary: Get a random scramble for the given puzzle
+            operationId: getRandomScramble
             parameters:
                 - in: path
                   name: puzzleId
@@ -138,6 +144,7 @@ paths:
     /frontend/puzzle/{puzzleId}/svg:
         post:
             summary: Paint a given scramble into SVG for a given color scheme
+            operationId: paintScramble
             parameters:
                 - in: path
                   name: puzzleId
@@ -168,6 +175,7 @@ paths:
     /frontend/fmc/languages/available:
         get:
             summary: Get a list of languages for the FMC sheet that the backend supports
+            operationId: getFmcSheetLanguages
             responses:
                 '200':
                     description: A list of languages
@@ -188,6 +196,7 @@ paths:
     /frontend/fmc/languages/competitors:
         post:
             summary: Calculate a suggested list of FMC translations based on competitor nationalities
+            operationId: calculateSuggestedFmcTranslations
             requestBody:
                 description: A list of competitors in WCIF standard
                 required: true
@@ -221,6 +230,7 @@ paths:
     /frontend/mbld/best:
         post:
             summary: Calculate the number of cubes you should generate for MBLD given a list of competitors and their PBs
+            operationId: calculateMbldBest
             requestBody:
                 description: A list of competitors in WCIF standard
                 required: true
