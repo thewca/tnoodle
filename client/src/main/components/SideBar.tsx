@@ -201,7 +201,7 @@ const SideBar = () => {
 
                 let cachedBestMbldAttempt = cachedObject.bestMbldAttempt;
                 dispatch(setBestMbldAttempt(cachedBestMbldAttempt));
-            } else {
+            } else if (!!backendWcifVersion) {
                 setLoadingCompetitionInfo(true);
 
                 wcaApi
