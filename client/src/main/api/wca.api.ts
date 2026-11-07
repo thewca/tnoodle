@@ -1,9 +1,9 @@
 import axios from "axios";
 import { BASE_PATH } from "../../App";
-import ScrambleProgram from "../model/ScrambleProgram";
-import Competition from "../model/Competition";
-import Person from "../model/Person";
-import Wcif from "../model/Wcif";
+import type ScrambleProgram from "../model/ScrambleProgram";
+import type Competition from "../model/Competition";
+import type Person from "../model/Person";
+import type Wcif from "../model/Wcif";
 import { getHashParameter, getQueryParameter } from "../util/query.param.util";
 
 // Members of the Software Team can configure this here: https://www.worldcubeassociation.org/oauth/applications/123.

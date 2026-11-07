@@ -1,12 +1,12 @@
 import axios from "axios";
-import BestMbld from "../model/BestMbld";
-import RunningVersion from "../model/RunningVersion";
-import WcaEvent from "../model/WcaEvent";
-import WcaFormat from "../model/WcaFormat";
-import Wcif from "../model/Wcif";
+import type BestMbld from "../model/BestMbld";
+import type RunningVersion from "../model/RunningVersion";
+import type WcaEvent from "../model/WcaEvent";
+import type WcaFormat from "../model/WcaFormat";
+import type Wcif from "../model/Wcif";
 import { ScrambleClient } from "./tnoodle.socket";
-import WebsocketBlobResult from "../model/WebsocketBlobResult";
-import ScrambleAndImage from "../model/ScrambleAndImage";
+import type WebsocketBlobResult from "../model/WebsocketBlobResult";
+import type ScrambleAndImage from "../model/ScrambleAndImage";
 
 let backendUrl = new URL("http://localhost:2014");
 export const tNoodleBackend = backendUrl.toString().replace(/\/$/g, "");

@@ -1,4 +1,4 @@
-import { Extendable } from "./Extension";
+import { type Extendable } from "./Extension";
 
 export default interface Round extends Extendable {
     format: string;

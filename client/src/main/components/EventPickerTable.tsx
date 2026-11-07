@@ -3,14 +3,14 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import tnoodleApi from "../api/tnoodle.api";
 import { toWcaUrl } from "../api/wca.api";
-import RootState from "../model/RootState";
+import type RootState from "../model/RootState";
 import {
     setBackendWcifVersion,
     setWcaEvents,
     setWcaFormats,
 } from "../redux/slice/WcifSlice";
 import EventPicker from "./EventPicker";
-import WcaEvent from "../model/WcaEvent";
+import type WcaEvent from "../model/WcaEvent";
 import { buildMbldExtension } from "../util/wcif.util";
 import { MBLD_DEFAULT } from "../constants/wca.constants";
 

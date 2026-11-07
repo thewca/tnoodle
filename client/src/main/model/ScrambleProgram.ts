@@ -1,4 +1,4 @@
-import CurrentTnoodle from "../model/CurrentTnoodle";
+import type CurrentTnoodle from "../model/CurrentTnoodle";
 
 export default interface ScrambleProgram {
     current: CurrentTnoodle;
