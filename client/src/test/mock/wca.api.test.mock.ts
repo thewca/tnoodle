@@ -1,4 +1,5 @@
 import Wcif from "../../main/model/Wcif";
+import { wcifTestVersion } from "./tnoodle.api.test.mock";
 
 export const me = {
     wca_id: "2010AAAA01",
@@ -35,7 +36,7 @@ export const competitions = [
 
 export const wcifs: Record<string, Wcif> = {
     [competitions[0].id]: {
-        formatVersion: "1.0",
+        formatVersion: wcifTestVersion,
         id: competitions[0].id,
         name: competitions[0].name,
         shortName: competitions[0].name,
@@ -745,7 +746,7 @@ export const wcifs: Record<string, Wcif> = {
     },
 
     [competitions[1].id]: {
-        formatVersion: "1.0",
+        formatVersion: wcifTestVersion,
         id: competitions[1].id,
         name: competitions[1].name,
         shortName: competitions[1].name,

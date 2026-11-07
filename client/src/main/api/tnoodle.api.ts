@@ -24,6 +24,7 @@ let solvedPuzzleSvgEndpoint = (puzzleId: string) =>
     `/frontend/puzzle/${puzzleId}/svg`;
 let wcaEventsEndpoint = "/frontend/data/events";
 let formatsEndpoint = "/frontend/data/formats";
+let backendWcifVersionEndpoint = "/frontend/data/wcif-version";
 
 class TnoodleApi {
     fetchWcaEvents = () =>
@@ -31,6 +32,9 @@ class TnoodleApi {
 
     fetchFormats = () =>
         axios.get<Record<string, WcaFormat>>(tNoodleBackend + formatsEndpoint);
+
+    fetchBackendWcifVersion = () =>
+        axios.get<string>(tNoodleBackend + backendWcifVersionEndpoint);
 
     fetchSuggestedFmcTranslations = (wcif: Wcif) =>
         axios.post<string[]>(

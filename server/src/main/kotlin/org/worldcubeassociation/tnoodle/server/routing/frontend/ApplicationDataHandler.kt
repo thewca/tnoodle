@@ -1,6 +1,5 @@
 package org.worldcubeassociation.tnoodle.server.routing.frontend
 
-import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.worldcubeassociation.tnoodle.server.RouteHandler
@@ -8,6 +7,7 @@ import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.model.FormatData
 import org.worldcubeassociation.tnoodle.server.serial.frontend.EventFrontendData
 import org.worldcubeassociation.tnoodle.server.serial.frontend.FormatFrontendData
+import org.worldcubeassociation.tnoodle.server.wcif.model.Competition
 
 object ApplicationDataHandler : RouteHandler {
     override fun install(router: Route) {
@@ -23,6 +23,10 @@ object ApplicationDataHandler : RouteHandler {
                 }
 
                 call.respond(formatData)
+            }
+
+            get("wcif-version") {
+                call.respond(Competition.FORMAT_VERSION)
             }
         }
     }

@@ -13,6 +13,7 @@ import {
     languages,
     scrambleAndImage,
     version,
+    wcifTestVersion,
 } from "./mock/tnoodle.api.test.mock";
 import { axiosResponse, getNewStore } from "./mock/util.test.mock";
 import { scrambleProgram } from "./mock/wca.api.test.mock";
@@ -58,6 +59,10 @@ it("There should be only 1 button of type submit, check FMC changes", async () =
 
     jest.spyOn(tnoodleApi, "fetchFormats").mockImplementation(() =>
         Promise.resolve({ data: formats, ...axiosResponse }),
+    );
+
+    jest.spyOn(tnoodleApi, "fetchBackendWcifVersion").mockImplementation(() =>
+        Promise.resolve({ data: wcifTestVersion, ...axiosResponse }),
     );
 
     jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockImplementation(
@@ -182,5 +187,6 @@ it("There should be only 1 button of type submit, check FMC changes", async () =
     // Clear mock
     jest.spyOn(tnoodleApi, "fetchWcaEvents").mockRestore();
     jest.spyOn(tnoodleApi, "fetchFormats").mockRestore();
+    jest.spyOn(tnoodleApi, "fetchBackendWcifVersion").mockRestore();
     jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockRestore();
 });

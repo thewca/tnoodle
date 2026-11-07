@@ -4,7 +4,11 @@ import { useDispatch, useSelector } from "react-redux";
 import tnoodleApi from "../api/tnoodle.api";
 import { toWcaUrl } from "../api/wca.api";
 import RootState from "../model/RootState";
-import { setWcaEvents, setWcaFormats } from "../redux/slice/WcifSlice";
+import {
+    setBackendWcifVersion,
+    setWcaEvents,
+    setWcaFormats,
+} from "../redux/slice/WcifSlice";
 import EventPicker from "./EventPicker";
 import WcaEvent from "../model/WcaEvent";
 import { buildMbldExtension } from "../util/wcif.util";
@@ -29,6 +33,9 @@ const EventPickerTable = () => {
         });
         tnoodleApi.fetchWcaEvents().then((response) => {
             dispatch(setWcaEvents(response.data));
+        });
+        tnoodleApi.fetchBackendWcifVersion().then((response) => {
+            dispatch(setBackendWcifVersion(response.data));
         });
     }, [dispatch]);
 

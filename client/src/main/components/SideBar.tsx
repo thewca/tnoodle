@@ -37,6 +37,9 @@ const SideBar = () => {
         (state: RootState) => state.informationSlice.cachedObjects,
     );
     const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
+    const backendWcifVersion = useSelector(
+        (state: RootState) => state.wcifSlice.backendWcifVersion,
+    );
     const generatingScrambles = useSelector(
         (state: RootState) => state.scramblingSlice.generatingScrambles,
     );
@@ -184,7 +187,10 @@ const SideBar = () => {
             // For quick switching between competitions.
             let cachedObject = cachedObjects[competitionId];
 
-            if (!!cachedObject) {
+            if (
+                !!cachedObject &&
+                cachedObject.wcif.formatVersion === backendWcifVersion
+            ) {
                 updateWcif(cachedObject.wcif);
 
                 let cachedSuggestedFmcTranslations =
@@ -195,11 +201,11 @@ const SideBar = () => {
 
                 let cachedBestMbldAttempt = cachedObject.bestMbldAttempt;
                 dispatch(setBestMbldAttempt(cachedBestMbldAttempt));
-            } else {
+            } else if (!!backendWcifVersion) {
                 setLoadingCompetitionInfo(true);
 
                 wcaApi
-                    .getCompetitionJson(competitionId)
+                    .getCompetitionJson(competitionId, backendWcifVersion)
                     .then((response) => {
                         updateWcif(response.data);
                         dispatch(
@@ -219,6 +225,7 @@ const SideBar = () => {
             dispatch,
             wcif.id,
             cachedObjects,
+            backendWcifVersion,
             getAndCacheBestMbldAttempt,
             getAndCacheSuggestedFmcTranslations,
             updateWcif,
