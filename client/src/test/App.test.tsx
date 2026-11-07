@@ -18,6 +18,7 @@ import {
     plainZip,
     scrambleAndImage,
     version,
+    wcifTestVersion,
 } from "./mock/tnoodle.api.test.mock";
 import { axiosResponse, getNewStore } from "./mock/util.test.mock";
 import {
@@ -51,6 +52,10 @@ beforeEach(() => {
 
     jest.spyOn(tnoodleApi, "fetchFormats").mockImplementation(() =>
         Promise.resolve({ data: formats, ...axiosResponse }),
+    );
+
+    jest.spyOn(tnoodleApi, "fetchBackendWcifVersion").mockImplementation(() =>
+        Promise.resolve({ data: wcifTestVersion, ...axiosResponse }),
     );
 
     jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockImplementation(
@@ -110,6 +115,7 @@ afterEach(() => {
     // Clear mock
     jest.spyOn(tnoodleApi, "fetchWcaEvents").mockRestore();
     jest.spyOn(tnoodleApi, "fetchFormats").mockRestore();
+    jest.spyOn(tnoodleApi, "fetchBackendWcifVersion").mockRestore();
     jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockRestore();
     jest.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockRestore();
     jest.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockRestore();
