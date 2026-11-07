@@ -22,7 +22,7 @@
     "scripts": {
         "start": "vite",
         "build": "vite build",
-        "test": "vitest run --coverage",
+        "test": "vitest run",
         "prettier": "prettier --check .",
         "lint": "prettier --write ."
     },
