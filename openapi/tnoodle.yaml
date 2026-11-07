@@ -1,0 +1,267 @@
+openapi: 3.1.0
+info:
+    title: TNoodle backend
+    description: Endpoints exposed by the backend server
+    version: 1.0.0
+servers:
+    - url: 'http://localhost:2014'
+paths:
+    /version:
+        get:
+            summary: Show version information of the backend
+            responses:
+                '200':
+                    description: The version information object of the backend you're connected to
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    project_name:
+                                        type: string
+                                        example: TNoodle-WCA
+                                    project_version:
+                                        type: string
+                                        example: 1.2.3
+                                        format: semver
+                                    is_signed_build:
+                                        type: boolean
+                                    signature_key_bytes:
+                                        type: string
+                                        format: byte
+    /frontend/data/events:
+        get:
+            summary: Get a list of events that the backend can scramble
+            responses:
+                '200':
+                    description: A list of events
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        id:
+                                            type: string
+                                            example: 333
+                                        name:
+                                            type: string
+                                            example: 3x3 Rubik's Cube
+                                        puzzle_id:
+                                            type: string
+                                            example: 333
+                                        puzzle_group_id:
+                                            type:
+                                                - string
+                                                - "null"
+                                            example: nxn
+                                        format_ids:
+                                            type: array
+                                            items:
+                                                type: string
+                                                example: ao5
+                                        is_fewest_moves:
+                                            type: boolean
+                                        is_multiple_blindfolded:
+                                            type: boolean
+    /frontend/data/formats:
+        get:
+            summary: Get a list of formats that the backend knows about
+            responses:
+                '200':
+                    description: A list of formats
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        id:
+                                            type: string
+                                            example: ao5
+                                        name:
+                                            type: string
+                                            example: Average of 5
+                                        short_name:
+                                            type: string
+                                            example: AO5
+    /frontend/data/wcif-version:
+        get:
+            summary: Get the WCIF version that the backend supports
+            responses:
+                '200':
+                    description: The WCIF version that the backend supports
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: 2.2.0
+                                format: semver
+    /frontend/puzzle/{puzzleId}/colors:
+        get:
+            summary: Get the default color scheme for a given puzzle
+            parameters:
+                - in: path
+                  name: puzzleId
+                  schema:
+                    type: string
+                  required: true
+                  description: The ID of the puzzle
+            responses:
+                '200':
+                    description: The default color scheme for the puzzle
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                additionalProperties:
+                                    type: string
+    /frontend/puzzle/{puzzleId}/scramble:
+        get:
+            summary: Get a random scramble for the given puzzle
+            parameters:
+                - in: path
+                  name: puzzleId
+                  schema:
+                    type: string
+                  required: true
+                  description: The ID of the puzzle
+            responses:
+                '200':
+                    description: The random scramble for the puzzle
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+    /frontend/puzzle/{puzzleId}/svg:
+        post:
+            summary: Paint a given scramble into SVG for a given color scheme
+            parameters:
+                - in: path
+                  name: puzzleId
+                  schema:
+                    type: string
+                  required: true
+                  description: The ID of the puzzle
+                - in: query
+                  name: scramble
+                  schema:
+                    type: string
+                  description: Optional scramble to paint (otherwise paints solved puzzle)
+            requestBody:
+                description: The color scheme to paint
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties:
+                                type: string
+            responses:
+                '200':
+                    description: The SVG of the puzzle
+                    content:
+                        image/svg+xml:
+                            schema:
+                                type: string
+    /frontend/fmc/languages/available:
+        get:
+            summary: Get a list of languages for the FMC sheet that the backend supports
+            responses:
+                '200':
+                    description: A list of languages
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        code:
+                                            type: string
+                                            example: en
+                                            description: The ISO 639-1 code of the language
+                                        name:
+                                            type: string
+                                            description: The English display name of the language
+    /frontend/fmc/languages/competitors:
+        post:
+            summary: Calculate a suggested list of FMC translations based on competitor nationalities
+            requestBody:
+                description: A list of competitors in WCIF standard
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: array
+                            items:
+                                type: object
+                                properties:
+                                    registration:
+                                        type: object
+                                        properties:
+                                            status:
+                                                type: string
+                                                description: The registration status of the competitor
+                                    countryIso2:
+                                        type: string
+                                        description: The ISO 3166-1 alpha-2 code of the competitor's nationality
+            responses:
+                '200':
+                    description: A list of suggested FMC translation locales
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: string
+                                    description: The suggested FMC translation locale
+                                    example: de
+    /frontend/mbld/best:
+        post:
+            summary: Calculate the number of cubes you should generate for MBLD given a list of competitors and their PBs
+            requestBody:
+                description: A list of competitors in WCIF standard
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: array
+                            items:
+                                type: object
+                                properties:
+                                    registration:
+                                        type: object
+                                        properties:
+                                            status:
+                                                type: string
+                                                description: The registration status of the competitor
+                                    personalBests:
+                                        type: array
+                                        items:
+                                            type: object
+                                            properties:
+                                                eventId:
+                                                    type: string
+                                                    description: The event ID
+                                                value:
+                                                    type: integer
+                                                    description: The competitor's PB
+            responses:
+                '200':
+                    description: The best MBLD attempt
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    solved:
+                                        type: integer
+                                        description: The number of cubes which were solved
+                                    attempted:
+                                        type: integer
+                                        description: The number of cubes which were attempted
+                                    duration:
+                                        type: integer
+                                        description: The duration of the attempt in whole seconds
