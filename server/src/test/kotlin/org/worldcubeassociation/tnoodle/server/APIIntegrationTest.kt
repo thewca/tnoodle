@@ -39,16 +39,16 @@ class APIIntegrationTest {
 
     @Test
     fun `test that every upcoming competition produces some output without error`() = runBlocking {
-        val upcomingComps =
+        val upcomingCompIds =
             getClient().use {
                 it.get("https://www.worldcubeassociation.org/api/v0/competitions/").body<List<UpcomingCompetition>>()
-            }.shuffled()
+            }.shuffled().map { it.id }
 
         val generationDate = LocalDateTime.now()
 
-        val jobs = upcomingComps.map { it.id }.map {
+        val jobs = upcomingCompIds.map {
             launch(Dispatchers.Default) {
-                val url = "https://www.worldcubeassociation.org/api/v0/competitions/$it/wcif/public"
+                val url = "https://www.worldcubeassociation.org/api/v0/competitions/$it/wcif/version/${Competition.FORMAT_VERSION}"
                 val multiCubes = MultiScrambleCountExtension(Random.nextInt(10, 20))
 
                 val websiteWcif = getClient().use { it.get(url).body<Competition>() }
