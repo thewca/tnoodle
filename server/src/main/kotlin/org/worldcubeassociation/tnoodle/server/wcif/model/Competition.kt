@@ -15,6 +15,6 @@ data class Competition(
     override val extensions: List<Extension> = emptyList()
 ) : ExtensionProvider() {
     companion object {
-        const val FORMAT_VERSION = "2.2.0"
+        const val FORMAT_VERSION = "2.2"
     }
 }

@@ -262,4 +262,4 @@ export const scrambleAndImage = {
     svgImage: emptySvg,
 };
 
-export const wcifTestVersion = "2.2.0";
+export const wcifTestVersion = "2.2";
