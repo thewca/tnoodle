@@ -352,9 +352,8 @@ it("Logged user", async () => {
 
     vi.spyOn(wcaApi, "isLogged").mockImplementation(() => true);
 
-    vi.spyOn(wcaApi, "getCompetitionJson").mockImplementation(
-        (competitionId) =>
-            Promise.resolve({ ...axiosResponse, data: wcifs[competitionId] }),
+    vi.spyOn(wcaApi, "getCompetitionJson").mockImplementation((competitionId) =>
+        Promise.resolve({ ...axiosResponse, data: wcifs[competitionId] }),
     );
 
     vi.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockImplementation(() =>
@@ -486,9 +485,8 @@ it("Comfort features should not block zip generation", async () => {
 
     vi.spyOn(wcaApi, "isLogged").mockImplementation(() => true);
 
-    vi.spyOn(wcaApi, "getCompetitionJson").mockImplementation(
-        (competitionId) =>
-            Promise.resolve({ ...axiosResponse, data: wcifs[competitionId] }),
+    vi.spyOn(wcaApi, "getCompetitionJson").mockImplementation((competitionId) =>
+        Promise.resolve({ ...axiosResponse, data: wcifs[competitionId] }),
     );
 
     // Comfort features

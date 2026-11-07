@@ -18,7 +18,12 @@
         "noFallthroughCasesInSwitch": true,
         "moduleResolution": "node",
         "jsx": "react-jsx",
-        "types": ["react/next", "react-dom/next", "vitest/globals", "@testing-library/jest-dom"]
+        "types": [
+            "react/next",
+            "react-dom/next",
+            "vitest/globals",
+            "@testing-library/jest-dom"
+        ]
     },
     "include": ["src"],
     "exclude": ["node_modules"]
