@@ -9,7 +9,7 @@ WORKDIR /home/gradle/src
 # allow the frontend to run in restricted mode
 # needs to be present at build time because CRA injects a "fake" process.env into the React code
 ARG ONLINE
-ENV REACT_APP_TNOODLE_ONLINE_MODE=${ONLINE:+"--online"}
+ENV VITE_TNOODLE_ONLINE_MODE=${ONLINE:+"--online"}
 
 RUN gradle buildOfficial --no-daemon
 
@@ -39,7 +39,7 @@ WORKDIR /app
 # allow deployments to online Docker containers
 # (requires TNoodle to mangle with Java runtime, see WebscramblesServer#main for details)
 ARG ONLINE
-ENV REACT_APP_TNOODLE_ONLINE_MODE=${ONLINE:+"--online"}
+ENV VITE_TNOODLE_ONLINE_MODE=${ONLINE:+"--online"}
 
 ARG PORT
 # Set the port for the application to detect

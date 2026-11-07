@@ -1,10 +1,10 @@
 import { OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { MAX_WCA_ROUNDS, MBLD_DEFAULT } from "../constants/wca.constants";
-import RootState from "../model/RootState";
-import Round from "../model/Round";
-import WcaEvent from "../model/WcaEvent";
-import WcifEvent from "../model/WcifEvent";
+import type RootState from "../model/RootState";
+import type Round from "../model/Round";
+import type WcaEvent from "../model/WcaEvent";
+import type WcifEvent from "../model/WcifEvent";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
 import { setWcifEvent } from "../redux/slice/WcifSlice";
 import {
@@ -21,7 +21,7 @@ import "@cubing/icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import SVG from "react-inlinesvg";
 import SchemeColorPicker from "./SchemeColorPicker";
-import ScrambleAndImage from "../model/ScrambleAndImage";
+import type ScrambleAndImage from "../model/ScrambleAndImage";
 import _ from "lodash";
 import { setExtensionLazily, findExtension } from "../util/extension.util";
 

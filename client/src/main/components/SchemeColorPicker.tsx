@@ -1,8 +1,8 @@
 import "./SchemeColorPicker.css";
-import { ColorResult, SketchPicker } from "react-color";
+import { type ColorResult, SketchPicker } from "react-color";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useSelector } from "react-redux";
-import RootState from "../model/RootState";
+import type RootState from "../model/RootState";
 
 interface SchemeColorPickerProps {
     defaultColors: string[];

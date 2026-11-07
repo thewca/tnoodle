@@ -2,10 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import tnoodleApi from "../api/tnoodle.api";
 import wcaApi, { isUsingStaging } from "../api/wca.api";
-import CurrentTnoodle from "../model/CurrentTnoodle";
+import type CurrentTnoodle from "../model/CurrentTnoodle";
 import { setWcif } from "../redux/slice/WcifSlice";
 import { frontendStatusExtensionId } from "../util/wcif.util";
-import RootState from "../model/RootState";
+import type RootState from "../model/RootState";
 import { setExtensionLazily } from "../util/extension.util";
 
 const VersionInfo = () => {

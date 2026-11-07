@@ -45,11 +45,11 @@ it("Current version is the correct one", async () => {
     };
 
     // Turn on mocking behavior
-    jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
         Promise.resolve({ ...axiosResponse, data: version }),
     );
 
-    jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
+    vi.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
         Promise.resolve({ ...axiosResponse, data: scrambleProgram }),
     );
 
@@ -68,8 +68,8 @@ it("Current version is the correct one", async () => {
     expect(alert).toBe(null);
 
     // Clear mock
-    jest.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
-    jest.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
+    vi.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
 });
 
 it("Current version is allowed, but it's not the latest one", async () => {
@@ -98,11 +98,11 @@ it("Current version is allowed, but it's not the latest one", async () => {
         ],
     };
 
-    jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
         Promise.resolve({ ...axiosResponse, data: version }),
     );
 
-    jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
+    vi.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
         Promise.resolve({ ...axiosResponse, data: scrambleProgram }),
     );
 
@@ -124,8 +124,8 @@ it("Current version is allowed, but it's not the latest one", async () => {
     const downloadLink = container.querySelector("a")!.href;
     expect(downloadLink).toBe(scrambleProgram.current.download);
 
-    jest.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
-    jest.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
+    vi.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
 });
 
 it("Not signed version alert", async () => {
@@ -154,11 +154,11 @@ it("Not signed version alert", async () => {
         ],
     };
 
-    jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
         Promise.resolve({ ...axiosResponse, data: version }),
     );
 
-    jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
+    vi.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
         Promise.resolve({ ...axiosResponse, data: scrambleProgram }),
     );
 
@@ -177,8 +177,8 @@ it("Not signed version alert", async () => {
         "You are running an unsigned TNoodle release.",
     );
 
-    jest.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
-    jest.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
+    vi.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
 });
 
 it("Signed with different key", async () => {
@@ -207,11 +207,11 @@ it("Signed with different key", async () => {
         ],
     };
 
-    jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
         Promise.resolve({ ...axiosResponse, data: version }),
     );
 
-    jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
+    vi.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
         Promise.resolve({ ...axiosResponse, data: scrambleProgram }),
     );
 
@@ -230,8 +230,8 @@ it("Signed with different key", async () => {
         "You are running an unsigned TNoodle release.",
     );
 
-    jest.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
-    jest.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
+    vi.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
 });
 
 it("Not allowed TNoodle version, despite it's official", async () => {
@@ -260,11 +260,11 @@ it("Not allowed TNoodle version, despite it's official", async () => {
         ],
     };
 
-    jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
         Promise.resolve({ ...axiosResponse, data: version }),
     );
 
-    jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
+    vi.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
         Promise.resolve({ ...axiosResponse, data: scrambleProgram }),
     );
 
@@ -281,8 +281,8 @@ it("Not allowed TNoodle version, despite it's official", async () => {
     const alert = container.querySelector(".alert-danger")!;
     expect(alert.textContent).toContain("which is not allowed.");
 
-    jest.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
-    jest.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
+    vi.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
 });
 
 it("Do not bother the user if we can't be sure", async () => {
@@ -306,11 +306,11 @@ it("Do not bother the user if we can't be sure", async () => {
         ],
     };
 
-    jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
         Promise.resolve({ ...axiosResponse, data: version }),
     );
 
-    jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
+    vi.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
         Promise.resolve({ ...axiosResponse, data: scrambleProgram }),
     );
 
@@ -327,6 +327,6 @@ it("Do not bother the user if we can't be sure", async () => {
     const alert = container.querySelector(".alert");
     expect(alert).toBe(null);
 
-    jest.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
-    jest.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
+    vi.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
 });

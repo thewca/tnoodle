@@ -11,9 +11,6 @@ updates:
       interval: "monthly"
     open-pull-requests-limit: 10
     ignore:
-      - dependency-name: "typescript"
-        versions:
-          - ">= 5"
       - dependency-name: "@types/node"
         versions:
           - ">= 25"

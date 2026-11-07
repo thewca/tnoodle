@@ -23,9 +23,9 @@ Create an OAuth application at http://localhost:3000/oauth/applications/new.
   http://localhost:3001/scramble/oauth/wca
 - Scopes: public manage_competitions
 
-Then, run `yarn start` with the `REACT_APP_WCA_ORIGIN` and `REACT_APP_TNOODLE_APP_ID` variables set.
+Then, run `yarn start` with the `VITE_WCA_ORIGIN` and `VITE_TNOODLE_APP_ID` variables set.
 For example:
 
 ```
-REACT_APP_WCA_ORIGIN=http://localhost:3000 REACT_APP_TNOODLE_APP_ID=tnoodle-development-uid yarn start
+VITE_WCA_ORIGIN=http://localhost:3000 VITE_TNOODLE_APP_ID=tnoodle-development-uid yarn start
 ```

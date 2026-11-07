@@ -1,8 +1,8 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import WcaEvent from "../../model/WcaEvent";
-import WcaFormat from "../../model/WcaFormat";
-import Wcif from "../../model/Wcif";
-import WcifEvent from "../../model/WcifEvent";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type WcaEvent from "../../model/WcaEvent";
+import type WcaFormat from "../../model/WcaFormat";
+import type Wcif from "../../model/Wcif";
+import type WcifEvent from "../../model/WcifEvent";
 import { competitionName2Id } from "../../util/competition.name.util";
 import {
     copiesExtensionId,
