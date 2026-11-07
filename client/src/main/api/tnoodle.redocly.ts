@@ -7,32 +7,32 @@
  */
 
 export type GetVersionInfoResult = {
-    project_name?: string;
+    project_name: string;
     /**
      * @format semver
      */
-    project_version?: string;
-    is_signed_build?: boolean;
+    project_version: string;
+    is_signed_build: boolean;
     /**
      * @format byte
      */
-    signature_key_bytes?: string;
+    signature_key_bytes: string;
 };
 
 export type GetWcaEventsResult = {
-    id?: string;
-    name?: string;
-    puzzle_id?: string;
-    puzzle_group_id?: string | null;
-    format_ids?: string[];
-    is_fewest_moves?: boolean;
-    is_multiple_blindfolded?: boolean;
+    id: string;
+    name: string;
+    puzzle_id: string;
+    puzzle_group_id?: string;
+    format_ids: string[];
+    is_fewest_moves: boolean;
+    is_multiple_blindfolded: boolean;
 }[];
 
 export type GetWcaFormatsResult = {
-    id?: string;
-    name?: string;
-    short_name?: string;
+    id: string;
+    name: string;
+    short_name: string;
 }[];
 
 export type GetBackendWcifVersionResult = string;
@@ -91,26 +91,26 @@ export type GetFmcSheetLanguagesResult = {
     /**
      * The ISO 639-1 code of the language
      */
-    code?: string;
+    code: string;
     /**
      * The English display name of the language
      */
-    name?: string;
+    name: string;
 }[];
 
 export type CalculateSuggestedFmcTranslationsResult = string[];
 
 export type CalculateSuggestedFmcTranslationsBody = {
-    registration?: {
+    registration: {
         /**
          * The registration status of the competitor
          */
-        status?: string;
+        status: string;
     };
     /**
      * The ISO 3166-1 alpha-2 code of the competitor's nationality
      */
-    countryIso2?: string;
+    countryIso2: string;
 }[];
 
 export type CalculateSuggestedFmcTranslationsVariables = {
@@ -121,33 +121,33 @@ export type CalculateMbldBestResult = {
     /**
      * The number of cubes which were solved
      */
-    solved?: number;
+    solved: number;
     /**
      * The number of cubes which were attempted
      */
-    attempted?: number;
+    attempted: number;
     /**
      * The duration of the attempt in whole seconds
      */
-    duration?: number;
+    duration: number;
 };
 
 export type CalculateMbldBestBody = {
-    registration?: {
+    registration: {
         /**
          * The registration status of the competitor
          */
-        status?: string;
+        status: string;
     };
-    personalBests?: {
+    personalBests: {
         /**
          * The event ID
          */
-        eventId?: string;
+        eventId: string;
         /**
          * The competitor's PB
          */
-        value?: number;
+        value: number;
     }[];
 }[];
 

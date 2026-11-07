@@ -30,6 +30,11 @@ paths:
                                     signature_key_bytes:
                                         type: string
                                         format: byte
+                                required:
+                                    - project_name
+                                    - project_version
+                                    - is_signed_build
+                                    - signature_key_bytes
     /frontend/data/events:
         get:
             summary: Get a list of events that the backend can scramble
@@ -54,9 +59,7 @@ paths:
                                             type: string
                                             example: 333
                                         puzzle_group_id:
-                                            type:
-                                                - string
-                                                - "null"
+                                            type: string
                                             example: nxn
                                         format_ids:
                                             type: array
@@ -67,6 +70,13 @@ paths:
                                             type: boolean
                                         is_multiple_blindfolded:
                                             type: boolean
+                                    required:
+                                        - id
+                                        - name
+                                        - puzzle_id
+                                        - format_ids
+                                        - is_fewest_moves
+                                        - is_multiple_blindfolded
     /frontend/data/formats:
         get:
             summary: Get a list of formats that the backend knows about
@@ -90,6 +100,10 @@ paths:
                                         short_name:
                                             type: string
                                             example: AO5
+                                    required:
+                                        - id
+                                        - name
+                                        - short_name
     /frontend/data/wcif-version:
         get:
             summary: Get the WCIF version that the backend supports
@@ -193,6 +207,9 @@ paths:
                                         name:
                                             type: string
                                             description: The English display name of the language
+                                    required:
+                                        - code
+                                        - name
     /frontend/fmc/languages/competitors:
         post:
             summary: Calculate a suggested list of FMC translations based on competitor nationalities
@@ -213,9 +230,14 @@ paths:
                                             status:
                                                 type: string
                                                 description: The registration status of the competitor
+                                        required:
+                                            - status
                                     countryIso2:
                                         type: string
                                         description: The ISO 3166-1 alpha-2 code of the competitor's nationality
+                                required:
+                                    - registration
+                                    - countryIso2
             responses:
                 '200':
                     description: A list of suggested FMC translation locales
@@ -247,6 +269,8 @@ paths:
                                             status:
                                                 type: string
                                                 description: The registration status of the competitor
+                                        required:
+                                            - status
                                     personalBests:
                                         type: array
                                         items:
@@ -258,6 +282,12 @@ paths:
                                                 value:
                                                     type: integer
                                                     description: The competitor's PB
+                                            required:
+                                                - eventId
+                                                - value
+                                required:
+                                    - registration
+                                    - personalBests
             responses:
                 '200':
                     description: The best MBLD attempt
@@ -275,3 +305,7 @@ paths:
                                     duration:
                                         type: integer
                                         description: The duration of the attempt in whole seconds
+                                required:
+                                    - solved
+                                    - attempted
+                                    - duration
