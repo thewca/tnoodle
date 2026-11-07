@@ -1,4 +1,3 @@
-import configurations.CompilerSettings.JVM_TOOLCHAIN
 import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.CompilerSettings.JAVA_BYTECODE_VERSION
 import configurations.CompilerSettings.JAVA_TARGET_RELEASE
@@ -69,8 +68,6 @@ dependencies {
 configureJUnit5()
 
 kotlin {
-    jvmToolchain(JVM_TOOLCHAIN)
-
     compilerOptions {
         jvmTarget = KOTLIN_JVM_TARGET
     }
@@ -78,6 +75,7 @@ kotlin {
 
 java {
     targetCompatibility = JAVA_BYTECODE_VERSION
+    sourceCompatibility = JAVA_BYTECODE_VERSION
 }
 
 tasks.compileJava {

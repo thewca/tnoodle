@@ -1,5 +1,4 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import configurations.CompilerSettings.JVM_TOOLCHAIN
 import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.CompilerSettings.JAVA_BYTECODE_VERSION
 import configurations.CompilerSettings.JAVA_TARGET_RELEASE
@@ -37,8 +36,6 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(JVM_TOOLCHAIN)
-
     compilerOptions {
         jvmTarget = KOTLIN_JVM_TARGET
     }
@@ -46,6 +43,7 @@ kotlin {
 
 java {
     targetCompatibility = JAVA_BYTECODE_VERSION
+    sourceCompatibility = JAVA_BYTECODE_VERSION
 }
 
 tasks.compileJava {
@@ -74,6 +72,7 @@ tasks.create("registerManifest") {
 }
 
 tasks.getByName<ShadowJar>("shadowJar") {
+    exclude("module-info.class")
     exclude("META-INF/versions/**")
 
     val targetLn = rootProject.file(TNOODLE_SYMLINK)

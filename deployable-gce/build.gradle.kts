@@ -1,4 +1,3 @@
-import configurations.CompilerSettings.JVM_TOOLCHAIN
 import configurations.Repositories.attachRemoteRepositories
 import configurations.ProjectVersions.tNoodleImplOrDefault
 import configurations.ProjectVersions.tNoodleVersionOrDefault
@@ -17,10 +16,6 @@ dependencies {
     implementation(project(":server"))
 
     implementation(libs.google.cloud.storage)
-}
-
-kotlin {
-    jvmToolchain(JVM_TOOLCHAIN)
 }
 
 appengine {
