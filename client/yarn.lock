@@ -216,6 +216,11 @@
   dependencies:
     "@swc/helpers" "^0.5.0"
 
+"@redocly/cli@^2.76.0":
+  version "2.76.0"
+  resolved "https://registry.yarnpkg.com/@redocly/cli/-/cli-2.76.0.tgz#2e1880cce947151a51d28c635070b5cfafd35533"
+  integrity sha512-o967iiLTq4B9oPDBqclurfLn3HOhQvYNwJ+BEkZoW/p5PwIycqIoaNv+Q+Uabb4cH/XnSyo646tCAscnjzZ6Ig==
+
 "@reduxjs/toolkit@^2.14.0":
   version "2.14.0"
   resolved "https://registry.yarnpkg.com/@reduxjs/toolkit/-/toolkit-2.14.0.tgz#4977d4f7f889e634eeb7381becc5b5648fecf051"
