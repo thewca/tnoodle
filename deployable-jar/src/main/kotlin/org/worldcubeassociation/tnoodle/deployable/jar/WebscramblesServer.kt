@@ -57,7 +57,7 @@ class WebscramblesServer(environmentConfig: ServerEnvironmentConfig) : Applicati
             val noUpgrade by parser.flagging("-u", "--noupgrade", help = "If an instance of TNoodle is running on the desired port(s), do not attempt to kill it and start up")
             val noReexec by parser.flagging(NO_REEXEC_OPT, help = "Do not reexec. This is sometimes done to rename java.exe on Windows, or to get a larger heap size.")
 
-            val onlineModeEnv = System.getenv("REACT_APP_TNOODLE_ONLINE_MODE")
+            val onlineModeEnv = System.getenv("VITE_TNOODLE_ONLINE_MODE")
             val isEnvOnlineMode = onlineModeEnv != null && onlineModeEnv.isNotEmpty()
 
             val isCliOnlineMode by parser.flagging("-o", "--online", help = "Change configuration for online mode. This will override port bindings and sun.awt.fontconfig")

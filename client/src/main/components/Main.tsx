@@ -115,7 +115,7 @@ const Main = () => {
         link.remove();
     };
 
-    const appOnlineMode = !!process.env.REACT_APP_TNOODLE_ONLINE_MODE;
+    const appOnlineMode = !!import.meta.env.VITE_TNOODLE_ONLINE_MODE;
 
     const scrambleButton = () => {
         if (generatingScrambles) {
