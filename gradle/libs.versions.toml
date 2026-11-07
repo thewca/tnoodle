@@ -54,7 +54,7 @@ tnoodle-scrambles = { module = "org.worldcubeassociation.tnoodle:lib-scrambles",
 apache-commons-lang3 = { module = "org.apache.commons:commons-lang3", version = "3.21.0" }
 kotless-ktor = { module = "io.kotless:ktor-lang", version.ref = "kotless" }
 mockk = { module = "io.mockk:mockk", version = "1.14.11" }
-eclipse-jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version = "7.8.0.202609011348-r" }
+eclipse-jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version = "7.8.1.202611041320-r" }
 
 [bundles]
 batik = ["batik-transcoder", "batik-codec"]
