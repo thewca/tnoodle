@@ -1,6 +1,5 @@
 package org.worldcubeassociation.tnoodle.server.routing
 
-import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 

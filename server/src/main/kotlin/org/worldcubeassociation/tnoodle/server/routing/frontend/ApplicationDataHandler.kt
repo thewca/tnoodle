@@ -18,10 +18,7 @@ object ApplicationDataHandler : RouteHandler {
             }
 
             get("formats") {
-                val formatData = FormatData.WCA_FORMATS.mapValues {
-                    FormatFrontendData.fromDataModel(it.value)
-                }
-
+                val formatData = FormatData.entries.map(FormatFrontendData.Companion::fromDataModel)
                 call.respond(formatData)
             }
 

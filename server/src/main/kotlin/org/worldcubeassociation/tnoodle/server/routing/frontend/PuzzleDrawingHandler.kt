@@ -7,7 +7,6 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.model.PuzzleData
-import org.worldcubeassociation.tnoodle.server.serial.frontend.FrontendScrambleAndImage
 import org.worldcubeassociation.tnoodle.svglite.Color
 
 object PuzzleDrawingHandler : RouteHandler {
@@ -28,22 +27,20 @@ object PuzzleDrawingHandler : RouteHandler {
                     val puzzle = call.puzzleData
                         ?: return@post call.respond(HttpStatusCode.NotFound)
 
-                    val colorScheme = call.receiveColorScheme()
-
                     val randomScramble = puzzle.generateScramble()
-                    val scrambledPuzzleSvg = puzzle.scramblerWithCache.drawScramble(randomScramble, colorScheme)
-
-                    val frontendData = FrontendScrambleAndImage(randomScramble, scrambledPuzzleSvg.toString())
-
-                    call.respond(frontendData)
+                    call.respond(randomScramble)
                 }
 
                 post("svg") {
                     val puzzle = call.puzzleData
                         ?: return@post call.respond(HttpStatusCode.NotFound)
 
-                    val colorScheme = call.receiveColorScheme()
-                    val solvedPuzzleSvg = puzzle.scramblerWithCache.drawScramble(null, colorScheme)
+                    val rawColorScheme = call.receive<Map<String, String>?>().orEmpty()
+                    val modelColorScheme = rawColorScheme.mapValues { Color(it.value) }
+
+                    val requestScramble = call.queryParameters["scramble"]
+
+                    val solvedPuzzleSvg = puzzle.scramblerWithCache.drawScramble(requestScramble, modelColorScheme.toMutableMap())
 
                     call.respondText(solvedPuzzleSvg.toString(), ContentType.Image.SVG)
                 }
@@ -57,11 +54,4 @@ object PuzzleDrawingHandler : RouteHandler {
 
             return PuzzleData.WCA_PUZZLES[puzzleId]
         }
-
-    private suspend fun ApplicationCall.receiveColorScheme(): HashMap<String, Color> {
-        val rawColorScheme = receive<Map<String, String>>()
-        val colorScheme = rawColorScheme.mapValues { Color(it.value) }
-
-        return HashMap(colorScheme)
-    }
 }
