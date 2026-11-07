@@ -1,4 +1,5 @@
 export default interface WcaFormat {
+    id: string;
     name: string;
-    shortName: string;
+    short_name: string;
 }

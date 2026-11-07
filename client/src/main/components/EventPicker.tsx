@@ -246,7 +246,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     };
 
     const abbreviate = (str: string) =>
-        !!wcaFormats ? wcaFormats[str].shortName : "-";
+        !!wcaFormats ? wcaFormats.find((format) => format.id === str)?.short_name : "-";
 
     const updateForeignColorScheme = (wcaEvent: WcaEvent) => {
         let wcifEvent = wcifEvents.find(
@@ -285,7 +285,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         const samePuzzleGroupEvents =
             wcaEvents?.filter((event) => {
                 return (
-                    wcaEvent.puzzle_group_id !== null &&
+                    wcaEvent.puzzle_group_id !== undefined &&
                     event.id !== wcaEvent.id &&
                     event.puzzle_group_id === wcaEvent.puzzle_group_id
                 );

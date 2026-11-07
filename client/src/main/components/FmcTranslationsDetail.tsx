@@ -3,7 +3,10 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type RootState from "../model/RootState";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
-import { client } from "../api/tnoodle.redocly";
+import {
+    client,
+    type GetFmcSheetLanguagesResult,
+} from "../api/tnoodle.redocly";
 import type WcifEvent from "../model/WcifEvent";
 import { fmcTranslationsExtensionId } from "../util/wcif.util";
 import { setWcifEvent } from "../redux/slice/WcifSlice";
@@ -26,7 +29,7 @@ const FmcTranslationsDetail = ({
     );
 
     const [availableTranslations, setAvailableTranslations] =
-        useState<Record<string, string>>();
+        useState<GetFmcSheetLanguagesResult>();
 
     useEffect(() => {
         if (availableTranslations === undefined) {
@@ -106,7 +109,7 @@ const FmcTranslationsDetail = ({
         if (availableTranslations === undefined) {
             selectNoneTranslation();
         } else {
-            updateEventSelectedTranslations(Object.keys(availableTranslations));
+            updateEventSelectedTranslations(availableTranslations.map((trans) => trans.code));
         }
     };
 
@@ -123,10 +126,8 @@ const FmcTranslationsDetail = ({
             return;
         }
 
-        let availableTranslationKeys = Object.keys(availableTranslations);
-
         let translationsChunks = chunk(
-            availableTranslationKeys,
+            availableTranslations,
             TRANSLATIONS_PER_LINE,
         );
 
@@ -135,7 +136,7 @@ const FmcTranslationsDetail = ({
                 {translationsChunk.map((translation, j) => {
                     let checkboxId = `fmc-${translation}`;
                     let translationStatus =
-                        selectedTranslations.includes(translation);
+                        selectedTranslations.includes(translation.code);
 
                     return (
                         <React.Fragment key={j}>
@@ -144,7 +145,7 @@ const FmcTranslationsDetail = ({
                                     className="form-label text-capitalize"
                                     htmlFor={checkboxId}
                                 >
-                                    {availableTranslations[translation]}
+                                    {translation.name}
                                 </label>
                             </th>
                             <th>
@@ -155,7 +156,7 @@ const FmcTranslationsDetail = ({
                                     checked={translationStatus}
                                     onChange={(e) =>
                                         handleTranslation(
-                                            translation,
+                                            translation.code,
                                             e.target.checked,
                                         )
                                     }

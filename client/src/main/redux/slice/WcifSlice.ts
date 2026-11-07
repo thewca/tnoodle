@@ -14,7 +14,7 @@ import {
 
 interface WcifState {
     wcaEvents?: WcaEvent[];
-    wcaFormats?: Record<string, WcaFormat>;
+    wcaFormats?: WcaFormat[];
     backendWcifVersion?: string;
     wcif: Wcif;
 }
@@ -57,7 +57,7 @@ export const wcifSlice = createSlice({
         },
         setWcaFormats: (
             state,
-            action: PayloadAction<Record<string, WcaFormat>>,
+            action: PayloadAction<WcaFormat[]>,
         ) => {
             state.wcaFormats = action.payload;
         },
