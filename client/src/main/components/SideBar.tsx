@@ -37,7 +37,9 @@ const SideBar = () => {
         (state: RootState) => state.informationSlice.cachedObjects,
     );
     const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
-    const backendWcifVersion = useSelector((state: RootState) => state.wcifSlice.backendWcifVersion);
+    const backendWcifVersion = useSelector(
+        (state: RootState) => state.wcifSlice.backendWcifVersion,
+    );
     const generatingScrambles = useSelector(
         (state: RootState) => state.scramblingSlice.generatingScrambles,
     );
@@ -185,7 +187,10 @@ const SideBar = () => {
             // For quick switching between competitions.
             let cachedObject = cachedObjects[competitionId];
 
-            if (!!cachedObject && cachedObject.wcif.formatVersion === backendWcifVersion) {
+            if (
+                !!cachedObject &&
+                cachedObject.wcif.formatVersion === backendWcifVersion
+            ) {
                 updateWcif(cachedObject.wcif);
 
                 let cachedSuggestedFmcTranslations =
