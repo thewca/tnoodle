@@ -1,0 +1,11 @@
+extends:
+    - spec
+
+client:
+    generators:
+        - typescript
+
+apis:
+    tnoodle:
+        root: ../openapi/tnoodle.yaml
+        clientOutput: ./src/main/api/tnoodle.redocly.ts
