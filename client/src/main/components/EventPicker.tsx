@@ -86,6 +86,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                             .paintScramble({
                                 path: { puzzleId: wcaEvent.puzzle_id },
                                 query: { scramble },
+                                body: colorScheme,
                             })
                             .then((response) => response.text())
                             .then((svgXml) => {
@@ -102,6 +103,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             client
                 .paintScramble({
                     path: { puzzleId: wcaEvent.puzzle_id },
+                    body: colorScheme,
                 })
                 .then((response) => response.text())
                 .then((svgXml) => {

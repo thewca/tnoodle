@@ -2,7 +2,7 @@ package org.worldcubeassociation.tnoodle.server.routing.frontend
 
 import io.ktor.http.*
 import io.ktor.server.application.*
-import io.ktor.server.request.*
+import io.ktor.server.request.receive
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.worldcubeassociation.tnoodle.server.RouteHandler
@@ -23,9 +23,9 @@ object PuzzleDrawingHandler : RouteHandler {
                     call.respond(defaultColorScheme)
                 }
 
-                post("scramble") {
+                get("scramble") {
                     val puzzle = call.puzzleData
-                        ?: return@post call.respond(HttpStatusCode.NotFound)
+                        ?: return@get call.respond(HttpStatusCode.NotFound)
 
                     val randomScramble = puzzle.generateScramble()
                     call.respond(randomScramble)
