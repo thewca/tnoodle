@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Collapse, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import tnoodleApi from "../api/tnoodle.api";
-import wcaApi from "../api/wca.api";
+import WcaApi from "../api/wca.api";
 import logo from "../assets/tnoodle_logo.svg";
 import type RootState from "../model/RootState";
 import {
@@ -27,6 +27,8 @@ import type Wcif from "../model/Wcif";
 import { setShowColorPicker } from "../redux/slice/SettingsSlice";
 import type Competition from "../model/Competition";
 import type Person from "../model/Person";
+import { useAuth } from "react-oidc-context";
+import { LAST_LOGIN_ENV_STORAGE, PRE_LOGIN_STORAGE } from "../api/wca.oidc";
 
 const SideBar = () => {
     const [loadingUser, setLoadingUser] = useState(false);
@@ -58,6 +60,8 @@ const SideBar = () => {
         [setIsOpen],
     );
 
+    const oidcAuth = useAuth();
+
     useEffect(() => {
         window.addEventListener("resize", handleIsOpen);
 
@@ -65,9 +69,11 @@ const SideBar = () => {
     }, [handleIsOpen]);
 
     useEffect(() => {
-        if (!wcaApi.isLogged()) {
+        if (!oidcAuth.isAuthenticated) {
             return;
         }
+
+        const wcaApi = new WcaApi(oidcAuth.user!.access_token);
 
         if (!me) {
             setLoadingUser(true);
@@ -86,7 +92,7 @@ const SideBar = () => {
                 .then((response) => setUpcomingCompetitions(response.data))
                 .finally(() => setLoadingCompetitions(false));
         }
-    }, [upcomingCompetitions, me]);
+    }, [upcomingCompetitions, me, oidcAuth.user]);
 
     const competitions = useMemo(() => {
         if (
@@ -202,6 +208,7 @@ const SideBar = () => {
                 let cachedBestMbldAttempt = cachedObject.bestMbldAttempt;
                 dispatch(setBestMbldAttempt(cachedBestMbldAttempt));
             } else if (!!backendWcifVersion) {
+                const wcaApi = new WcaApi(oidcAuth.user!.access_token);
                 setLoadingCompetitionInfo(true);
 
                 wcaApi
@@ -229,6 +236,7 @@ const SideBar = () => {
             getAndCacheBestMbldAttempt,
             getAndCacheSuggestedFmcTranslations,
             updateWcif,
+            oidcAuth.user,
         ],
     );
 
@@ -251,14 +259,32 @@ const SideBar = () => {
     const logInButton = () => {
         return (
             <div className="vstack gap-2">
-                <button
-                    type="button"
-                    className="btn btn-primary btn-lg"
-                    onClick={wcaApi.isLogged() ? wcaApi.logOut : wcaApi.logIn}
-                    disabled={generatingScrambles}
-                >
-                    {wcaApi.isLogged() ? "Log Out" : "Log In"}
-                </button>
+                {oidcAuth.isAuthenticated ? (
+                    <button
+                        type="button"
+                        className="btn btn-primary btn-lg"
+                        onClick={() => {
+                            delete localStorage[LAST_LOGIN_ENV_STORAGE];
+                            return oidcAuth.removeUser();
+                        }}
+                        disabled={generatingScrambles}
+                    >
+                        Log Out
+                    </button>
+                ) : (
+                    <button
+                        type="button"
+                        className="btn btn-primary btn-lg"
+                        onClick={() => {
+                            localStorage[PRE_LOGIN_STORAGE] =
+                                window.location.href;
+                            return oidcAuth.signinRedirect();
+                        }}
+                        disabled={generatingScrambles}
+                    >
+                        {oidcAuth.isAuthenticated ? "Log Out" : "Log In"}
+                    </button>
+                )}
                 {!!me && (
                     <p className="text-white">
                         Welcome, {me.name}.

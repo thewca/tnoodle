@@ -1,9 +1,8 @@
 import { type FormEvent, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import tnoodleApi from "../api/tnoodle.api";
-import wcaApi from "../api/wca.api";
 import { ScrambleClient } from "../api/tnoodle.socket";
-import { isUsingStaging } from "../api/wca.api";
+import { isUsingStaging } from "../api/wca.oidc";
 import type RootState from "../model/RootState";
 import {
     resetScramblingProgressCurrent,
@@ -19,6 +18,7 @@ import "./Main.css";
 import VersionInfo from "./VersionInfo";
 import type WebsocketBlobResult from "../model/WebsocketBlobResult";
 import { frontendStatusExtensionId } from "../util/wcif.util";
+import { useAuth } from "react-oidc-context";
 
 const Main = () => {
     const [competitionNameFileZip, setCompetitionNameFileZip] = useState("");
@@ -37,6 +37,8 @@ const Main = () => {
     );
 
     const interceptorRef = useRef<Interceptor>(null);
+
+    const oidcAuth = useAuth();
 
     const dispatch = useDispatch();
 
@@ -142,7 +144,7 @@ const Main = () => {
             (event) => event.rounds.length > 0,
         );
 
-        let isLoggedCompSelection = !isManualSelection && wcaApi.isLogged();
+        let isLoggedCompSelection = !isManualSelection && oidcAuth.isAuthenticated;
         let isOnlineLocked = appOnlineMode && !isLoggedCompSelection;
 
         let disableScrambleButton = !anyEventHasRounds || isOnlineLocked;
