@@ -5,7 +5,7 @@ kotless = "0.1.6"
 junit-jupiter = "5.14.4"
 batik = "1.20"
 itext7 = "9.8.0"
-logback = "1.6.6"
+logback = "1.3.16"
 
 nodejs = "24.21.0"
 

@@ -35,5 +35,10 @@ updates:
       - dependency-name: "org.junit.platform:junit-platform-launcher"
         versions:
           - ">= 2"
+      # Logback versions starting at 1.4 have been compiled against Java 11,
+      #   but the Gradle packager does not realize this because it's pulled in as "runtimeOnly"
+      - dependency-name: "ch.qos.logback:logback-*"
+        versions:
+          - ">= 1.4"
     cooldown:
       default-days: 1
