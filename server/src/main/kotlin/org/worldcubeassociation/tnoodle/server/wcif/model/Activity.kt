@@ -7,8 +7,13 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 @Serializable
-data class Activity(override val id: Int, val activityCode: @Serializable(with = ActivityCode.Companion::class) ActivityCode, val startTime: String, val childActivities: List<Activity> = emptyList(), val scrambleSetId: Int? = null) :
-    IndexingIdProvider {
+data class Activity(
+    override val id: Int,
+    val activityCode: @Serializable(with = ActivityCode.Companion::class) ActivityCode,
+    val startTime: String,
+    val childActivities: List<Activity> = emptyList(),
+    val scrambleSetId: Int? = null,
+) : IndexingIdProvider {
     val leafChildActivities: List<Activity>
         get() = childActivities.takeUnless { it.isEmpty() }
             ?.flatMap { it.leafChildActivities }

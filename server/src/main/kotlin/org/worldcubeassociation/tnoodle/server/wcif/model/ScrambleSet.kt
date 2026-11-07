@@ -5,8 +5,12 @@ import org.worldcubeassociation.tnoodle.server.wcif.model.extension.ExtensionPro
 import org.worldcubeassociation.tnoodle.server.wcif.provider.IndexingIdProvider
 
 @Serializable
-data class ScrambleSet(override val id: Int, val scrambles: List<@Serializable(with = Scramble.Companion::class) Scramble>, val extraScrambles: List<@Serializable(with = Scramble.Companion::class) Scramble>, override val extensions: List<Extension> = emptyList()) : ExtensionProvider(),
-    IndexingIdProvider {
+data class ScrambleSet(
+    override val id: Int,
+    val scrambles: List<@Serializable(with = Scramble.Companion::class) Scramble>,
+    val extraScrambles: List<@Serializable(with = Scramble.Companion::class) Scramble>,
+    override val extensions: List<Extension> = emptyList(),
+) : ExtensionProvider(), IndexingIdProvider {
     val allScrambles: List<Scramble>
         get() = scrambles + extraScrambles
 

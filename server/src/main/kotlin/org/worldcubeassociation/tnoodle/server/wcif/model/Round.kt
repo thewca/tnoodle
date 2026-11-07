@@ -6,8 +6,13 @@ import org.worldcubeassociation.tnoodle.server.wcif.model.extension.ExtensionPro
 import org.worldcubeassociation.tnoodle.server.wcif.provider.FormatIdProvider
 
 @Serializable
-data class Round(val id: String, val format: String, val scrambleSetCount: Int, val scrambleSets: List<ScrambleSet> = emptyList(), override val extensions: List<Extension> = emptyList()): ExtensionProvider(),
-    FormatIdProvider {
+data class Round(
+    val id: String,
+    val format: String,
+    val scrambleSetCount: Int,
+    val scrambleSets: List<ScrambleSet> = emptyList(),
+    override val extensions: List<Extension> = emptyList(),
+): ExtensionProvider(), FormatIdProvider {
     val idCode: ActivityCode
         get() = ActivityCode(id)
 
