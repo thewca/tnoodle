@@ -1,79 +1,10 @@
-import axios from "axios";
-import type BestMbld from "../model/BestMbld";
-import type RunningVersion from "../model/RunningVersion";
-import type WcaEvent from "../model/WcaEvent";
-import type WcaFormat from "../model/WcaFormat";
 import type Wcif from "../model/Wcif";
 import { ScrambleClient } from "./tnoodle.socket";
 import type WebsocketBlobResult from "../model/WebsocketBlobResult";
-import type ScrambleAndImage from "../model/ScrambleAndImage";
-import { tNoodleBackend } from "../../paths";
 
 let zipEndpoint = "/wcif/zip";
-let versionEndpoint = "/version";
-let fmcTranslationsEndpoint = "/frontend/fmc/languages/available";
-let suggestedFmcTranslationsEndpoint = "/frontend/fmc/languages/competitors";
-let bestMbldAttemptEndpoint = "/frontend/mbld/best";
-let puzzleColorSchemeEndpoint = (puzzleId: string) =>
-    `/frontend/puzzle/${puzzleId}/colors`;
-let puzzleRandomScrambleEndpoint = (puzzleId: string) =>
-    `/frontend/puzzle/${puzzleId}/scramble`;
-let solvedPuzzleSvgEndpoint = (puzzleId: string) =>
-    `/frontend/puzzle/${puzzleId}/svg`;
-let wcaEventsEndpoint = "/frontend/data/events";
-let formatsEndpoint = "/frontend/data/formats";
-let backendWcifVersionEndpoint = "/frontend/data/wcif-version";
 
 class TnoodleApi {
-    fetchWcaEvents = () =>
-        axios.get<WcaEvent[]>(tNoodleBackend + wcaEventsEndpoint);
-
-    fetchFormats = () =>
-        axios.get<Record<string, WcaFormat>>(tNoodleBackend + formatsEndpoint);
-
-    fetchBackendWcifVersion = () =>
-        axios.get<string>(tNoodleBackend + backendWcifVersionEndpoint);
-
-    fetchSuggestedFmcTranslations = (wcif: Wcif) =>
-        axios.post<string[]>(
-            tNoodleBackend + suggestedFmcTranslationsEndpoint,
-            wcif,
-        );
-
-    fetchBestMbldAttempt = (wcif: Wcif) =>
-        axios.post<BestMbld>(tNoodleBackend + bestMbldAttemptEndpoint, wcif);
-
-    fetchPuzzleColorScheme = (puzzleId: string) =>
-        axios.get<Record<string, string>>(
-            tNoodleBackend + puzzleColorSchemeEndpoint(puzzleId),
-        );
-
-    fetchPuzzleRandomScramble = (
-        puzzleId: string,
-        colorScheme: Record<string, string> = {},
-    ) =>
-        axios.post<ScrambleAndImage>(
-            tNoodleBackend + puzzleRandomScrambleEndpoint(puzzleId),
-            colorScheme,
-        );
-
-    fetchPuzzleSolvedSvg = (
-        puzzleId: string,
-        colorScheme: Record<string, string> = {},
-    ) =>
-        axios.post<string>(
-            tNoodleBackend + solvedPuzzleSvgEndpoint(puzzleId),
-            colorScheme,
-        );
-
-    fetchRunningVersion = () =>
-        axios.get<RunningVersion>(tNoodleBackend + versionEndpoint);
-
-    fetchAvailableFmcTranslations = () =>
-        axios.get<Record<string, string>>(
-            tNoodleBackend + fmcTranslationsEndpoint,
-        );
-
     fetchZip = (
         scrambleClient: ScrambleClient,
         wcif: Wcif,

@@ -1,7 +1,7 @@
 import { chunk } from "lodash";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import tnoodleApi from "../api/tnoodle.api";
+import { client } from "../api/tnoodle.redocly";
 import { toWcaUrl } from "../api/wca.api";
 import type RootState from "../model/RootState";
 import {
@@ -20,7 +20,9 @@ const EventPickerTable = () => {
     const isManualSelection = useSelector(
         (state: RootState) => state.informationSlice.isManualSelection,
     );
-    const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
+    const wcif = useSelector(
+        (state: RootState) => state.wcifSlice.wcif,
+    );
     const wcaEvents = useSelector(
         (state: RootState) => state.wcifSlice.wcaEvents,
     );
@@ -28,14 +30,14 @@ const EventPickerTable = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        tnoodleApi.fetchFormats().then((response) => {
-            dispatch(setWcaFormats(response.data));
+        client.getFrontendDataFormats().then((response) => {
+            dispatch(setWcaFormats(response));
         });
-        tnoodleApi.fetchWcaEvents().then((response) => {
-            dispatch(setWcaEvents(response.data));
+        client.getFrontendDataEvents().then((response) => {
+            dispatch(setWcaEvents(response));
         });
-        tnoodleApi.fetchBackendWcifVersion().then((response) => {
-            dispatch(setBackendWcifVersion(response.data));
+        client.getFrontendDataWcifVersion().then((response) => {
+            dispatch(setBackendWcifVersion(response));
         });
     }, [dispatch]);
 

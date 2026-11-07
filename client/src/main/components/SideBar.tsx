@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Collapse, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import tnoodleApi from "../api/tnoodle.api";
+import { client } from "../api/tnoodle.redocly";
 import wcaApi from "../api/wca.api";
 import logo from "../assets/tnoodle_logo.svg";
 import type RootState from "../model/RootState";
@@ -139,8 +139,10 @@ const SideBar = () => {
 
     const getAndCacheBestMbldAttempt = useCallback(
         (wcif: Wcif) => {
-            tnoodleApi.fetchBestMbldAttempt(wcif).then((response) => {
-                const attempted = response.data?.attempted;
+            client.postFrontendMbldBest({
+                body: wcif.persons,
+            }).then((response) => {
+                const attempted = response?.attempted;
 
                 if (!!attempted) {
                     dispatch(
@@ -159,15 +161,17 @@ const SideBar = () => {
 
     const getAndCacheSuggestedFmcTranslations = useCallback(
         (wcif: Wcif) => {
-            tnoodleApi.fetchSuggestedFmcTranslations(wcif).then((response) => {
+            client.postFrontendFmcLanguagesCompetitors({
+                body: wcif.persons,
+            }).then((response) => {
                 dispatch(
                     addCachedObject({
                         competitionId: wcif.id,
                         identifier: "suggestedFmcTranslations",
-                        object: response.data,
+                        object: response,
                     }),
                 );
-                dispatch(setSuggestedFmcTranslations(response.data));
+                dispatch(setSuggestedFmcTranslations(response));
             });
         },
         [dispatch],

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import tnoodleApi from "../api/tnoodle.api";
 import wcaApi from "../api/wca.api";
+import { client } from "../api/tnoodle.redocly";
 import type CurrentTnoodle from "../model/CurrentTnoodle";
 import { setWcif } from "../redux/slice/WcifSlice";
 import { frontendStatusExtensionId } from "../util/wcif.util";
@@ -40,15 +40,15 @@ const VersionInfo = () => {
             setWcaPublicKeyBytes(response.data.publicKeyBytes);
         });
 
-        tnoodleApi.fetchRunningVersion().then((response) => {
+        client.getVersion().then((response) => {
             let versionString =
-                !!response.data.projectName && !!response.data.projectVersion
-                    ? `${response.data.projectName}-${response.data.projectVersion}`
+                !!response.project_name && !!response.project_version
+                    ? `${response.project_name}-${response.project_version}`
                     : "";
 
             setRunningVersion(versionString);
-            setSignedBuild(response.data.signedBuild);
-            setSignatureKeyBytes(response.data.signatureKeyBytes);
+            setSignedBuild(response.is_signed_build);
+            setSignatureKeyBytes(response.signature_key_bytes);
         });
     }, []);
 
