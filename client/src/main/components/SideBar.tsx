@@ -28,7 +28,7 @@ import { setShowColorPicker } from "../redux/slice/SettingsSlice";
 import type Competition from "../model/Competition";
 import type Person from "../model/Person";
 import { useAuth } from "react-oidc-context";
-import { LAST_LOGIN_ENV_STORAGE, PRE_LOGIN_STORAGE } from "../api/wca.oidc";
+import { PRE_LOGIN_STORAGE } from "../api/wca.oidc";
 
 const SideBar = () => {
     const [loadingUser, setLoadingUser] = useState(false);
@@ -263,10 +263,7 @@ const SideBar = () => {
                     <button
                         type="button"
                         className="btn btn-primary btn-lg"
-                        onClick={() => {
-                            delete localStorage[LAST_LOGIN_ENV_STORAGE];
-                            return oidcAuth.removeUser();
-                        }}
+                        onClick={() => oidcAuth.removeUser()}
                         disabled={generatingScrambles}
                     >
                         Log Out
@@ -282,7 +279,7 @@ const SideBar = () => {
                         }}
                         disabled={generatingScrambles}
                     >
-                        {oidcAuth.isAuthenticated ? "Log Out" : "Log In"}
+                        Log In
                     </button>
                 )}
                 {!!me && (
