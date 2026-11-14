@@ -144,7 +144,8 @@ const Main = () => {
             (event) => event.rounds.length > 0,
         );
 
-        let isLoggedCompSelection = !isManualSelection && oidcAuth.isAuthenticated;
+        let isLoggedCompSelection =
+            !isManualSelection && oidcAuth.isAuthenticated;
         let isOnlineLocked = appOnlineMode && !isLoggedCompSelection;
 
         let disableScrambleButton = !anyEventHasRounds || isOnlineLocked;

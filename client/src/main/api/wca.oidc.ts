@@ -1,17 +1,24 @@
 import { BASE_PATH } from "../../paths";
-import type { OidcClientSettings } from "oidc-client-ts";
+import { type OidcClientSettings, User } from "oidc-client-ts";
 import { getQueryParameter } from "../util/query.param.util";
-
-export const PRE_LOGIN_STORAGE = "TNoodle.preLoginHref";
 
 export function isUsingStaging() {
     return getQueryParameter("staging") === "true";
 }
 
-export function gotoPreLoginPath() {
-    let preLoginHref = localStorage[PRE_LOGIN_STORAGE] || "/";
-    delete localStorage[PRE_LOGIN_STORAGE];
-    window.location.replace(preLoginHref);
+export interface CustomAuthState {
+    returnSearch?: string;
+}
+
+export function gotoPreLoginPath(user?: User) {
+    const customState = user?.state as CustomAuthState | undefined;
+    const restoredSearch = customState?.returnSearch ?? "";
+
+    window.history.replaceState(
+        {},
+        document.title,
+        `${window.location.pathname}${restoredSearch}`,
+    );
 }
 
 export const getWcaOrigin = () => {

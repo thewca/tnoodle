@@ -28,7 +28,7 @@ import { setShowColorPicker } from "../redux/slice/SettingsSlice";
 import type Competition from "../model/Competition";
 import type Person from "../model/Person";
 import { useAuth } from "react-oidc-context";
-import { PRE_LOGIN_STORAGE } from "../api/wca.oidc";
+import type { CustomAuthState } from "../api/wca.oidc";
 
 const SideBar = () => {
     const [loadingUser, setLoadingUser] = useState(false);
@@ -272,11 +272,13 @@ const SideBar = () => {
                     <button
                         type="button"
                         className="btn btn-primary btn-lg"
-                        onClick={() => {
-                            localStorage[PRE_LOGIN_STORAGE] =
-                                window.location.href;
-                            return oidcAuth.signinRedirect();
-                        }}
+                        onClick={() =>
+                            oidcAuth.signinRedirect({
+                                state: {
+                                    returnSearch: window.location.search,
+                                } satisfies CustomAuthState,
+                            })
+                        }
                         disabled={generatingScrambles}
                     >
                         Log In
