@@ -70,6 +70,9 @@ const SideBar = () => {
 
     useEffect(() => {
         if (!oidcAuth.isAuthenticated) {
+            setMe(undefined);
+            setUpcomingCompetitions(undefined);
+
             return;
         }
 
@@ -92,7 +95,7 @@ const SideBar = () => {
                 .then((response) => setUpcomingCompetitions(response.data))
                 .finally(() => setLoadingCompetitions(false));
         }
-    }, [upcomingCompetitions, me, oidcAuth.user]);
+    }, [upcomingCompetitions, me, oidcAuth.isAuthenticated, oidcAuth.user]);
 
     const competitions = useMemo(() => {
         if (
