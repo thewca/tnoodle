@@ -17,7 +17,7 @@ export function gotoPreLoginPath(user?: User) {
     window.history.replaceState(
         {},
         document.title,
-        `${window.location.pathname}${restoredSearch}`,
+        window.location.origin + BASE_PATH + restoredSearch,
     );
 }
 
