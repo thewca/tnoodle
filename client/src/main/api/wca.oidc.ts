@@ -27,7 +27,7 @@ export const getWcaOrigin = () => {
 
 const getTnoodleAppId = () => {
     if (isUsingStaging()) {
-        return "example-application-id";
+        return "example-application-id-public";
     }
 
     return (
