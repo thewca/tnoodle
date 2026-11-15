@@ -7,5 +7,6 @@ public/manifest.json
 src/serviceWorker.js
 
 src/main/api/tnoodle.redocly.ts
+src/main/api/wca.redocly.ts
 
 yarn.lock

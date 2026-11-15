@@ -1,4 +1,4 @@
-import type Wcif from "../model/Wcif";
+import type { Wcif } from "../model/Wcif";
 import { ScrambleClient } from "./tnoodle.socket";
 import type WebsocketBlobResult from "../model/WebsocketBlobResult";
 

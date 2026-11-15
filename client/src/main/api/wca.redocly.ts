@@ -158,44 +158,15 @@ export type Ops = {
  * tags) for cache keys, tracing span names, and request logging.
  */
 export const OPERATIONS = {
-    getMe: {
-        id: "getMe",
-        method: "GET",
-        path: "/api/v0/me",
-        security: [[{ scheme: "bearerAuth", kind: "bearer" }]],
-    },
-    getScrambleProgram: {
-        id: "getScrambleProgram",
-        method: "GET",
-        path: "/api/v0/scramble-program",
-    },
-    getCompetitions: {
-        id: "getCompetitions",
-        method: "GET",
-        path: "/api/v0/competitions",
-        params: [
-            { name: "managed_by_me", in: "query" },
-            { name: "start", in: "query" },
-            { name: "sort", in: "query" },
-        ],
-        security: [[{ scheme: "bearerAuth", kind: "bearer" }]],
-    },
-    getWcif: {
-        id: "getWcif",
-        method: "GET",
-        path: "/api/v0/competitions/{competitionId}/wcif/version/{formatVersion}",
-        params: [
-            { name: "competitionId", in: "path" },
-            { name: "formatVersion", in: "path" },
-        ],
-        security: [[{ scheme: "bearerAuth", kind: "bearer" }]],
-    },
+    getMe: { id: "getMe", method: "GET", path: "/api/v0/me", security: [[{ scheme: "bearerAuth", kind: "bearer" }]] },
+    getScrambleProgram: { id: "getScrambleProgram", method: "GET", path: "/api/v0/scramble-program" },
+    getCompetitions: { id: "getCompetitions", method: "GET", path: "/api/v0/competitions", params: [{ name: "managed_by_me", in: "query" }, { name: "start", in: "query" }, { name: "sort", in: "query" }], security: [[{ scheme: "bearerAuth", kind: "bearer" }]] },
+    getWcif: { id: "getWcif", method: "GET", path: "/api/v0/competitions/{competitionId}/wcif/version/{formatVersion}", params: [{ name: "competitionId", in: "path" }, { name: "formatVersion", in: "path" }], security: [[{ scheme: "bearerAuth", kind: "bearer" }]] }
 } as const satisfies Record<string, OperationDescriptor>;
 
 export type OperationId = (typeof OPERATIONS)[keyof typeof OPERATIONS]["id"];
 
-export type OperationPath =
-    (typeof OPERATIONS)[keyof typeof OPERATIONS]["path"];
+export type OperationPath = (typeof OPERATIONS)[keyof typeof OPERATIONS]["path"];
 
 // ─── Embedded runtime (@redocly/client-generator, assembled per this API's needs) ───
 
@@ -209,126 +180,121 @@ export type OperationPath =
 
 /** How one operation parameter is sent: its location plus OpenAPI query-serialization hints. */
 export type ParamSpec = {
-    name: string;
-    in: "path" | "query" | "header" | "cookie";
-    style?: "form" | "spaceDelimited" | "pipeDelimited" | "deepObject";
-    explode?: boolean;
-    allowReserved?: boolean;
+  name: string;
+  in: 'path' | 'query' | 'header' | 'cookie';
+  style?: 'form' | 'spaceDelimited' | 'pipeDelimited' | 'deepObject';
+  explode?: boolean;
+  allowReserved?: boolean;
 };
 
 /** One security scheme, denormalized onto the operation (`scheme` names the spec's scheme). */
 export type SecuritySpec =
-    | { scheme: string; kind: "bearer" | "basic" }
-    | {
-          scheme: string;
-          kind: "apiKey";
-          name: string;
-          in: "header" | "query" | "cookie";
-      };
+  | { scheme: string; kind: 'bearer' | 'basic' }
+  | { scheme: string; kind: 'apiKey'; name: string; in: 'header' | 'query' | 'cookie' };
 
 /**
  * How to auto-iterate a paginated operation (drives its `.pages()`/`.items()` members).
  * `nextCursor`, `nextLink`, and `items` are RFC 6901 JSON pointers into the page (response) value.
  */
 export type PaginationSpec =
-    | {
-          style: "cursor";
-          /** The query param the iterator advances with the response's cursor. */
-          param: string;
-          /** Optional page-size query param (recorded for tooling; never set by the runtime). */
-          limitParam?: string;
-          /** Pointer to the next cursor in the page. */
-          nextCursor: string;
-          /** Optional pointer to a boolean "more pages" flag — `false` stops iteration. */
-          hasMore?: string;
-          /** Pointer to the page's item array. */
-          items: string;
-      }
-    | {
-          style: "offset" | "page";
-          /** The numeric query param the iterator advances. */
-          param: string;
-          /** Optional page-size query param (recorded for tooling; never set by the runtime). */
-          limitParam?: string;
-          /** Pointer to the page's item array. */
-          items: string;
-      }
-    | {
-          /** RFC 8288: follow the response's `Link` header `rel="next"`; stop when absent. */
-          style: "link";
-          /** Optional page-size query param (recorded for tooling; never set by the runtime). */
-          limitParam?: string;
-          /** Pointer to the page's item array. */
-          items: string;
-      }
-    | {
-          /** Follow the next page's URL at `nextLink` in the page; stop when it is absent. */
-          style: "body-link";
-          /** Optional page-size query param (recorded for tooling; never set by the runtime). */
-          limitParam?: string;
-          /** Pointer to the next page's URL in the page. */
-          nextLink: string;
-          /** Pointer to the page's item array. */
-          items: string;
-      };
+  | {
+      style: 'cursor';
+      /** The query param the iterator advances with the response's cursor. */
+      param: string;
+      /** Optional page-size query param (recorded for tooling; never set by the runtime). */
+      limitParam?: string;
+      /** Pointer to the next cursor in the page. */
+      nextCursor: string;
+      /** Optional pointer to a boolean "more pages" flag — `false` stops iteration. */
+      hasMore?: string;
+      /** Pointer to the page's item array. */
+      items: string;
+    }
+  | {
+      style: 'offset' | 'page';
+      /** The numeric query param the iterator advances. */
+      param: string;
+      /** Optional page-size query param (recorded for tooling; never set by the runtime). */
+      limitParam?: string;
+      /** Pointer to the page's item array. */
+      items: string;
+    }
+  | {
+      /** RFC 8288: follow the response's `Link` header `rel="next"`; stop when absent. */
+      style: 'link';
+      /** Optional page-size query param (recorded for tooling; never set by the runtime). */
+      limitParam?: string;
+      /** Pointer to the page's item array. */
+      items: string;
+    }
+  | {
+      /** Follow the next page's URL at `nextLink` in the page; stop when it is absent. */
+      style: 'body-link';
+      /** Optional page-size query param (recorded for tooling; never set by the runtime). */
+      limitParam?: string;
+      /** Pointer to the next page's URL in the page. */
+      nextLink: string;
+      /** Pointer to the page's item array. */
+      items: string;
+    };
 
 /** The frozen data contract between generated code and the runtime: one operation's wire shape. */
 export type OperationDescriptor = {
-    id: string;
-    method: string;
-    path: string;
-    tags?: readonly string[];
-    params?: readonly ParamSpec[];
-    /** `multipart: true` marks a typed object body serialized to FormData by the runtime. */
-    body?: { contentType: string; multipart?: boolean };
-    /** Defaults to `'json'` (content-type negotiation on parse). */
-    responseKind?: "json" | "text" | "blob" | "void" | "sse";
-    sseDataKind?: "json" | "text";
-    /** OR-alternatives, each an AND-set: the runtime applies the first fully-configured one. */
-    security?: readonly (readonly SecuritySpec[])[];
-    pagination?: PaginationSpec;
-    /**
-     * `'grouped'` marks an operation that takes its inputs namespaced by layer even on a
-     * `argsStyle: 'flat'` client — the generator sets it where a merged call could not carry
-     * one name for two layers, and the operation's own input type says the same.
-     */
-    argsStyle?: "grouped";
-    /**
-     * Declared success-response headers for throw-mode `{ envelope: true }`.
-     * `name` is the lowercased wire name; `key` is the camelCase envelope property.
-     */
-    responseHeaders?: readonly ResponseHeaderSpec[];
+  id: string;
+  method: string;
+  path: string;
+  tags?: readonly string[];
+  params?: readonly ParamSpec[];
+  /** `multipart: true` marks a typed object body serialized to FormData by the runtime. */
+  body?: { contentType: string; multipart?: boolean };
+  /** Defaults to `'json'` (content-type negotiation on parse). */
+  responseKind?: 'json' | 'text' | 'blob' | 'void' | 'sse';
+  sseDataKind?: 'json' | 'text';
+  /** OR-alternatives, each an AND-set: the runtime applies the first fully-configured one. */
+  security?: readonly (readonly SecuritySpec[])[];
+  pagination?: PaginationSpec;
+  /**
+   * `'grouped'` marks an operation that takes its inputs namespaced by layer even on a
+   * `argsStyle: 'flat'` client — the generator sets it where a merged call could not carry
+   * one name for two layers, and the operation's own input type says the same.
+   */
+  argsStyle?: 'grouped';
+  /**
+   * Declared success-response headers for throw-mode `{ envelope: true }`.
+   * `name` is the lowercased wire name; `key` is the camelCase envelope property.
+   */
+  responseHeaders?: readonly ResponseHeaderSpec[];
 };
 
 /** One declared response header the runtime coerces into the envelope `headers` object. */
 export type ResponseHeaderSpec = {
-    name: string;
-    key: string;
-    type: "string" | "number" | "boolean";
+  name: string;
+  key: string;
+  type: 'string' | 'number' | 'boolean';
 };
 
 /** A query value: scalars, arrays of scalars, or objects (serialized as deepObject brackets). */
 export type QueryValue =
-    | string
-    | number
-    | boolean
-    | null
-    | undefined
-    | Array<string | number | boolean | null | undefined>
-    | Record<string, unknown>;
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | Array<string | number | boolean | null | undefined>
+  | Record<string, unknown>;
 
 /** A credential: a literal, or a (possibly async) function resolved per request (refresh flows). */
 export type TokenProvider = string | (() => string | Promise<string>);
 
 /** Per-instance credentials, keyed by the scheme kinds the runtime can inject. */
 export type AuthCredentials = {
-    bearer?: TokenProvider;
-    basic?: { username: string; password: string };
-    apiKey?: Record<string, TokenProvider>;
+  bearer?: TokenProvider;
+  basic?: { username: string; password: string };
+  apiKey?: Record<string, TokenProvider>;
 };
 
 /** Backoff shape: 'fixed' = constant delay; 'exponential' = doubling per attempt. */
-export type RetryStrategy = "fixed" | "exponential";
+export type RetryStrategy = 'fixed' | 'exponential';
 
 /**
  * The operation's identity, exposed to middleware for targeting (`ctx.operation`).
@@ -340,35 +306,35 @@ export type RetryStrategy = "fixed" | "exponential";
  * (byte-locked to generated output) remain assignable through middleware callbacks.
  */
 export type OperationContext<
-    Id extends string = string,
-    Path extends string = string,
-    Tag extends string = string,
+  Id extends string = string,
+  Path extends string = string,
+  Tag extends string = string,
 > = { id: Id; path: Path; tags: Tag[] };
 
 /** The mutable request context threaded through the middleware chain. */
 export type RequestContext<Op extends OperationContext = OperationContext> = {
-    url: string;
-    method: string;
-    headers: Record<string, string>;
-    body?: unknown;
-    operation: Op;
+  url: string;
+  method: string;
+  headers: Record<string, string>;
+  body?: unknown;
+  operation: Op;
 };
 
 /** The failed attempt handed to a custom `retryOn`: exactly one of `response`/`error` is set. */
 export type RetryContext<Op extends OperationContext = OperationContext> = {
-    attempt: number;
-    request: RequestContext<Op>;
-    response?: Response;
-    error?: unknown;
+  attempt: number;
+  request: RequestContext<Op>;
+  response?: Response;
+  error?: unknown;
 };
 
 /** Opt-in retry policy; a per-call override merges field-by-field over the config policy. */
 export type RetryConfig<Op extends OperationContext = OperationContext> = {
-    retries?: number;
-    retryDelay?: number;
-    retryStrategy?: RetryStrategy;
-    jitter?: boolean;
-    retryOn?: (ctx: RetryContext<Op>) => boolean | Promise<boolean>;
+  retries?: number;
+  retryDelay?: number;
+  retryStrategy?: RetryStrategy;
+  jitter?: boolean;
+  retryOn?: (ctx: RetryContext<Op>) => boolean | Promise<boolean>;
 };
 
 /**
@@ -376,119 +342,107 @@ export type RetryConfig<Op extends OperationContext = OperationContext> = {
  * (pure types); the real `ApiError` class is assignable to it.
  */
 export type ApiErrorLike = globalThis.Error & {
-    url: string;
-    status: number;
-    statusText: string;
-    body: unknown;
+  url: string;
+  status: number;
+  statusText: string;
+  body: unknown;
 };
 
 export type SettledCall = {
-    // `| undefined`, so the runtime can pass an unset response under `exactOptionalPropertyTypes`.
-    response?: Response | undefined;
-    error?: unknown;
-    attempts: number;
-    durationMs: number;
+  // `| undefined`, so the runtime can pass an unset response under `exactOptionalPropertyTypes`.
+  response?: Response | undefined;
+  error?: unknown;
+  attempts: number;
+  durationMs: number;
 };
 
 /** One interceptor: any subset of the four hooks. */
 export type Middleware<Op extends OperationContext = OperationContext> = {
-    onRequest?: (ctx: RequestContext<Op>) => void | Promise<void>;
-    onResponse?: (
-        response: Response,
-        ctx: RequestContext<Op>,
-    ) => Response | void | Promise<Response | void>;
-    /** Throw mode only: may map/replace the error. */
-    // `globalThis.Error` so a spec schema named `Error` cannot shadow it in inline mode.
-    onError?: (
-        error: ApiErrorLike,
-        ctx: RequestContext<Op>,
-    ) => globalThis.Error | Promise<globalThis.Error>;
-    onSettled?: (
-        ctx: RequestContext<Op>,
-        call: SettledCall,
-    ) => void | Promise<void>;
+  onRequest?: (ctx: RequestContext<Op>) => void | Promise<void>;
+  onResponse?: (
+    response: Response,
+    ctx: RequestContext<Op>
+  ) => Response | void | Promise<Response | void>;
+  /** Throw mode only: may map/replace the error. */
+  // `globalThis.Error` so a spec schema named `Error` cannot shadow it in inline mode.
+  onError?: (
+    error: ApiErrorLike,
+    ctx: RequestContext<Op>
+  ) => globalThis.Error | Promise<globalThis.Error>;
+  onSettled?: (ctx: RequestContext<Op>, call: SettledCall) => void | Promise<void>;
 };
 
 /** Client configuration: transport, defaults, retry policy, middleware, and credentials. */
 export type ClientConfig<Op extends OperationContext = OperationContext> = {
-    serverUrl?: string;
-    fetch?: typeof fetch;
-    headers?:
-        | Record<string, string>
-        | (() => Record<string, string> | Promise<Record<string, string>>);
-    retry?: RetryConfig<Op>;
-    /** Milliseconds before a request attempt aborts (covers the body read too; each retry
-     * attempt gets a fresh budget). Per-call `timeout` overrides it, `0` disables it.
-     * SSE streams are long-lived by design and never inherit this value. */
-    timeout?: number;
-    /** Send an `Idempotency-Key` header on POST/PATCH (one stable key per logical call,
-     * reused across retry attempts) — which also makes those retries safe under the
-     * default retry policy. `true` generates a UUID per call; a function supplies the key. */
-    idempotencyKey?: boolean | (() => string);
-    /** Identifies this client to the API via an `X-Redocly-Client` header (the generator
-     * bakes a default). Sent only OUTSIDE browsers — a custom header would force a CORS
-     * preflight. Override with your own value, or `false` to disable. */
-    clientHeader?: string | false;
-    middleware?: Middleware<Op>[];
-    auth?: AuthCredentials;
-    /** Fixed at generate time by the generator (`'throw'` when omitted); `configure()` ignores it. */
-    errorMode?: "throw" | "result";
-    /**
-     * How each call spells its inputs: `'grouped'` (the default) namespaces them by layer —
-     * `{ path, query, headers, cookies, body }` — and `'flat'` takes one merged object.
-     * Fixed at generate time, like `errorMode`, because it shapes the static types.
-     */
-    argsStyle?: "grouped" | "flat";
-    onRequest?: Middleware<Op>["onRequest"];
-    onResponse?: Middleware<Op>["onResponse"];
-    onError?: Middleware<Op>["onError"];
+  serverUrl?: string;
+  fetch?: typeof fetch;
+  headers?:
+    | Record<string, string>
+    | (() => Record<string, string> | Promise<Record<string, string>>);
+  retry?: RetryConfig<Op>;
+  /** Milliseconds before a request attempt aborts (covers the body read too; each retry
+   * attempt gets a fresh budget). Per-call `timeout` overrides it, `0` disables it.
+   * SSE streams are long-lived by design and never inherit this value. */
+  timeout?: number;
+  /** Send an `Idempotency-Key` header on POST/PATCH (one stable key per logical call,
+   * reused across retry attempts) — which also makes those retries safe under the
+   * default retry policy. `true` generates a UUID per call; a function supplies the key. */
+  idempotencyKey?: boolean | (() => string);
+  /** Identifies this client to the API via an `X-Redocly-Client` header (the generator
+   * bakes a default). Sent only OUTSIDE browsers — a custom header would force a CORS
+   * preflight. Override with your own value, or `false` to disable. */
+  clientHeader?: string | false;
+  middleware?: Middleware<Op>[];
+  auth?: AuthCredentials;
+  /** Fixed at generate time by the generator (`'throw'` when omitted); `configure()` ignores it. */
+  errorMode?: 'throw' | 'result';
+  /**
+   * How each call spells its inputs: `'grouped'` (the default) namespaces them by layer —
+   * `{ path, query, headers, cookies, body }` — and `'flat'` takes one merged object.
+   * Fixed at generate time, like `errorMode`, because it shapes the static types.
+   */
+  argsStyle?: 'grouped' | 'flat';
+  onRequest?: Middleware<Op>['onRequest'];
+  onResponse?: Middleware<Op>['onResponse'];
+  onError?: Middleware<Op>['onError'];
 };
 
 /** Response readers for the per-call `parseAs` override. */
-export type ParseAs =
-    "auto" | "json" | "text" | "blob" | "arrayBuffer" | "formData" | "stream";
+export type ParseAs = 'auto' | 'json' | 'text' | 'blob' | 'arrayBuffer' | 'formData' | 'stream';
 
 /** Per-call options: standard `RequestInit` plus a retry override, a timeout override
  * (`0` disables the config default), and a forced reader. */
 export type RequestOptions = RequestInit & {
-    retry?: RetryConfig;
-    timeout?: number;
-    /** Per-call idempotency key: a literal key, `true` to generate one, `false` to skip. */
-    idempotencyKey?: string | boolean | (() => string);
-    parseAs?: ParseAs;
-    /**
-     * Throw mode only: return `{ data, headers, response }` instead of the parsed body;
-     * ignored in result mode. The explicit `| undefined` keeps the wrappers' emitted
-     * `envelope: undefined` strip legal under `exactOptionalPropertyTypes`.
-     */
-    envelope?: boolean | undefined;
+  retry?: RetryConfig;
+  timeout?: number;
+  /** Per-call idempotency key: a literal key, `true` to generate one, `false` to skip. */
+  idempotencyKey?: string | boolean | (() => string);
+  parseAs?: ParseAs;
+  /**
+   * Throw mode only: return `{ data, headers, response }` instead of the parsed body;
+   * ignored in result mode. The explicit `| undefined` keeps the wrappers' emitted
+   * `envelope: undefined` strip legal under `exactOptionalPropertyTypes`.
+   */
+  envelope?: boolean | undefined;
 };
 
 /** Throw-mode success envelope when `RequestOptions.envelope` is `true`. */
 export type Envelope<TData, THeaders = Record<string, never>> = {
-    data: TData;
-    headers: THeaders;
-    response: Response;
+  data: TData;
+  headers: THeaders;
+  response: Response;
 };
 
 /** Per-call options for an SSE stream; reconnect defaults to true. */
-export type SseOptions = RequestInit & {
-    reconnect?: boolean;
-    reconnectDelay?: number;
-};
+export type SseOptions = RequestInit & { reconnect?: boolean; reconnectDelay?: number };
 
 /** A single decoded Server-Sent Event with its payload typed from the spec. */
-export type ServerSentEvent<T> = {
-    event?: string;
-    data: T;
-    id?: string;
-    retry?: number;
-};
+export type ServerSentEvent<T> = { event?: string; data: T; id?: string; retry?: number };
 
 /** Result-mode return shape: exactly one of `data`/`error` is set. */
 export type Result<TData, TError> =
-    | { data: TData; error: undefined; response: Response }
-    | { data: undefined; error: TError; response: Response };
+  | { data: TData; error: undefined; response: Response }
+  | { data: undefined; error: TError; response: Response };
 
 /**
  * The generated `Ops` type's shape: per-operation args/result, plus `kind: 'sse'` for
@@ -497,31 +451,31 @@ export type Result<TData, TError> =
  * iteration unwraps the `Result` envelope the one-shot `result` carries).
  */
 export type OpsShape = Record<
-    string,
-    {
-        args: object;
-        result: unknown;
-        kind?: "sse";
-        item?: unknown;
-        page?: unknown;
-        /** Declared success-response headers for `{ envelope: true }` (camelCase keys). */
-        headers?: object;
-        /** Result-mode entries ignore the throw-only `envelope` option. */
-        mode?: "result";
-    }
+  string,
+  {
+    args: object;
+    result: unknown;
+    kind?: 'sse';
+    item?: unknown;
+    page?: unknown;
+    /** Declared success-response headers for `{ envelope: true }` (camelCase keys). */
+    headers?: object;
+    /** Result-mode entries ignore the throw-only `envelope` option. */
+    mode?: 'result';
+  }
 >;
 
 /** The always-present client members (assigned after the operation loop — they win collisions). */
 export type ClientCore<Op extends OperationContext = OperationContext> = {
-    /** Merge into the config; note `middleware` REPLACES the chain (use `use()` to compose). */
-    configure(config: ClientConfig<Op>): void;
-    /** Append interceptors (composes with baked/publisher middleware). */
-    use(...middleware: Middleware<Op>[]): void;
-    auth: {
-        bearer(token: TokenProvider): void;
-        basic(username: string, password: string): void;
-        apiKey(scheme: string, value: TokenProvider): void;
-    };
+  /** Merge into the config; note `middleware` REPLACES the chain (use `use()` to compose). */
+  configure(config: ClientConfig<Op>): void;
+  /** Append interceptors (composes with baked/publisher middleware). */
+  use(...middleware: Middleware<Op>[]): void;
+  auth: {
+    bearer(token: TokenProvider): void;
+    basic(username: string, password: string): void;
+    apiKey(scheme: string, value: TokenProvider): void;
+  };
 };
 
 /**
@@ -537,8 +491,8 @@ type NoRequiredKeys<A> = {} extends A ? true : false;
  * or the method's own `result` (throw mode — already the raw page).
  */
 type PageOf<Entry extends OpsShape[string]> = Entry extends { page: unknown }
-    ? Entry["page"]
-    : Entry["result"];
+  ? Entry['page']
+  : Entry['result'];
 
 /**
  * The auto-pagination members intersected onto a paginated method — present exactly when
@@ -548,29 +502,17 @@ type PageOf<Entry extends OpsShape[string]> = Entry extends { page: unknown }
  * failed page aborts iteration by throwing `ApiError`, even on result-mode clients; the
  * `onError` middleware hook (throw-mode-only) is not invoked.
  */
-type Paginated<Entry extends OpsShape[string]> = "item" extends keyof Entry
-    ? NoRequiredKeys<Entry["args"]> extends true
-        ? {
-              pages(
-                  args?: Entry["args"],
-                  init?: RequestOptions,
-              ): AsyncGenerator<PageOf<Entry>>;
-              items(
-                  args?: Entry["args"],
-                  init?: RequestOptions,
-              ): AsyncGenerator<Entry["item"]>;
-          }
-        : {
-              pages(
-                  args: Entry["args"],
-                  init?: RequestOptions,
-              ): AsyncGenerator<PageOf<Entry>>;
-              items(
-                  args: Entry["args"],
-                  init?: RequestOptions,
-              ): AsyncGenerator<Entry["item"]>;
-          }
-    : unknown;
+type Paginated<Entry extends OpsShape[string]> = 'item' extends keyof Entry
+  ? NoRequiredKeys<Entry['args']> extends true
+    ? {
+        pages(args?: Entry['args'], init?: RequestOptions): AsyncGenerator<PageOf<Entry>>;
+        items(args?: Entry['args'], init?: RequestOptions): AsyncGenerator<Entry['item']>;
+      }
+    : {
+        pages(args: Entry['args'], init?: RequestOptions): AsyncGenerator<PageOf<Entry>>;
+        items(args: Entry['args'], init?: RequestOptions): AsyncGenerator<Entry['item']>;
+      }
+  : unknown;
 
 /**
  * The stable identity every client method carries: the SPEC operationId (also set as
@@ -580,9 +522,9 @@ type Paginated<Entry extends OpsShape[string]> = "item" extends keyof Entry
 export type OperationMethodIdentity = { readonly operationId: string };
 
 /** Declared response-header bag for an Ops entry; empty object when none are declared. */
-type HeadersOf<Entry extends OpsShape[string]> = "headers" extends keyof Entry
-    ? NonNullable<Entry["headers"]>
-    : Record<string, never>;
+type HeadersOf<Entry extends OpsShape[string]> = 'headers' extends keyof Entry
+  ? NonNullable<Entry['headers']>
+  : Record<string, never>;
 
 /**
  * Return type of a throw-mode call: the body by default, `Envelope<…>` for a literal
@@ -594,121 +536,102 @@ type HeadersOf<Entry extends OpsShape[string]> = "headers" extends keyof Entry
  * `boolean | undefined`).
  */
 export type EnvelopeResult<
-    TData,
-    THeaders,
-    TInit extends RequestOptions | undefined,
+  TData,
+  THeaders,
+  TInit extends RequestOptions | undefined,
 > = TInit extends undefined
-    ? TData
-    : RequestOptions extends TInit
-      ? TInit extends RequestOptions
-          ? TData
-          : EnvelopeResultForKnownInit<TData, THeaders, TInit>
-      : EnvelopeResultForKnownInit<TData, THeaders, TInit>;
+  ? TData
+  : RequestOptions extends TInit
+    ? TInit extends RequestOptions
+      ? TData
+      : EnvelopeResultForKnownInit<TData, THeaders, TInit>
+    : EnvelopeResultForKnownInit<TData, THeaders, TInit>;
 
-type EnvelopeResultForKnownInit<TData, THeaders, TInit> =
-    "envelope" extends keyof TInit
-        ? [TInit["envelope" & keyof TInit]] extends [true]
-            ? Envelope<TData, THeaders>
-            : [TInit["envelope" & keyof TInit]] extends [false | undefined]
-              ? TData
-              : TData | Envelope<TData, THeaders>
-        : TData;
+type EnvelopeResultForKnownInit<TData, THeaders, TInit> = 'envelope' extends keyof TInit
+  ? [TInit['envelope' & keyof TInit]] extends [true]
+    ? Envelope<TData, THeaders>
+    : [TInit['envelope' & keyof TInit]] extends [false | undefined]
+      ? TData
+      : TData | Envelope<TData, THeaders>
+  : TData;
 
 /** A one-shot method whose return shape never varies with per-call options. */
 type BodyMethod<Entry extends OpsShape[string]> =
-    NoRequiredKeys<Entry["args"]> extends true
-        ? (
-              args?: Entry["args"],
-              init?: RequestOptions,
-          ) => Promise<Entry["result"]>
-        : (
-              args: Entry["args"],
-              init?: RequestOptions,
-          ) => Promise<Entry["result"]>;
+  NoRequiredKeys<Entry['args']> extends true
+    ? (args?: Entry['args'], init?: RequestOptions) => Promise<Entry['result']>
+    : (args: Entry['args'], init?: RequestOptions) => Promise<Entry['result']>;
 
 /**
  * One-shot (non-SSE) method: default returns the body; `{ envelope: true }` returns
  * `{ data, headers, response }` with typed declared headers.
  */
 type ThrowMethod<Entry extends OpsShape[string]> =
-    NoRequiredKeys<Entry["args"]> extends true
-        ? <Init extends RequestOptions | undefined = undefined>(
-              args?: Entry["args"],
-              init?: Init,
-          ) => Promise<EnvelopeResult<Entry["result"], HeadersOf<Entry>, Init>>
-        : <Init extends RequestOptions | undefined = undefined>(
-              args: Entry["args"],
-              init?: Init,
-          ) => Promise<EnvelopeResult<Entry["result"], HeadersOf<Entry>, Init>>;
+  NoRequiredKeys<Entry['args']> extends true
+    ? <Init extends RequestOptions | undefined = undefined>(
+        args?: Entry['args'],
+        init?: Init
+      ) => Promise<EnvelopeResult<Entry['result'], HeadersOf<Entry>, Init>>
+    : <Init extends RequestOptions | undefined = undefined>(
+        args: Entry['args'],
+        init?: Init
+      ) => Promise<EnvelopeResult<Entry['result'], HeadersOf<Entry>, Init>>;
 
 /** The typed instance client: one bound method per operation plus the core members. */
-export type Client<
-    Ops extends OpsShape,
-    Op extends OperationContext = OperationContext,
-> = {
-    [K in keyof Ops]: Ops[K] extends { kind: "sse" }
-        ? (NoRequiredKeys<Ops[K]["args"]> extends true
-              ? (
-                    args?: Ops[K]["args"],
-                    init?: SseOptions,
-                ) => AsyncGenerator<ServerSentEvent<Ops[K]["result"]>>
-              : (
-                    args: Ops[K]["args"],
-                    init?: SseOptions,
-                ) => AsyncGenerator<ServerSentEvent<Ops[K]["result"]>>) &
-              OperationMethodIdentity
-        : (Ops[K] extends { mode: "result" }
-              ? BodyMethod<Ops[K]>
-              : ThrowMethod<Ops[K]>) &
-              OperationMethodIdentity &
-              Paginated<Ops[K]>;
+export type Client<Ops extends OpsShape, Op extends OperationContext = OperationContext> = {
+  [K in keyof Ops]: Ops[K] extends { kind: 'sse' }
+    ? (NoRequiredKeys<Ops[K]['args']> extends true
+        ? (
+            args?: Ops[K]['args'],
+            init?: SseOptions
+          ) => AsyncGenerator<ServerSentEvent<Ops[K]['result']>>
+        : (
+            args: Ops[K]['args'],
+            init?: SseOptions
+          ) => AsyncGenerator<ServerSentEvent<Ops[K]['result']>>) &
+        OperationMethodIdentity
+    : (Ops[K] extends { mode: 'result' } ? BodyMethod<Ops[K]> : ThrowMethod<Ops[K]>) &
+        OperationMethodIdentity &
+        Paginated<Ops[K]>;
 } & ClientCore<Op>;
 
 /** The error thrown (throw mode) for a non-2xx response, carrying the decoded error body. */
 export class ApiError extends Error {
-    public readonly url: string;
-    public readonly status: number;
-    public readonly statusText: string;
-    public readonly body: unknown;
-    constructor(
-        url: string,
-        status: number,
-        statusText: string,
-        body: unknown,
-    ) {
-        super(`Request failed with status ${status}`);
-        this.name = "ApiError";
-        this.url = url;
-        this.status = status;
-        this.statusText = statusText;
-        this.body = body;
-    }
+  public readonly url: string;
+  public readonly status: number;
+  public readonly statusText: string;
+  public readonly body: unknown;
+  constructor(url: string, status: number, statusText: string, body: unknown) {
+    super(`Request failed with status ${status}`);
+    this.name = 'ApiError';
+    this.url = url;
+    this.status = status;
+    this.statusText = statusText;
+    this.body = body;
+  }
 }
 
 /** The error thrown when a request attempt exceeds the configured `timeout` — carries
  * the context a log line needs (which operation, what budget, which attempt). */
 export class TimeoutError extends Error {
-    public readonly operationId: string;
-    public readonly timeout: number;
-    public readonly attempt: number;
-    constructor(operationId: string, timeout: number, attempt: number) {
-        super(
-            `Request "${operationId}" timed out after ${timeout} ms (attempt ${attempt})`,
-        );
-        this.name = "TimeoutError";
-        this.operationId = operationId;
-        this.timeout = timeout;
-        this.attempt = attempt;
-    }
+  public readonly operationId: string;
+  public readonly timeout: number;
+  public readonly attempt: number;
+  constructor(operationId: string, timeout: number, attempt: number) {
+    super(`Request "${operationId}" timed out after ${timeout} ms (attempt ${attempt})`);
+    this.name = 'TimeoutError';
+    this.operationId = operationId;
+    this.timeout = timeout;
+    this.attempt = attempt;
+  }
 }
 
 /** The error to throw for an aborted request: the caller's abort reason when it is an Error. */
 // `globalThis.Error` (not bare `Error`) so a spec schema named `Error` cannot shadow it
 // when this module is embedded alongside generated types (inline mode).
 function abortError(signal: AbortSignal): globalThis.Error {
-    const reason = (signal as { reason?: unknown }).reason;
-    if (reason instanceof Error) return reason;
-    return new DOMException("The operation was aborted.", "AbortError");
+  const reason = (signal as { reason?: unknown }).reason;
+  if (reason instanceof Error) return reason;
+  return new DOMException('The operation was aborted.', 'AbortError');
 }
 
 /**
@@ -716,9 +639,9 @@ function abortError(signal: AbortSignal): globalThis.Error {
  * OpenAPI defaults (`style: 'form'`, `explode: true`) before building one.
  */
 type QueryStyle = {
-    style: NonNullable<ParamSpec["style"]>;
-    explode: boolean;
-    allowReserved?: boolean;
+  style: NonNullable<ParamSpec['style']>;
+  explode: boolean;
+  allowReserved?: boolean;
 };
 
 /**
@@ -726,23 +649,19 @@ type QueryStyle = {
  * `filter=a/b` survives instead of `filter=a%2Fb`.
  */
 function encodeReserved(value: string): string {
-    return encodeURIComponent(value).replace(
-        /%(3A|2F|3F|23|5B|5D|40|21|24|26|27|28|29|2A|2B|2C|3B|3D)/g,
-        (match) => decodeURIComponent(match),
-    );
+  return encodeURIComponent(value).replace(
+    /%(3A|2F|3F|23|5B|5D|40|21|24|26|27|28|29|2A|2B|2C|3B|3D)/g,
+    (match) => decodeURIComponent(match)
+  );
 }
 
 /** Substitute `{name}` template segments with encoded values; a missing value is a caller bug. */
-function substitutePath(
-    template: string,
-    values: Record<string, unknown>,
-): string {
-    return template.replace(/\{([^{}]+)\}/g, (_match, name: string) => {
-        const value = values[name];
-        if (value === undefined)
-            throw new Error(`Missing path parameter "${name}"`);
-        return encodeURIComponent(String(value));
-    });
+function substitutePath(template: string, values: Record<string, unknown>): string {
+  return template.replace(/\{([^{}]+)\}/g, (_match, name: string) => {
+    const value = values[name];
+    if (value === undefined) throw new Error(`Missing path parameter "${name}"`);
+    return encodeURIComponent(String(value));
+  });
 }
 
 /**
@@ -752,85 +671,70 @@ function substitutePath(
  * `deepObject` brackets, and `null`/`undefined` entries are skipped.
  */
 function buildUrl(
-    serverUrl: string,
-    path: string,
-    query?: Record<string, QueryValue>,
-    styles?: Record<string, QueryStyle>,
+  serverUrl: string,
+  path: string,
+  query?: Record<string, QueryValue>,
+  styles?: Record<string, QueryStyle>
 ): string {
-    // Trim trailing slashes with a scan, not `/\/+$/` — an anchored `+` regex is
-    // quadratic on adversarial many-slash input (the server URL is caller data).
-    let end = serverUrl.length;
-    while (end > 0 && serverUrl.charCodeAt(end - 1) === 47 /* '/' */) end--;
-    const url = serverUrl.slice(0, end) + path;
-    if (!query) return url;
-    const params = new URLSearchParams();
-    const raw: string[] = [];
-    for (const [key, value] of Object.entries(query)) {
-        if (value === undefined || value === null) continue;
-        const spec = styles?.[key];
-        if (!spec) {
-            if (Array.isArray(value)) {
-                for (const v of value) {
-                    if (v !== undefined && v !== null)
-                        params.append(key, String(v));
-                }
-            } else if (Object(value) === value) {
-                // Object-valued query params use `deepObject` style: key[subKey]=subValue.
-                for (const [subKey, subValue] of Object.entries(value)) {
-                    if (subValue !== undefined && subValue !== null) {
-                        params.append(`${key}[${subKey}]`, String(subValue));
-                    }
-                }
-            } else {
-                params.append(key, String(value));
-            }
-            continue;
+  // Trim trailing slashes with a scan, not `/\/+$/` — an anchored `+` regex is
+  // quadratic on adversarial many-slash input (the server URL is caller data).
+  let end = serverUrl.length;
+  while (end > 0 && serverUrl.charCodeAt(end - 1) === 47 /* '/' */) end--;
+  const url = serverUrl.slice(0, end) + path;
+  if (!query) return url;
+  const params = new URLSearchParams();
+  const raw: string[] = [];
+  for (const [key, value] of Object.entries(query)) {
+    if (value === undefined || value === null) continue;
+    const spec = styles?.[key];
+    if (!spec) {
+      if (Array.isArray(value)) {
+        for (const v of value) {
+          if (v !== undefined && v !== null) params.append(key, String(v));
         }
-        if (Array.isArray(value)) {
-            const items = value
-                .filter((v) => v !== undefined && v !== null)
-                .map(String);
-            if (spec.style === "form" && spec.explode) {
-                for (const v of items) {
-                    if (spec.allowReserved)
-                        raw.push(`${key}=${encodeReserved(v)}`);
-                    else params.append(key, v);
-                }
-            } else {
-                // Delimited styles put the LITERAL delimiter on the wire; only the
-                // values are encoded. `%20` (not `+`) is the literal space delimiter.
-                const delim =
-                    spec.style === "pipeDelimited"
-                        ? "|"
-                        : spec.style === "spaceDelimited"
-                          ? "%20"
-                          : ",";
-                const enc = spec.allowReserved
-                    ? encodeReserved
-                    : encodeURIComponent;
-                raw.push(
-                    `${encodeURIComponent(key)}=${items.map(enc).join(delim)}`,
-                );
-            }
-        } else if (Object(value) === value) {
-            // `deepObject` (and any object spec, for now): key[subKey]=subValue.
-            for (const [subKey, subValue] of Object.entries(value)) {
-                if (subValue !== undefined && subValue !== null) {
-                    if (spec.allowReserved)
-                        raw.push(
-                            `${key}[${subKey}]=${encodeReserved(String(subValue))}`,
-                        );
-                    else params.append(`${key}[${subKey}]`, String(subValue));
-                }
-            }
-        } else if (spec.allowReserved) {
-            raw.push(`${key}=${encodeReserved(String(value))}`);
-        } else {
-            params.append(key, String(value));
+      } else if (Object(value) === value) {
+        // Object-valued query params use `deepObject` style: key[subKey]=subValue.
+        for (const [subKey, subValue] of Object.entries(value)) {
+          if (subValue !== undefined && subValue !== null) {
+            params.append(`${key}[${subKey}]`, String(subValue));
+          }
         }
+      } else {
+        params.append(key, String(value));
+      }
+      continue;
     }
-    const qs = [params.toString(), ...raw].filter(Boolean).join("&");
-    return qs ? `${url}?${qs}` : url;
+    if (Array.isArray(value)) {
+      const items = value.filter((v) => v !== undefined && v !== null).map(String);
+      if (spec.style === 'form' && spec.explode) {
+        for (const v of items) {
+          if (spec.allowReserved) raw.push(`${key}=${encodeReserved(v)}`);
+          else params.append(key, v);
+        }
+      } else {
+        // Delimited styles put the LITERAL delimiter on the wire; only the
+        // values are encoded. `%20` (not `+`) is the literal space delimiter.
+        const delim =
+          spec.style === 'pipeDelimited' ? '|' : spec.style === 'spaceDelimited' ? '%20' : ',';
+        const enc = spec.allowReserved ? encodeReserved : encodeURIComponent;
+        raw.push(`${encodeURIComponent(key)}=${items.map(enc).join(delim)}`);
+      }
+    } else if (Object(value) === value) {
+      // `deepObject` (and any object spec, for now): key[subKey]=subValue.
+      for (const [subKey, subValue] of Object.entries(value)) {
+        if (subValue !== undefined && subValue !== null) {
+          if (spec.allowReserved) raw.push(`${key}[${subKey}]=${encodeReserved(String(subValue))}`);
+          else params.append(`${key}[${subKey}]`, String(subValue));
+        }
+      }
+    } else if (spec.allowReserved) {
+      raw.push(`${key}=${encodeReserved(String(value))}`);
+    } else {
+      params.append(key, String(value));
+    }
+  }
+  const qs = [params.toString(), ...raw].filter(Boolean).join('&');
+  return qs ? `${url}?${qs}` : url;
 }
 
 /**
@@ -841,62 +745,51 @@ function buildUrl(
  * behind a spec gap is the worse failure — consumers can reach it with a cast
  * while the API description catches up.
  */
-async function parse(
-    response: Response,
-    kind: ParseAs | "void",
-): Promise<unknown> {
-    if (kind === "void") {
-        if (
-            response.status === 204 ||
-            response.status === 205 ||
-            response.status === 304
-        ) {
-            return undefined;
-        }
-        const contentType = (
-            response.headers.get("content-type") ?? ""
-        ).toLowerCase();
-        if (!contentType.includes("json")) return undefined;
-        // Best-effort: an empty or malformed body on an undeclared response stays undefined.
-        const text = await response.text().catch(() => "");
-        if (text === "") return undefined;
-        try {
-            return JSON.parse(text);
-        } catch {
-            return undefined;
-        }
+async function parse(response: Response, kind: ParseAs | 'void'): Promise<unknown> {
+  if (kind === 'void') {
+    if (response.status === 204 || response.status === 205 || response.status === 304) {
+      return undefined;
     }
-    if (response.status === 204) return undefined;
-    if (kind === "stream") return response.body;
-    if (kind === "blob") return response.blob();
-    if (kind === "arrayBuffer") return response.arrayBuffer();
-    if (kind === "formData") return response.formData();
-    if (kind === "text") return response.text();
-    if (kind === "json") return response.json();
-    // 'auto' — negotiate from the response's content type (case-insensitively:
-    // `Text/Plain` and `application/JSON` are valid per RFC 9110).
-    const contentType = (
-        response.headers.get("content-type") ?? ""
-    ).toLowerCase();
-    if (contentType.includes("json")) return response.json();
-    if (contentType.startsWith("text/")) return response.text();
-    // An untyped body reads as a Blob — but an EMPTY one resolves to undefined: a 2xx
-    // with `Content-Length: 0` must not yield a truthy `new Blob([])` that silently
-    // defeats every `!data` guard downstream.
-    const blob = await response.blob();
-    return blob.size > 0 ? blob : undefined;
+    const contentType = (response.headers.get('content-type') ?? '').toLowerCase();
+    if (!contentType.includes('json')) return undefined;
+    // Best-effort: an empty or malformed body on an undeclared response stays undefined.
+    const text = await response.text().catch(() => '');
+    if (text === '') return undefined;
+    try {
+      return JSON.parse(text);
+    } catch {
+      return undefined;
+    }
+  }
+  if (response.status === 204) return undefined;
+  if (kind === 'stream') return response.body;
+  if (kind === 'blob') return response.blob();
+  if (kind === 'arrayBuffer') return response.arrayBuffer();
+  if (kind === 'formData') return response.formData();
+  if (kind === 'text') return response.text();
+  if (kind === 'json') return response.json();
+  // 'auto' — negotiate from the response's content type (case-insensitively:
+  // `Text/Plain` and `application/JSON` are valid per RFC 9110).
+  const contentType = (response.headers.get('content-type') ?? '').toLowerCase();
+  if (contentType.includes('json')) return response.json();
+  if (contentType.startsWith('text/')) return response.text();
+  // An untyped body reads as a Blob — but an EMPTY one resolves to undefined: a 2xx
+  // with `Content-Length: 0` must not yield a truthy `new Blob([])` that silently
+  // defeats every `!data` guard downstream.
+  const blob = await response.blob();
+  return blob.size > 0 ? blob : undefined;
 }
 
 /** Best-effort decode of a non-2xx body (JSON when declared, else text; undefined on failure). */
 async function readError(response: Response): Promise<unknown> {
-    const contentType = response.headers.get("content-type") ?? "";
-    if (contentType.toLowerCase().includes("json")) {
-        return response.json().catch(() => undefined);
-    }
-    return response.text().catch(() => undefined);
+  const contentType = response.headers.get('content-type') ?? '';
+  if (contentType.toLowerCase().includes('json')) {
+    return response.json().catch(() => undefined);
+  }
+  return response.text().catch(() => undefined);
 }
 
-const IDEMPOTENT_METHODS = new Set(["GET", "HEAD", "PUT", "DELETE", "OPTIONS"]);
+const IDEMPOTENT_METHODS = new Set(['GET', 'HEAD', 'PUT', 'DELETE', 'OPTIONS']);
 const TRANSIENT_STATUS = new Set([408, 429, 500, 502, 503, 504]);
 
 /**
@@ -905,14 +798,12 @@ const TRANSIENT_STATUS = new Set([408, 429, 500, 502, 503, 504]);
  * transient status. A custom `retryOn` fully replaces this (no method check kept).
  */
 export function defaultRetryOn(ctx: RetryContext): boolean {
-    const safeToResend =
-        IDEMPOTENT_METHODS.has(ctx.request.method.toUpperCase()) ||
-        "Idempotency-Key" in ctx.request.headers ||
-        "idempotency-key" in ctx.request.headers;
-    if (!safeToResend) return false;
-    return (
-        ctx.response === undefined || TRANSIENT_STATUS.has(ctx.response.status)
-    );
+  const safeToResend =
+    IDEMPOTENT_METHODS.has(ctx.request.method.toUpperCase()) ||
+    'Idempotency-Key' in ctx.request.headers ||
+    'idempotency-key' in ctx.request.headers;
+  if (!safeToResend) return false;
+  return ctx.response === undefined || TRANSIENT_STATUS.has(ctx.response.status);
 }
 
 /**
@@ -920,63 +811,54 @@ export function defaultRetryOn(ctx: RetryContext): boolean {
  * wins; otherwise fixed/exponential backoff over `retryDelay`, with full jitter
  * unless `jitter === false`.
  */
-function retryDelay(
-    retry: RetryConfig,
-    attempt: number,
-    retryAfter: string | null,
-): number {
-    if (retryAfter) {
-        const seconds = Number(retryAfter);
-        if (!Number.isNaN(seconds)) return seconds * 1000;
-        const when = Date.parse(retryAfter);
-        if (!Number.isNaN(when)) return Math.max(0, when - Date.now());
-    }
-    const base = retry.retryDelay ?? 1000;
-    const raw =
-        retry.retryStrategy === "fixed"
-            ? base
-            : base * Math.pow(2, attempt - 1);
-    return retry.jitter === false ? raw : Math.random() * raw;
+function retryDelay(retry: RetryConfig, attempt: number, retryAfter: string | null): number {
+  if (retryAfter) {
+    const seconds = Number(retryAfter);
+    if (!Number.isNaN(seconds)) return seconds * 1000;
+    const when = Date.parse(retryAfter);
+    if (!Number.isNaN(when)) return Math.max(0, when - Date.now());
+  }
+  const base = retry.retryDelay ?? 1000;
+  const raw = retry.retryStrategy === 'fixed' ? base : base * Math.pow(2, attempt - 1);
+  return retry.jitter === false ? raw : Math.random() * raw;
 }
 
 /** Abort-aware sleep: resolves after `ms`, rejects with the abort reason immediately on abort. */
 function sleep(ms: number, signal?: AbortSignal): Promise<void> {
-    return new Promise((resolve, reject) => {
-        if (signal?.aborted) {
-            reject(abortError(signal));
-            return;
-        }
-        const onAbort = () => {
-            clearTimeout(timer);
-            reject(abortError(signal as AbortSignal));
-        };
-        const timer = setTimeout(() => {
-            if (signal) signal.removeEventListener("abort", onAbort);
-            resolve();
-        }, ms);
-        if (signal) signal.addEventListener("abort", onAbort, { once: true });
-    });
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(abortError(signal));
+      return;
+    }
+    const onAbort = () => {
+      clearTimeout(timer);
+      reject(abortError(signal as AbortSignal));
+    };
+    const timer = setTimeout(() => {
+      if (signal) signal.removeEventListener('abort', onAbort);
+      resolve();
+    }, ms);
+    if (signal) signal.addEventListener('abort', onAbort, { once: true });
+  });
 }
 
 /** Resolve a credential: a literal passes through; a function is awaited per request. */
 async function resolveToken(provider: TokenProvider): Promise<string> {
-    return typeof provider === "function" ? await provider() : provider;
+  return typeof provider === 'function' ? await provider() : provider;
 }
 
 /** UTF-8-safe base64: bare `btoa` throws on non-Latin-1 credentials (RFC 7617 allows UTF-8). */
 function encodeBase64(text: string): string {
-    let binary = "";
-    for (const byte of new TextEncoder().encode(text))
-        binary += String.fromCharCode(byte);
-    return btoa(binary);
+  let binary = '';
+  for (const byte of new TextEncoder().encode(text)) binary += String.fromCharCode(byte);
+  return btoa(binary);
 }
 
 /** Whether a credential for this scheme is configured on the instance. */
 function isConfigured(scheme: SecuritySpec, config: ClientConfig): boolean {
-    if (scheme.kind === "apiKey")
-        return config.auth?.apiKey?.[scheme.scheme] !== undefined;
-    if (scheme.kind === "bearer") return config.auth?.bearer !== undefined;
-    return config.auth?.basic !== undefined;
+  if (scheme.kind === 'apiKey') return config.auth?.apiKey?.[scheme.scheme] !== undefined;
+  if (scheme.kind === 'bearer') return config.auth?.bearer !== undefined;
+  return config.auth?.basic !== undefined;
 }
 
 /**
@@ -989,41 +871,38 @@ function isConfigured(scheme: SecuritySpec, config: ClientConfig): boolean {
  * Cookie-borne apiKeys fold into a single `Cookie` header joined with `; `.
  */
 async function resolveAuth(
-    security: readonly (readonly SecuritySpec[])[],
-    config: ClientConfig,
+  security: readonly (readonly SecuritySpec[])[],
+  config: ClientConfig
 ): Promise<{ headers: Record<string, string>; query: Record<string, string> }> {
-    const alternative =
-        security.find((schemes) =>
-            schemes.every((scheme) => isConfigured(scheme, config)),
-        ) ??
-        security[0] ??
-        [];
-    const headers: Record<string, string> = {};
-    const query: Record<string, string> = {};
-    const cookies: string[] = [];
-    for (const scheme of alternative) {
-        if (scheme.kind === "apiKey") {
-            const provider = config.auth?.apiKey?.[scheme.scheme];
-            if (provider === undefined) continue;
-            const value = await resolveToken(provider);
-            if (scheme.in === "header") headers[scheme.name] = value;
-            else if (scheme.in === "query") query[scheme.name] = value;
-            // Cookie values may contain reserved characters (`;`, `=`, space, …); percent-encode
-            // so the credential can't break the `Cookie` header syntax.
-            else cookies.push(`${scheme.name}=${encodeURIComponent(value)}`);
-        } else if (scheme.kind === "bearer") {
-            const provider = config.auth?.bearer;
-            if (provider !== undefined)
-                headers.Authorization = `Bearer ${await resolveToken(provider)}`;
-        } else {
-            const basic = config.auth?.basic;
-            if (basic !== undefined) {
-                headers.Authorization = `Basic ${encodeBase64(`${basic.username}:${basic.password}`)}`;
-            }
-        }
+  const alternative =
+    security.find((schemes) => schemes.every((scheme) => isConfigured(scheme, config))) ??
+    security[0] ??
+    [];
+  const headers: Record<string, string> = {};
+  const query: Record<string, string> = {};
+  const cookies: string[] = [];
+  for (const scheme of alternative) {
+    if (scheme.kind === 'apiKey') {
+      const provider = config.auth?.apiKey?.[scheme.scheme];
+      if (provider === undefined) continue;
+      const value = await resolveToken(provider);
+      if (scheme.in === 'header') headers[scheme.name] = value;
+      else if (scheme.in === 'query') query[scheme.name] = value;
+      // Cookie values may contain reserved characters (`;`, `=`, space, …); percent-encode
+      // so the credential can't break the `Cookie` header syntax.
+      else cookies.push(`${scheme.name}=${encodeURIComponent(value)}`);
+    } else if (scheme.kind === 'bearer') {
+      const provider = config.auth?.bearer;
+      if (provider !== undefined) headers.Authorization = `Bearer ${await resolveToken(provider)}`;
+    } else {
+      const basic = config.auth?.basic;
+      if (basic !== undefined) {
+        headers.Authorization = `Basic ${encodeBase64(`${basic.username}:${basic.password}`)}`;
+      }
     }
-    if (cookies.length > 0) headers.Cookie = cookies.join("; ");
-    return { headers, query };
+  }
+  if (cookies.length > 0) headers.Cookie = cookies.join('; ');
+  return { headers, query };
 }
 
 /**
@@ -1031,27 +910,25 @@ async function resolveAuth(
  * `createClient` (the same seam the future inline-mode assembler relies on).
  */
 type SendCapabilities = {
-    /** Serialize a typed multipart body (a plain object) to FormData. */
-    serializeMultipart?: (body: Record<string, unknown>) => FormData;
+  /** Serialize a typed multipart body (a plain object) to FormData. */
+  serializeMultipart?: (body: Record<string, unknown>) => FormData;
 };
 
 /**
  * Normalize a caller's `HeadersInit` (plain record, `Headers` instance, or entry pairs)
  * to a plain record — spreading a `Headers` or an array contributes no entries.
  */
-function toHeaderRecord(
-    headers: HeadersInit | undefined,
-): Record<string, string> {
-    if (headers === undefined) return {};
-    if (headers instanceof Headers) {
-        const record: Record<string, string> = {};
-        headers.forEach((value, key) => {
-            record[key] = value;
-        });
-        return record;
-    }
-    if (Array.isArray(headers)) return Object.fromEntries(headers);
-    return headers;
+function toHeaderRecord(headers: HeadersInit | undefined): Record<string, string> {
+  if (headers === undefined) return {};
+  if (headers instanceof Headers) {
+    const record: Record<string, string> = {};
+    headers.forEach((value, key) => {
+      record[key] = value;
+    });
+    return record;
+  }
+  if (Array.isArray(headers)) return Object.fromEntries(headers);
+  return headers;
 }
 
 /**
@@ -1059,21 +936,17 @@ function toHeaderRecord(
  * `onError` config hooks as one implicit first middleware, then `config.middleware`.
  */
 function middlewareChain(config: ClientConfig): Middleware[] {
-    const single =
-        config.onRequest || config.onResponse || config.onError
-            ? [
-                  {
-                      ...(config.onRequest
-                          ? { onRequest: config.onRequest }
-                          : {}),
-                      ...(config.onResponse
-                          ? { onResponse: config.onResponse }
-                          : {}),
-                      ...(config.onError ? { onError: config.onError } : {}),
-                  },
-              ]
-            : [];
-    return [...single, ...(config.middleware ?? [])];
+  const single =
+    config.onRequest || config.onResponse || config.onError
+      ? [
+          {
+            ...(config.onRequest ? { onRequest: config.onRequest } : {}),
+            ...(config.onResponse ? { onResponse: config.onResponse } : {}),
+            ...(config.onError ? { onError: config.onError } : {}),
+          },
+        ]
+      : [];
+  return [...single, ...(config.middleware ?? [])];
 }
 
 /**
@@ -1082,15 +955,12 @@ function middlewareChain(config: ClientConfig): Middleware[] {
  * static, and every request with a timeout would throw before `fetch` runs.
  */
 function timeoutSignal(ms: number): AbortSignal {
-    if (typeof AbortSignal.timeout === "function")
-        return AbortSignal.timeout(ms);
-    const controller = new AbortController();
-    setTimeout(() => {
-        controller.abort(
-            new DOMException(`Timed out after ${ms} ms`, "TimeoutError"),
-        );
-    }, ms);
-    return controller.signal;
+  if (typeof AbortSignal.timeout === 'function') return AbortSignal.timeout(ms);
+  const controller = new AbortController();
+  setTimeout(() => {
+    controller.abort(new DOMException(`Timed out after ${ms} ms`, 'TimeoutError'));
+  }, ms);
+  return controller.signal;
 }
 
 /**
@@ -1100,20 +970,19 @@ function timeoutSignal(ms: number): AbortSignal {
  * signal does not keep one per request.
  */
 function anySignal(signals: AbortSignal[]): AbortSignal {
-    if (typeof AbortSignal.any === "function") return AbortSignal.any(signals);
-    const controller = new AbortController();
-    const listeners = new Map<AbortSignal, () => void>();
-    const abort = (reason: unknown) => {
-        for (const [signal, listener] of listeners)
-            signal.removeEventListener("abort", listener);
-        controller.abort(reason);
-    };
-    for (const signal of signals) {
-        const listener = () => abort(signal.reason);
-        listeners.set(signal, listener);
-        signal.addEventListener("abort", listener);
-    }
-    return controller.signal;
+  if (typeof AbortSignal.any === 'function') return AbortSignal.any(signals);
+  const controller = new AbortController();
+  const listeners = new Map<AbortSignal, () => void>();
+  const abort = (reason: unknown) => {
+    for (const [signal, listener] of listeners) signal.removeEventListener('abort', listener);
+    controller.abort(reason);
+  };
+  for (const signal of signals) {
+    const listener = () => abort(signal.reason);
+    listeners.set(signal, listener);
+    signal.addEventListener('abort', listener);
+  }
+  return controller.signal;
 }
 
 /**
@@ -1126,251 +995,222 @@ function anySignal(signals: AbortSignal[]): AbortSignal {
  * final response plus the request context.
  */
 async function send(
-    config: ClientConfig,
-    op: OperationContext,
-    url: string,
-    init: RequestOptions,
-    body: unknown | undefined,
-    bodySpec: { contentType: string; multipart?: boolean } | undefined,
-    caps: SendCapabilities,
-    accept = "application/json",
+  config: ClientConfig,
+  op: OperationContext,
+  url: string,
+  init: RequestOptions,
+  body: unknown | undefined,
+  bodySpec: { contentType: string; multipart?: boolean } | undefined,
+  caps: SendCapabilities,
+  accept = 'application/json'
 ): Promise<{ response: Response; context: RequestContext }> {
-    const {
-        retry: callRetry,
-        timeout: callTimeout,
-        idempotencyKey: callKey,
-        ...fetchInit
-    } = init;
-    const retry: RetryConfig = { ...config.retry, ...callRetry };
-    const timeout = callTimeout ?? config.timeout;
-    const idempotency = callKey ?? config.idempotencyKey;
-    const extra =
-        typeof config.headers === "function"
-            ? await config.headers()
-            : config.headers;
-    const headers: Record<string, string> = {
-        Accept: accept,
-        ...extra,
-        ...toHeaderRecord(fetchInit.headers),
-    };
-    const method = (fetchInit.method ?? "GET").toUpperCase();
-    // One stable key per LOGICAL call — set before the retry loop so every attempt
-    // re-sends the same key; a caller-provided header always wins.
-    if (
-        idempotency !== undefined &&
-        idempotency !== false &&
-        (method === "POST" || method === "PATCH") &&
-        !("Idempotency-Key" in headers) &&
-        !("idempotency-key" in headers)
-    ) {
-        headers["Idempotency-Key"] =
-            typeof idempotency === "string"
-                ? idempotency
-                : typeof idempotency === "function"
-                  ? idempotency()
-                  : crypto.randomUUID();
+  const { retry: callRetry, timeout: callTimeout, idempotencyKey: callKey, ...fetchInit } = init;
+  const retry: RetryConfig = { ...config.retry, ...callRetry };
+  const timeout = callTimeout ?? config.timeout;
+  const idempotency = callKey ?? config.idempotencyKey;
+  const extra = typeof config.headers === 'function' ? await config.headers() : config.headers;
+  const headers: Record<string, string> = {
+    Accept: accept,
+    ...extra,
+    ...toHeaderRecord(fetchInit.headers),
+  };
+  const method = (fetchInit.method ?? 'GET').toUpperCase();
+  // One stable key per LOGICAL call — set before the retry loop so every attempt
+  // re-sends the same key; a caller-provided header always wins.
+  if (
+    idempotency !== undefined &&
+    idempotency !== false &&
+    (method === 'POST' || method === 'PATCH') &&
+    !('Idempotency-Key' in headers) &&
+    !('idempotency-key' in headers)
+  ) {
+    headers['Idempotency-Key'] =
+      typeof idempotency === 'string'
+        ? idempotency
+        : typeof idempotency === 'function'
+          ? idempotency()
+          : crypto.randomUUID();
+  }
+  // Client identification for the API owner's telemetry — never in browsers, where a
+  // custom header would force a CORS preflight the API may not allow.
+  if (
+    typeof config.clientHeader === 'string' &&
+    typeof document === 'undefined' &&
+    !('X-Redocly-Client' in headers) &&
+    !('x-redocly-client' in headers)
+  ) {
+    headers['X-Redocly-Client'] = config.clientHeader;
+  }
+  const context: RequestContext = {
+    url,
+    method: fetchInit.method ?? 'GET',
+    headers,
+    body,
+    operation: op,
+  };
+  const middleware = middlewareChain(config);
+  for (const mw of middleware) if (mw.onRequest) await mw.onRequest(context);
+  // Serialize AFTER onRequest so body mutations (case conversion, enveloping, signing) take effect.
+  let payload: BodyInit | undefined;
+  let isStream = false;
+  if (context.body !== undefined) {
+    const value = context.body;
+    const isBinary =
+      value instanceof Blob ||
+      value instanceof ArrayBuffer ||
+      ArrayBuffer.isView(value as ArrayBufferView);
+    const isFormData = typeof FormData !== 'undefined' && value instanceof FormData;
+    const isURLSearchParams = value instanceof URLSearchParams;
+    isStream =
+      (typeof ReadableStream !== 'undefined' && value instanceof ReadableStream) ||
+      (value !== null &&
+        typeof (value as Partial<AsyncIterable<unknown>>)[Symbol.asyncIterator] === 'function');
+    const hasContentType = 'Content-Type' in context.headers || 'content-type' in context.headers;
+    if (isFormData || isURLSearchParams || isBinary || isStream || typeof value === 'string') {
+      payload = value as BodyInit;
+      // `fetch` derives the type of FormData and URLSearchParams, boundary included, and a
+      // multipart boundary is only the caller's to set. Any other pass-through body gets
+      // the declared type when the caller set none.
+      const declared = bodySpec?.contentType;
+      if (
+        !isFormData &&
+        !isURLSearchParams &&
+        !hasContentType &&
+        declared !== undefined &&
+        !declared.toLowerCase().includes('multipart')
+      ) {
+        context.headers['Content-Type'] = declared;
+      }
+    } else if (bodySpec?.multipart === true) {
+      if (!caps.serializeMultipart) {
+        throw new Error('Multipart capability not wired: cannot serialize the request body');
+      }
+      payload = caps.serializeMultipart(value as Record<string, unknown>);
+    } else {
+      payload = JSON.stringify(value);
+      if (!hasContentType) {
+        // The spec's declared request content type (e.g. application/merge-patch+json).
+        context.headers['Content-Type'] = bodySpec?.contentType ?? 'application/json';
+      }
     }
-    // Client identification for the API owner's telemetry — never in browsers, where a
-    // custom header would force a CORS preflight the API may not allow.
-    if (
-        typeof config.clientHeader === "string" &&
-        typeof document === "undefined" &&
-        !("X-Redocly-Client" in headers) &&
-        !("x-redocly-client" in headers)
-    ) {
-        headers["X-Redocly-Client"] = config.clientHeader;
-    }
-    const context: RequestContext = {
-        url,
-        method: fetchInit.method ?? "GET",
-        headers,
-        body,
-        operation: op,
-    };
-    const middleware = middlewareChain(config);
-    for (const mw of middleware) if (mw.onRequest) await mw.onRequest(context);
-    // Serialize AFTER onRequest so body mutations (case conversion, enveloping, signing) take effect.
-    let payload: BodyInit | undefined;
-    let isStream = false;
-    if (context.body !== undefined) {
-        const value = context.body;
-        const isBinary =
-            value instanceof Blob ||
-            value instanceof ArrayBuffer ||
-            ArrayBuffer.isView(value as ArrayBufferView);
-        const isFormData =
-            typeof FormData !== "undefined" && value instanceof FormData;
-        const isURLSearchParams = value instanceof URLSearchParams;
-        isStream =
-            (typeof ReadableStream !== "undefined" &&
-                value instanceof ReadableStream) ||
-            (value !== null &&
-                typeof (value as Partial<AsyncIterable<unknown>>)[
-                    Symbol.asyncIterator
-                ] === "function");
-        const hasContentType =
-            "Content-Type" in context.headers ||
-            "content-type" in context.headers;
-        if (
-            isFormData ||
-            isURLSearchParams ||
-            isBinary ||
-            isStream ||
-            typeof value === "string"
-        ) {
-            payload = value as BodyInit;
-            // `fetch` derives the type of FormData and URLSearchParams, boundary included, and a
-            // multipart boundary is only the caller's to set. Any other pass-through body gets
-            // the declared type when the caller set none.
-            const declared = bodySpec?.contentType;
-            if (
-                !isFormData &&
-                !isURLSearchParams &&
-                !hasContentType &&
-                declared !== undefined &&
-                !declared.toLowerCase().includes("multipart")
-            ) {
-                context.headers["Content-Type"] = declared;
-            }
-        } else if (bodySpec?.multipart === true) {
-            if (!caps.serializeMultipart) {
-                throw new Error(
-                    "Multipart capability not wired: cannot serialize the request body",
-                );
-            }
-            payload = caps.serializeMultipart(value as Record<string, unknown>);
-        } else {
-            payload = JSON.stringify(value);
-            if (!hasContentType) {
-                // The spec's declared request content type (e.g. application/merge-patch+json).
-                context.headers["Content-Type"] =
-                    bodySpec?.contentType ?? "application/json";
-            }
-        }
-    }
-    const doFetch = config.fetch ?? fetch;
-    // A stream is consumed by the first attempt and cannot be replayed, so it never retries.
-    const maxAttempts = isStream ? 1 : 1 + (retry.retries ?? 0);
-    const retryOn = retry.retryOn ?? defaultRetryOn;
-    const signal = fetchInit.signal ?? undefined;
+  }
+  const doFetch = config.fetch ?? fetch;
+  // A stream is consumed by the first attempt and cannot be replayed, so it never retries.
+  const maxAttempts = isStream ? 1 : 1 + (retry.retries ?? 0);
+  const retryOn = retry.retryOn ?? defaultRetryOn;
+  const signal = fetchInit.signal ?? undefined;
 
-    const startedAt = Date.now();
-    let attempt = 0;
-    let finalResponse: Response;
-    let lastResponse: Response | undefined;
-    try {
-        while (true) {
-            if (signal?.aborted) throw abortError(signal);
-            attempt++;
-            // A fresh timeout budget per attempt; the caller's signal still wins the race.
-            // The composed signal also governs reading the response body.
-            const budget = timeout ? timeoutSignal(timeout) : undefined;
-            const attemptSignal =
-                budget && signal
-                    ? anySignal([signal, budget])
-                    : (budget ?? signal);
-            let response: Response;
-            try {
-                response = await doFetch(context.url, {
-                    ...fetchInit,
-                    // `fetch` requires it for a stream body.
-                    ...(isStream ? { duplex: "half" } : {}),
-                    signal: attemptSignal ?? null,
-                    method: context.method,
-                    headers: context.headers,
-                    body: payload ?? null,
-                });
-            } catch (error) {
-                // Decided before any await, when no timer can have fired since `fetch` rejected: an
-                // aborted budget means this attempt timed out. The abort reason's name is no
-                // evidence, because Chrome 103 to 123 abort a timeout with `AbortError`.
-                const timedOut =
-                    timeout !== undefined &&
-                    budget?.aborted &&
-                    !signal?.aborted;
-                if (
-                    attempt < maxAttempts &&
-                    !signal?.aborted &&
-                    (await retryOn({ attempt, request: context, error }))
-                ) {
-                    await sleep(retryDelay(retry, attempt, null), signal);
-                    continue;
-                }
-                // Our timeout fired (never the caller's own abort — that rethrows untouched):
-                // wrap the bare DOMException with the context a log line needs.
-                if (timedOut) throw new TimeoutError(op.id, timeout, attempt);
-                throw error;
-            }
-            lastResponse = response;
-            // Reverse order: the last-registered middleware wraps closest to the network (onion).
-            for (let i = middleware.length - 1; i >= 0; i--) {
-                const onResponse = middleware[i]?.onResponse;
-                if (onResponse) {
-                    const replaced = await onResponse(response, context);
-                    if (replaced && replaced !== response) {
-                        // Cancel the abandoned original's body — like the retry path, an unread body
-                        // keeps its connection checked out under Node/undici.
-                        await response.body?.cancel().catch(() => undefined);
-                        response = replaced;
-                        lastResponse = replaced;
-                    }
-                }
-            }
-            if (
-                !response.ok &&
-                attempt < maxAttempts &&
-                !signal?.aborted &&
-                (await retryOn({ attempt, request: context, response }))
-            ) {
-                const retryAfter = response.headers.get("retry-after");
-                // Drain the abandoned response body before the next attempt: an unread body
-                // keeps the connection checked out (and can stall the pool) under Node/undici
-                // and other strict HTTP clients. Ignore errors (e.g. a middleware already read it).
-                await response.body?.cancel().catch(() => undefined);
-                lastResponse = undefined;
-                await sleep(retryDelay(retry, attempt, retryAfter), signal);
-                continue;
-            }
-            finalResponse = response;
-            break;
+  const startedAt = Date.now();
+  let attempt = 0;
+  let finalResponse: Response;
+  let lastResponse: Response | undefined;
+  try {
+    while (true) {
+      if (signal?.aborted) throw abortError(signal);
+      attempt++;
+      // A fresh timeout budget per attempt; the caller's signal still wins the race.
+      // The composed signal also governs reading the response body.
+      const budget = timeout ? timeoutSignal(timeout) : undefined;
+      const attemptSignal = budget && signal ? anySignal([signal, budget]) : (budget ?? signal);
+      let response: Response;
+      try {
+        response = await doFetch(context.url, {
+          ...fetchInit,
+          // `fetch` requires it for a stream body.
+          ...(isStream ? { duplex: 'half' } : {}),
+          signal: attemptSignal ?? null,
+          method: context.method,
+          headers: context.headers,
+          body: payload ?? null,
+        });
+      } catch (error) {
+        // Decided before any await, when no timer can have fired since `fetch` rejected: an
+        // aborted budget means this attempt timed out. The abort reason's name is no
+        // evidence, because Chrome 103 to 123 abort a timeout with `AbortError`.
+        const timedOut = timeout !== undefined && budget?.aborted && !signal?.aborted;
+        if (
+          attempt < maxAttempts &&
+          !signal?.aborted &&
+          (await retryOn({ attempt, request: context, error }))
+        ) {
+          await sleep(retryDelay(retry, attempt, null), signal);
+          continue;
         }
-    } catch (error) {
-        const settled: SettledCall = {
-            response: lastResponse,
-            error,
-            attempts: attempt,
-            durationMs: Date.now() - startedAt,
-        };
-        for (const mw of middleware) {
-            if (!mw.onSettled) continue;
-            try {
-                await mw.onSettled(context, settled);
-            } catch (hookError) {
-                globalThis.console?.warn("onSettled hook failed", hookError);
-            }
-        }
+        // Our timeout fired (never the caller's own abort — that rethrows untouched):
+        // wrap the bare DOMException with the context a log line needs.
+        if (timedOut) throw new TimeoutError(op.id, timeout, attempt);
         throw error;
-    }
-    const settled: SettledCall = {
-        response: finalResponse,
-        attempts: attempt,
-        durationMs: Date.now() - startedAt,
-    };
-    const hookErrors: unknown[] = [];
-    for (const mw of middleware) {
-        if (!mw.onSettled) continue;
-        try {
-            await mw.onSettled(context, settled);
-        } catch (hookError) {
-            hookErrors.push(hookError);
+      }
+      lastResponse = response;
+      // Reverse order: the last-registered middleware wraps closest to the network (onion).
+      for (let i = middleware.length - 1; i >= 0; i--) {
+        const onResponse = middleware[i]?.onResponse;
+        if (onResponse) {
+          const replaced = await onResponse(response, context);
+          if (replaced && replaced !== response) {
+            // Cancel the abandoned original's body — like the retry path, an unread body
+            // keeps its connection checked out under Node/undici.
+            await response.body?.cancel().catch(() => undefined);
+            response = replaced;
+            lastResponse = replaced;
+          }
         }
+      }
+      if (
+        !response.ok &&
+        attempt < maxAttempts &&
+        !signal?.aborted &&
+        (await retryOn({ attempt, request: context, response }))
+      ) {
+        const retryAfter = response.headers.get('retry-after');
+        // Drain the abandoned response body before the next attempt: an unread body
+        // keeps the connection checked out (and can stall the pool) under Node/undici
+        // and other strict HTTP clients. Ignore errors (e.g. a middleware already read it).
+        await response.body?.cancel().catch(() => undefined);
+        lastResponse = undefined;
+        await sleep(retryDelay(retry, attempt, retryAfter), signal);
+        continue;
+      }
+      finalResponse = response;
+      break;
     }
-    if (hookErrors.length > 0) {
-        // The caller never gets this response, so release its connection.
-        await finalResponse.body?.cancel().catch(() => undefined);
-        throw hookErrors[0];
+  } catch (error) {
+    const settled: SettledCall = {
+      response: lastResponse,
+      error,
+      attempts: attempt,
+      durationMs: Date.now() - startedAt,
+    };
+    for (const mw of middleware) {
+      if (!mw.onSettled) continue;
+      try {
+        await mw.onSettled(context, settled);
+      } catch (hookError) {
+        globalThis.console?.warn('onSettled hook failed', hookError);
+      }
     }
-    return { response: finalResponse, context };
+    throw error;
+  }
+  const settled: SettledCall = {
+    response: finalResponse,
+    attempts: attempt,
+    durationMs: Date.now() - startedAt,
+  };
+  const hookErrors: unknown[] = [];
+  for (const mw of middleware) {
+    if (!mw.onSettled) continue;
+    try {
+      await mw.onSettled(context, settled);
+    } catch (hookError) {
+      hookErrors.push(hookError);
+    }
+  }
+  if (hookErrors.length > 0) {
+    // The caller never gets this response, so release its connection.
+    await finalResponse.body?.cancel().catch(() => undefined);
+    throw hookErrors[0];
+  }
+  return { response: finalResponse, context };
 }
 
 /**
@@ -1379,69 +1219,52 @@ async function send(
  * inline-mode assembler wires only the capabilities a spec needs.
  */
 type Capabilities = SendCapabilities & {
-    resolveAuth?: (
-        security: readonly (readonly SecuritySpec[])[],
-        config: ClientConfig,
-    ) => Promise<{
-        headers: Record<string, string>;
-        query: Record<string, string>;
-    }>;
-    sse?: (
-        config: ClientConfig,
-        op: OperationContext,
-        // Re-preparing per (re)connect (not a frozen url/init) lets a refresh-style
-        // TokenProvider issue a fresh credential after a dropped stream reconnects.
-        prepare: () => Promise<{ url: string; init: SseOptions }>,
-        dataKind: "json" | "text",
-    ) => AsyncGenerator<ServerSentEvent<unknown>>;
-    paginate?: {
-        pages: (
-            call: (
-                args?: OperationArgs,
-                init?: RequestOptions,
-            ) => Promise<unknown>,
-            spec: PaginationSpec,
-            args?: OperationArgs,
-            init?: RequestOptions,
-        ) => AsyncGenerator<unknown>;
-        items: (
-            call: (
-                args?: OperationArgs,
-                init?: RequestOptions,
-            ) => Promise<unknown>,
-            spec: PaginationSpec,
-            args?: OperationArgs,
-            init?: RequestOptions,
-        ) => AsyncGenerator<unknown>;
-        // The `link`-style iterators need the raw `Link` header + page URL, which the
-        // parsed-page call above cannot carry (the shape mirrors paginate's `LinkPageCall`).
-        pagesByLink: (
-            call: (
-                args?: OperationArgs,
-                init?: RequestOptions,
-            ) => Promise<{
-                page: unknown;
-                linkHeader: string | null;
-                url: string;
-            }>,
-            spec: PaginationSpec,
-            args?: OperationArgs,
-            init?: RequestOptions,
-        ) => AsyncGenerator<unknown>;
-        itemsByLink: (
-            call: (
-                args?: OperationArgs,
-                init?: RequestOptions,
-            ) => Promise<{
-                page: unknown;
-                linkHeader: string | null;
-                url: string;
-            }>,
-            spec: PaginationSpec,
-            args?: OperationArgs,
-            init?: RequestOptions,
-        ) => AsyncGenerator<unknown>;
-    };
+  resolveAuth?: (
+    security: readonly (readonly SecuritySpec[])[],
+    config: ClientConfig
+  ) => Promise<{ headers: Record<string, string>; query: Record<string, string> }>;
+  sse?: (
+    config: ClientConfig,
+    op: OperationContext,
+    // Re-preparing per (re)connect (not a frozen url/init) lets a refresh-style
+    // TokenProvider issue a fresh credential after a dropped stream reconnects.
+    prepare: () => Promise<{ url: string; init: SseOptions }>,
+    dataKind: 'json' | 'text'
+  ) => AsyncGenerator<ServerSentEvent<unknown>>;
+  paginate?: {
+    pages: (
+      call: (args?: OperationArgs, init?: RequestOptions) => Promise<unknown>,
+      spec: PaginationSpec,
+      args?: OperationArgs,
+      init?: RequestOptions
+    ) => AsyncGenerator<unknown>;
+    items: (
+      call: (args?: OperationArgs, init?: RequestOptions) => Promise<unknown>,
+      spec: PaginationSpec,
+      args?: OperationArgs,
+      init?: RequestOptions
+    ) => AsyncGenerator<unknown>;
+    // The `link`-style iterators need the raw `Link` header + page URL, which the
+    // parsed-page call above cannot carry (the shape mirrors paginate's `LinkPageCall`).
+    pagesByLink: (
+      call: (
+        args?: OperationArgs,
+        init?: RequestOptions
+      ) => Promise<{ page: unknown; linkHeader: string | null; url: string }>,
+      spec: PaginationSpec,
+      args?: OperationArgs,
+      init?: RequestOptions
+    ) => AsyncGenerator<unknown>;
+    itemsByLink: (
+      call: (
+        args?: OperationArgs,
+        init?: RequestOptions
+      ) => Promise<{ page: unknown; linkHeader: string | null; url: string }>,
+      spec: PaginationSpec,
+      args?: OperationArgs,
+      init?: RequestOptions
+    ) => AsyncGenerator<unknown>;
+  };
 };
 
 /**
@@ -1450,28 +1273,22 @@ type Capabilities = SendCapabilities & {
  * converts it to this shape before anything downstream reads it.
  */
 type OperationArgs = {
-    path?: Record<string, unknown>;
-    query?: Record<string, QueryValue>;
-    body?: unknown;
-    headers?: Record<string, unknown>;
-    cookies?: Record<string, unknown>;
+  path?: Record<string, unknown>;
+  query?: Record<string, QueryValue>;
+  body?: unknown;
+  headers?: Record<string, unknown>;
+  cookies?: Record<string, unknown>;
 } & Record<string, unknown>;
 
 /** The five layer keys, and the only top-level keys a namespaced call may carry. */
-const LAYERS: readonly string[] = [
-    "path",
-    "query",
-    "body",
-    "headers",
-    "cookies",
-];
+const LAYERS: readonly string[] = ['path', 'query', 'body', 'headers', 'cookies'];
 
 /** Where a declared parameter's `in` value puts it. */
-const LAYER_OF: Record<string, "path" | "query" | "headers" | "cookies"> = {
-    path: "path",
-    query: "query",
-    header: "headers",
-    cookie: "cookies",
+const LAYER_OF: Record<string, 'path' | 'query' | 'headers' | 'cookies'> = {
+  path: 'path',
+  query: 'query',
+  header: 'headers',
+  cookie: 'cookies',
 };
 
 /**
@@ -1480,40 +1297,34 @@ const LAYER_OF: Record<string, "path" | "query" | "headers" | "cookies"> = {
  * body, which is how a flat call spells an object body. `body` stays reserved for the
  * operations a flat call cannot merge (an array, a scalar, or a binary body).
  */
-function namespaceArgs(
-    op: OperationDescriptor,
-    args: OperationArgs,
-): OperationArgs {
-    const layers: Record<string, Record<string, unknown>> = {};
-    let body: unknown;
-    let properties: Record<string, unknown> | undefined;
-    const layerOfParam = new Map(
-        (op.params ?? []).map((param) => [param.name, param.in]),
-    );
-    for (const [key, value] of Object.entries(args)) {
-        const layer = LAYER_OF[layerOfParam.get(key) ?? ""];
-        if (layer !== undefined) {
-            (layers[layer] ??= {})[key] = value;
-        } else if (key === "body" && op.body !== undefined) {
-            body = value;
-        } else if (op.body !== undefined) {
-            (properties ??= {})[key] = value;
-        } else {
-            throw new TypeError(
-                `Unknown argument "${key}" for operation "${op.id}": it names no declared parameter, and the operation takes no request body.`,
-            );
-        }
+function namespaceArgs(op: OperationDescriptor, args: OperationArgs): OperationArgs {
+  const layers: Record<string, Record<string, unknown>> = {};
+  let body: unknown;
+  let properties: Record<string, unknown> | undefined;
+  const layerOfParam = new Map((op.params ?? []).map((param) => [param.name, param.in]));
+  for (const [key, value] of Object.entries(args)) {
+    const layer = LAYER_OF[layerOfParam.get(key) ?? ''];
+    if (layer !== undefined) {
+      (layers[layer] ??= {})[key] = value;
+    } else if (key === 'body' && op.body !== undefined) {
+      body = value;
+    } else if (op.body !== undefined) {
+      (properties ??= {})[key] = value;
+    } else {
+      throw new TypeError(
+        `Unknown argument "${key}" for operation "${op.id}": it names no declared parameter, and the operation takes no request body.`
+      );
     }
-    const namespaced: OperationArgs = {};
-    if (layers.path) namespaced.path = layers.path;
-    // The flat surface types every query value, so the collected bag is one by construction.
-    if (layers.query)
-        namespaced.query = layers.query as Record<string, QueryValue>;
-    if (layers.headers) namespaced.headers = layers.headers;
-    if (layers.cookies) namespaced.cookies = layers.cookies;
-    if (properties !== undefined) namespaced.body = properties;
-    else if (body !== undefined) namespaced.body = body;
-    return namespaced;
+  }
+  const namespaced: OperationArgs = {};
+  if (layers.path) namespaced.path = layers.path;
+  // The flat surface types every query value, so the collected bag is one by construction.
+  if (layers.query) namespaced.query = layers.query as Record<string, QueryValue>;
+  if (layers.headers) namespaced.headers = layers.headers;
+  if (layers.cookies) namespaced.cookies = layers.cookies;
+  if (properties !== undefined) namespaced.body = properties;
+  else if (body !== undefined) namespaced.body = body;
+  return namespaced;
 }
 
 /** The response reader implied by the descriptor (before any per-call `parseAs` override). */
@@ -1523,28 +1334,19 @@ function namespaceArgs(
  * answer with a JSON error body instead of the payload). Caller `init.headers` and
  * `config.headers` still override.
  */
-function acceptFor(kind: ParseAs | "void"): string {
-    if (kind === "text") return "text/*";
-    if (
-        kind === "blob" ||
-        kind === "arrayBuffer" ||
-        kind === "stream" ||
-        kind === "formData"
-    ) {
-        return "*/*";
-    }
-    return "application/json"; // json | auto | void
+function acceptFor(kind: ParseAs | 'void'): string {
+  if (kind === 'text') return 'text/*';
+  if (kind === 'blob' || kind === 'arrayBuffer' || kind === 'stream' || kind === 'formData') {
+    return '*/*';
+  }
+  return 'application/json'; // json | auto | void
 }
 
-function kindFor(op: OperationDescriptor): ParseAs | "void" {
-    if (
-        op.responseKind === "void" ||
-        op.responseKind === "blob" ||
-        op.responseKind === "text"
-    ) {
-        return op.responseKind;
-    }
-    return "auto";
+function kindFor(op: OperationDescriptor): ParseAs | 'void' {
+  if (op.responseKind === 'void' || op.responseKind === 'blob' || op.responseKind === 'text') {
+    return op.responseKind;
+  }
+  return 'auto';
 }
 
 /**
@@ -1553,33 +1355,33 @@ function kindFor(op: OperationDescriptor): ParseAs | "void" {
  * could not be merged, so its input type never offered the flat shape.
  */
 function inputOf(
-    op: OperationDescriptor,
-    args: OperationArgs,
-    config: ClientConfig,
+  op: OperationDescriptor,
+  args: OperationArgs,
+  config: ClientConfig
 ): OperationArgs {
-    const merged = config.argsStyle === "flat" && op.argsStyle !== "grouped";
-    return merged ? namespaceArgs(op, args) : args;
+  const merged = config.argsStyle === 'flat' && op.argsStyle !== 'grouped';
+  return merged ? namespaceArgs(op, args) : args;
 }
 
 /** Route the namespaced args to the request pieces. */
 function splitArgs(op: OperationDescriptor, args: OperationArgs) {
-    // An unknown layer key can only be a bug (usually flat-style args on a namespaced
-    // client). TypeScript catches it, but a transpiler that skips type-checking would
-    // otherwise ship a request that silently drops the value — fail the call loudly.
-    for (const key of Object.keys(args)) {
-        if (!LAYERS.includes(key)) {
-            throw new TypeError(
-                `Unknown argument "${key}" for operation "${op.id}". Inputs are grouped by layer: ${LAYERS.join(", ")}.`,
-            );
-        }
+  // An unknown layer key can only be a bug (usually flat-style args on a namespaced
+  // client). TypeScript catches it, but a transpiler that skips type-checking would
+  // otherwise ship a request that silently drops the value — fail the call loudly.
+  for (const key of Object.keys(args)) {
+    if (!LAYERS.includes(key)) {
+      throw new TypeError(
+        `Unknown argument "${key}" for operation "${op.id}". Inputs are grouped by layer: ${LAYERS.join(', ')}.`
+      );
     }
-    return {
-        path: args.path ?? {},
-        query: args.query,
-        body: args.body,
-        headers: args.headers,
-        cookies: args.cookies,
-    };
+  }
+  return {
+    path: args.path ?? {},
+    query: args.query,
+    body: args.body,
+    headers: args.headers,
+    cookies: args.cookies,
+  };
 }
 
 /**
@@ -1588,200 +1390,168 @@ function splitArgs(op: OperationDescriptor, args: OperationArgs) {
  * and always fully resolved — so `explode: false` or `allowReserved` alone (no `style`)
  * are honored, and an omitted `explode` keeps the exploded default.
  */
-function queryStyles(
-    op: OperationDescriptor,
-): Record<string, QueryStyle> | undefined {
-    let styles: Record<string, QueryStyle> | undefined;
-    for (const param of op.params ?? []) {
-        if (param.in !== "query") continue;
-        const deviates =
-            (param.style !== undefined && param.style !== "form") ||
-            param.explode === false ||
-            param.allowReserved === true;
-        if (!deviates) continue;
-        styles ??= {};
-        styles[param.name] = {
-            style: param.style ?? "form",
-            explode: param.explode ?? true,
-            ...(param.allowReserved === undefined
-                ? {}
-                : { allowReserved: param.allowReserved }),
-        };
-    }
-    return styles;
+function queryStyles(op: OperationDescriptor): Record<string, QueryStyle> | undefined {
+  let styles: Record<string, QueryStyle> | undefined;
+  for (const param of op.params ?? []) {
+    if (param.in !== 'query') continue;
+    const deviates =
+      (param.style !== undefined && param.style !== 'form') ||
+      param.explode === false ||
+      param.allowReserved === true;
+    if (!deviates) continue;
+    styles ??= {};
+    styles[param.name] = {
+      style: param.style ?? 'form',
+      explode: param.explode ?? true,
+      ...(param.allowReserved === undefined ? {} : { allowReserved: param.allowReserved }),
+    };
+  }
+  return styles;
 }
 
 /** Stringify caller-supplied extra headers, skipping empty entries. */
-function stringHeaders(
-    headers: Record<string, unknown> | undefined,
-): Record<string, string> {
-    const out: Record<string, string> = {};
-    for (const [key, value] of Object.entries(headers ?? {})) {
-        if (value !== undefined && value !== null) out[key] = String(value);
-    }
-    return out;
+function stringHeaders(headers: Record<string, unknown> | undefined): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [key, value] of Object.entries(headers ?? {})) {
+    if (value !== undefined && value !== null) out[key] = String(value);
+  }
+  return out;
 }
 
 /** Build the request pieces an attempt needs: the final URL and the merged per-call init. */
 async function prepareRequest(
-    config: ClientConfig,
-    op: OperationDescriptor,
-    args: OperationArgs,
-    init: RequestOptions | SseOptions,
-    caps: Capabilities,
+  config: ClientConfig,
+  op: OperationDescriptor,
+  args: OperationArgs,
+  init: RequestOptions | SseOptions,
+  caps: Capabilities
 ): Promise<{ url: string; init: RequestOptions; body: unknown }> {
-    const { path, query, body, headers, cookies } = splitArgs(op, args);
-    const authed: {
-        headers: Record<string, string>;
-        query: Record<string, string>;
-    } =
-        op.security?.length && caps.resolveAuth
-            ? await caps.resolveAuth(op.security, config)
-            : { headers: {}, query: {} };
-    // Cookie params join the auth-injected cookies in one `Cookie` header (values
-    // percent-encoded, like auth cookies). Server-side only — browsers own the header.
-    const cookiePairs = Object.entries(cookies ?? {})
-        .filter(([, value]) => value !== undefined && value !== null)
-        .map(
-            ([cookieName, value]) =>
-                `${cookieName}=${encodeURIComponent(String(value))}`,
-        );
-    if (cookiePairs.length > 0) {
-        authed.headers.Cookie = [authed.headers.Cookie, ...cookiePairs]
-            .filter(Boolean)
-            .join("; ");
-    }
-    const fullQuery: Record<string, QueryValue> = { ...query, ...authed.query };
-    const url = buildUrl(
-        config.serverUrl ?? "",
-        substitutePath(op.path, path),
-        Object.keys(fullQuery).length > 0 ? fullQuery : undefined,
-        queryStyles(op),
-    );
-    const mergedInit: RequestOptions = {
-        ...init,
-        method: op.method.toUpperCase(),
-        // Precedence, lowest → highest (later spreads win): injected auth → explicit
-        // header params → caller `init.headers` — the caller always overrides both.
-        headers: {
-            ...authed.headers,
-            ...stringHeaders(headers),
-            ...toHeaderRecord(init.headers),
-        },
-    };
-    return { url, init: mergedInit, body };
+  const { path, query, body, headers, cookies } = splitArgs(op, args);
+  const authed: { headers: Record<string, string>; query: Record<string, string> } =
+    op.security?.length && caps.resolveAuth
+      ? await caps.resolveAuth(op.security, config)
+      : { headers: {}, query: {} };
+  // Cookie params join the auth-injected cookies in one `Cookie` header (values
+  // percent-encoded, like auth cookies). Server-side only — browsers own the header.
+  const cookiePairs = Object.entries(cookies ?? {})
+    .filter(([, value]) => value !== undefined && value !== null)
+    .map(([cookieName, value]) => `${cookieName}=${encodeURIComponent(String(value))}`);
+  if (cookiePairs.length > 0) {
+    authed.headers.Cookie = [authed.headers.Cookie, ...cookiePairs].filter(Boolean).join('; ');
+  }
+  const fullQuery: Record<string, QueryValue> = { ...query, ...authed.query };
+  const url = buildUrl(
+    config.serverUrl ?? '',
+    substitutePath(op.path, path),
+    Object.keys(fullQuery).length > 0 ? fullQuery : undefined,
+    queryStyles(op)
+  );
+  const mergedInit: RequestOptions = {
+    ...init,
+    method: op.method.toUpperCase(),
+    // Precedence, lowest → highest (later spreads win): injected auth → explicit
+    // header params → caller `init.headers` — the caller always overrides both.
+    headers: {
+      ...authed.headers,
+      ...stringHeaders(headers),
+      ...toHeaderRecord(init.headers),
+    },
+  };
+  return { url, init: mergedInit, body };
 }
 
 /** Coerce a single declared response header value; omit when absent or unparsable. */
 function coerceResponseHeader(
-    raw: string | null,
-    type: ResponseHeaderSpec["type"],
+  raw: string | null,
+  type: ResponseHeaderSpec['type']
 ): string | number | boolean | undefined {
-    if (raw === null) return undefined;
-    if (type === "number") {
-        if (raw.trim() === "") return undefined;
-        const value = Number(raw);
-        return Number.isFinite(value) ? value : undefined;
-    }
-    if (type === "boolean") {
-        const value = raw.trim().toLowerCase();
-        if (value === "true") return true;
-        if (value === "false") return false;
-        return undefined;
-    }
-    return raw;
+  if (raw === null) return undefined;
+  if (type === 'number') {
+    if (raw.trim() === '') return undefined;
+    const value = Number(raw);
+    return Number.isFinite(value) ? value : undefined;
+  }
+  if (type === 'boolean') {
+    const value = raw.trim().toLowerCase();
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return undefined;
+  }
+  return raw;
 }
 
 /** Build the camelCase declared-header bag for a throw-mode envelope. */
 function readEnvelopeHeaders(
-    response: Response,
-    specs: readonly ResponseHeaderSpec[] | undefined,
+  response: Response,
+  specs: readonly ResponseHeaderSpec[] | undefined
 ): Record<string, string | number | boolean> {
-    const headers: Record<string, string | number | boolean> = {};
-    for (const spec of specs ?? []) {
-        const value = coerceResponseHeader(
-            response.headers.get(spec.name),
-            spec.type,
-        );
-        if (value !== undefined) headers[spec.key] = value;
-    }
-    return headers;
+  const headers: Record<string, string | number | boolean> = {};
+  for (const spec of specs ?? []) {
+    const value = coerceResponseHeader(response.headers.get(spec.name), spec.type);
+    if (value !== undefined) headers[spec.key] = value;
+  }
+  return headers;
 }
 
 /** One non-SSE call: send, then branch on the configured error mode. */
 async function execute(
-    config: ClientConfig,
-    op: OperationDescriptor,
-    args: OperationArgs,
-    init: RequestOptions,
-    caps: Capabilities,
+  config: ClientConfig,
+  op: OperationDescriptor,
+  args: OperationArgs,
+  init: RequestOptions,
+  caps: Capabilities
 ): Promise<unknown> {
-    const prepared = await prepareRequest(config, op, args, init, caps);
-    const opCtx: OperationContext = {
-        id: op.id,
-        path: op.path,
-        tags: [...(op.tags ?? [])],
-    };
-    // `parseAs` / `envelope` are client options, not fetch RequestInit fields.
-    const { parseAs, envelope, ...sendInit } = prepared.init;
-    const readKind = parseAs ?? kindFor(op);
-    const { response, context } = await send(
-        config,
-        opCtx,
-        prepared.url,
-        sendInit,
-        prepared.body,
-        op.body,
-        caps,
-        acceptFor(readKind),
-    );
-    if (config.errorMode === "result") {
-        if (!response.ok) {
-            return {
-                data: undefined,
-                error: await readError(response),
-                response,
-            };
-        }
-        return {
-            data: await parse(response, readKind),
-            error: undefined,
-            response,
-        };
-    }
+  const prepared = await prepareRequest(config, op, args, init, caps);
+  const opCtx: OperationContext = { id: op.id, path: op.path, tags: [...(op.tags ?? [])] };
+  // `parseAs` / `envelope` are client options, not fetch RequestInit fields.
+  const { parseAs, envelope, ...sendInit } = prepared.init;
+  const readKind = parseAs ?? kindFor(op);
+  const { response, context } = await send(
+    config,
+    opCtx,
+    prepared.url,
+    sendInit,
+    prepared.body,
+    op.body,
+    caps,
+    acceptFor(readKind)
+  );
+  if (config.errorMode === 'result') {
     if (!response.ok) {
-        let error: globalThis.Error = new ApiError(
-            context.url,
-            response.status,
-            response.statusText,
-            await readError(response),
-        );
-        // Thread the error through each middleware's onError in turn (each may replace it).
-        for (const mw of middlewareChain(config)) {
-            if (mw.onError)
-                error = await mw.onError(error as ApiErrorLike, context);
-        }
-        throw error;
+      return { data: undefined, error: await readError(response), response };
     }
-    const data = await parse(response, readKind);
-    if (envelope === true) {
-        return {
-            data,
-            headers: readEnvelopeHeaders(response, op.responseHeaders),
-            response,
-        };
+    return { data: await parse(response, readKind), error: undefined, response };
+  }
+  if (!response.ok) {
+    let error: globalThis.Error = new ApiError(
+      context.url,
+      response.status,
+      response.statusText,
+      await readError(response)
+    );
+    // Thread the error through each middleware's onError in turn (each may replace it).
+    for (const mw of middlewareChain(config)) {
+      if (mw.onError) error = await mw.onError(error as ApiErrorLike, context);
     }
-    return data;
+    throw error;
+  }
+  const data = await parse(response, readKind);
+  if (envelope === true) {
+    return {
+      data,
+      headers: readEnvelopeHeaders(response, op.responseHeaders),
+      response,
+    };
+  }
+  return data;
 }
 
 /** The paginate capability, or a descriptive throw when a paginated op is iterated unwired. */
 function paginateCapability(caps: Capabilities, op: OperationDescriptor) {
-    if (!caps.paginate) {
-        throw new Error(
-            `Pagination capability not wired: cannot iterate operation "${op.id}"`,
-        );
-    }
-    return caps.paginate;
+  if (!caps.paginate) {
+    throw new Error(`Pagination capability not wired: cannot iterate operation "${op.id}"`);
+  }
+  return caps.paginate;
 }
 
 /**
@@ -1791,39 +1561,31 @@ function paginateCapability(caps: Capabilities, op: OperationDescriptor) {
  * error-mode-agnostic; the throw-mode-only `onError` middleware hook is not invoked).
  */
 function pageCall(
-    method: (args?: OperationArgs, init?: RequestOptions) => Promise<unknown>,
-    config: ClientConfig,
+  method: (args?: OperationArgs, init?: RequestOptions) => Promise<unknown>,
+  config: ClientConfig
 ) {
-    const callWithoutEnvelope = (
-        args?: OperationArgs,
-        init?: RequestOptions,
-    ) => {
-        if (!init || init.envelope === undefined) return method(args, init);
-        const { envelope: _envelope, ...pageInit } = init;
-        return method(args, pageInit);
+  const callWithoutEnvelope = (args?: OperationArgs, init?: RequestOptions) => {
+    if (!init || init.envelope === undefined) return method(args, init);
+    const { envelope: _envelope, ...pageInit } = init;
+    return method(args, pageInit);
+  };
+  if (config.errorMode !== 'result') return callWithoutEnvelope;
+  return async (args?: OperationArgs, init?: RequestOptions) => {
+    const envelope = (await callWithoutEnvelope(args, init)) as {
+      data: unknown;
+      error: unknown;
+      response: Response;
     };
-    if (config.errorMode !== "result") return callWithoutEnvelope;
-    return async (args?: OperationArgs, init?: RequestOptions) => {
-        const envelope = (await callWithoutEnvelope(args, init)) as {
-            data: unknown;
-            error: unknown;
-            response: Response;
-        };
-        // Failure is `!response.ok` — NOT `data === undefined`: a successful bodyless page
-        // (204/void) also parses to undefined data, and a failed page's `error` can be
-        // undefined too (unreadable body). The pointers then miss on the undefined data
-        // and iteration stops cleanly, which is the correct semantics for an empty page.
-        if (!envelope.response.ok) {
-            const { response } = envelope;
-            throw new ApiError(
-                response.url,
-                response.status,
-                response.statusText,
-                envelope.error,
-            );
-        }
-        return envelope.data;
-    };
+    // Failure is `!response.ok` — NOT `data === undefined`: a successful bodyless page
+    // (204/void) also parses to undefined data, and a failed page's `error` can be
+    // undefined too (unreadable body). The pointers then miss on the undefined data
+    // and iteration stops cleanly, which is the correct semantics for an empty page.
+    if (!envelope.response.ok) {
+      const { response } = envelope;
+      throw new ApiError(response.url, response.status, response.statusText, envelope.error);
+    }
+    return envelope.data;
+  };
 }
 
 /**
@@ -1832,45 +1594,37 @@ function pageCall(
  * a relative `rel="next"` target). Error-mode-agnostic like all iteration: a failed
  * page throws `ApiError` even on result-mode clients.
  */
-function linkPageCall(
-    config: ClientConfig,
-    op: OperationDescriptor,
-    caps: Capabilities,
-) {
-    return async (args: OperationArgs = {}, init: RequestOptions = {}) => {
-        const prepared = await prepareRequest(config, op, args, init, caps);
-        const { parseAs, envelope: _envelope, ...sendInit } = prepared.init;
-        const readKind = parseAs ?? kindFor(op);
-        const opCtx: OperationContext = {
-            id: op.id,
-            path: op.path,
-            tags: [...(op.tags ?? [])],
-        };
-        const { response } = await send(
-            config,
-            opCtx,
-            prepared.url,
-            sendInit,
-            prepared.body,
-            op.body,
-            caps,
-            acceptFor(readKind),
-        );
-        if (!response.ok) {
-            throw new ApiError(
-                prepared.url,
-                response.status,
-                response.statusText,
-                await readError(response),
-            );
-        }
-        return {
-            page: await parse(response, readKind),
-            linkHeader: response.headers.get("link"),
-            // Some `Response` implementations leave `url` empty (mocks, constructed responses).
-            url: response.url === "" ? prepared.url : response.url,
-        };
+function linkPageCall(config: ClientConfig, op: OperationDescriptor, caps: Capabilities) {
+  return async (args: OperationArgs = {}, init: RequestOptions = {}) => {
+    const prepared = await prepareRequest(config, op, args, init, caps);
+    const { parseAs, envelope: _envelope, ...sendInit } = prepared.init;
+    const readKind = parseAs ?? kindFor(op);
+    const opCtx: OperationContext = { id: op.id, path: op.path, tags: [...(op.tags ?? [])] };
+    const { response } = await send(
+      config,
+      opCtx,
+      prepared.url,
+      sendInit,
+      prepared.body,
+      op.body,
+      caps,
+      acceptFor(readKind)
+    );
+    if (!response.ok) {
+      throw new ApiError(
+        prepared.url,
+        response.status,
+        response.statusText,
+        await readError(response)
+      );
+    }
+    return {
+      page: await parse(response, readKind),
+      linkHeader: response.headers.get('link'),
+      // Some `Response` implementations leave `url` empty (mocks, constructed responses).
+      url: response.url === '' ? prepared.url : response.url,
     };
+  };
 }
 
 /**
@@ -1880,193 +1634,142 @@ function linkPageCall(
  * collision with an operation. All behavior dispatches through the capability seam.
  */
 function createClientCore<
-    Ops extends OpsShape,
-    Id extends string = string,
-    Path extends string = string,
-    Tag extends string = string,
+  Ops extends OpsShape,
+  Id extends string = string,
+  Path extends string = string,
+  Tag extends string = string,
 >(
-    operations: Record<string, OperationDescriptor>,
-    initial: ClientConfig<OperationContext<Id, Path, Tag>> = {},
-    caps: Capabilities = {},
+  operations: Record<string, OperationDescriptor>,
+  initial: ClientConfig<OperationContext<Id, Path, Tag>> = {},
+  caps: Capabilities = {}
 ): Client<Ops, OperationContext<Id, Path, Tag>> {
-    // The literal-union narrowing is a compile-time DX contract only; internally the
-    // runtime works with the base (string-typed) context. One cast at this boundary —
-    // `ClientConfig<Narrow>` is not assignable to `ClientConfig` (middleware ctx
-    // params are contravariant).
-    const given = initial as ClientConfig;
-    // Private mutable config; the middleware array is copied so `use()` never mutates the caller's.
-    const config: ClientConfig = {
-        ...given,
-        middleware: [...(given.middleware ?? [])],
-    };
-    const client = {} as Record<string, unknown>;
+  // The literal-union narrowing is a compile-time DX contract only; internally the
+  // runtime works with the base (string-typed) context. One cast at this boundary —
+  // `ClientConfig<Narrow>` is not assignable to `ClientConfig` (middleware ctx
+  // params are contravariant).
+  const given = initial as ClientConfig;
+  // Private mutable config; the middleware array is copied so `use()` never mutates the caller's.
+  const config: ClientConfig = { ...given, middleware: [...(given.middleware ?? [])] };
+  const client = {} as Record<string, unknown>;
 
-    for (const [name, op] of Object.entries(operations)) {
-        if (op.responseKind === "sse") {
-            const method = (
-                given: OperationArgs = {},
-                init: SseOptions = {},
-            ) => {
-                const args = inputOf(op, given, config);
-                if (!caps.sse) {
-                    throw new Error(
-                        `SSE capability not wired: cannot stream operation "${op.id}"`,
-                    );
-                }
-                const stream = caps.sse;
-                return (async function* () {
-                    const opCtx: OperationContext = {
-                        id: op.id,
-                        path: op.path,
-                        tags: [...(op.tags ?? [])],
-                    };
-                    // A thunk the stream re-runs on every (re)connect, so auth (which `prepareRequest`
-                    // resolves) is refreshed per attempt rather than frozen at the first connect.
-                    const prepare = async () => {
-                        const prepared = await prepareRequest(
-                            config,
-                            op,
-                            args,
-                            init,
-                            caps,
-                        );
-                        return {
-                            url: prepared.url,
-                            init: prepared.init as SseOptions,
-                            body: prepared.body,
-                        };
-                    };
-                    yield* stream(
-                        config,
-                        opCtx,
-                        prepare,
-                        op.sseDataKind ?? "text",
-                    );
-                })();
-            };
-            // Consumers key off the function reference (cache keys, `OPERATIONS[fn.name]`), so
-            // each closure carries its operationId instead of an inferred binding name.
-            // `operationId` is the explicit, minification-proof form of the same identity
-            // (the SPEC operationId — `name` is the emitted key, which a collision may rename).
-            Object.defineProperty(method, "name", { value: name });
-            Object.defineProperty(method, "operationId", { value: op.id });
-            client[name] = method;
-        } else {
-            // `raw` takes namespaced args; `method` is the public entry that accepts whichever
-            // style the client was generated with. The iterators namespace once and then drive
-            // `raw`, so a flat call is never converted twice.
-            const raw = (args: OperationArgs = {}, init: RequestOptions = {}) =>
-                execute(config, op, args, init, caps);
-            const method = (
-                args: OperationArgs = {},
-                init: RequestOptions = {},
-            ) => raw(inputOf(op, args, config), init);
-            Object.defineProperty(method, "name", { value: name });
-            Object.defineProperty(method, "operationId", { value: op.id });
-            const spec = op.pagination;
-            // Paginated ops keep their one-shot call and gain `.pages`/`.items`, dispatching
-            // through the capability seam (like SSE: absent capability throws descriptively).
-            // Iteration is error-mode-agnostic: the iterators' pointers are data-rooted, so on
-            // a result-mode client (`errorMode` is fixed at construction — `configure()`
-            // ignores it) each page's envelope is unwrapped before it reaches the capability.
-            // A failed page aborts iteration by throwing ApiError, even on result-mode
-            // clients; the `onError` middleware hook (throw-mode-only) is not invoked.
-            client[name] =
-                spec === undefined
-                    ? method
-                    : spec.style === "link" || spec.style === "body-link"
-                      ? Object.assign(method, {
-                            pages: (
-                                args?: OperationArgs,
-                                init?: RequestOptions,
-                            ) =>
-                                paginateCapability(caps, op).pagesByLink(
-                                    linkPageCall(config, op, caps),
-                                    spec,
-                                    inputOf(op, args ?? {}, config),
-                                    init,
-                                ),
-                            items: (
-                                args?: OperationArgs,
-                                init?: RequestOptions,
-                            ) =>
-                                paginateCapability(caps, op).itemsByLink(
-                                    linkPageCall(config, op, caps),
-                                    spec,
-                                    inputOf(op, args ?? {}, config),
-                                    init,
-                                ),
-                        })
-                      : Object.assign(method, {
-                            pages: (
-                                args?: OperationArgs,
-                                init?: RequestOptions,
-                            ) =>
-                                paginateCapability(caps, op).pages(
-                                    pageCall(raw, config),
-                                    spec,
-                                    inputOf(op, args ?? {}, config),
-                                    init,
-                                ),
-                            items: (
-                                args?: OperationArgs,
-                                init?: RequestOptions,
-                            ) =>
-                                paginateCapability(caps, op).items(
-                                    pageCall(raw, config),
-                                    spec,
-                                    inputOf(op, args ?? {}, config),
-                                    init,
-                                ),
-                        });
+  for (const [name, op] of Object.entries(operations)) {
+    if (op.responseKind === 'sse') {
+      const method = (given: OperationArgs = {}, init: SseOptions = {}) => {
+        const args = inputOf(op, given, config);
+        if (!caps.sse) {
+          throw new Error(`SSE capability not wired: cannot stream operation "${op.id}"`);
         }
+        const stream = caps.sse;
+        return (async function* () {
+          const opCtx: OperationContext = { id: op.id, path: op.path, tags: [...(op.tags ?? [])] };
+          // A thunk the stream re-runs on every (re)connect, so auth (which `prepareRequest`
+          // resolves) is refreshed per attempt rather than frozen at the first connect.
+          const prepare = async () => {
+            const prepared = await prepareRequest(config, op, args, init, caps);
+            return { url: prepared.url, init: prepared.init as SseOptions, body: prepared.body };
+          };
+          yield* stream(config, opCtx, prepare, op.sseDataKind ?? 'text');
+        })();
+      };
+      // Consumers key off the function reference (cache keys, `OPERATIONS[fn.name]`), so
+      // each closure carries its operationId instead of an inferred binding name.
+      // `operationId` is the explicit, minification-proof form of the same identity
+      // (the SPEC operationId — `name` is the emitted key, which a collision may rename).
+      Object.defineProperty(method, 'name', { value: name });
+      Object.defineProperty(method, 'operationId', { value: op.id });
+      client[name] = method;
+    } else {
+      // `raw` takes namespaced args; `method` is the public entry that accepts whichever
+      // style the client was generated with. The iterators namespace once and then drive
+      // `raw`, so a flat call is never converted twice.
+      const raw = (args: OperationArgs = {}, init: RequestOptions = {}) =>
+        execute(config, op, args, init, caps);
+      const method = (args: OperationArgs = {}, init: RequestOptions = {}) =>
+        raw(inputOf(op, args, config), init);
+      Object.defineProperty(method, 'name', { value: name });
+      Object.defineProperty(method, 'operationId', { value: op.id });
+      const spec = op.pagination;
+      // Paginated ops keep their one-shot call and gain `.pages`/`.items`, dispatching
+      // through the capability seam (like SSE: absent capability throws descriptively).
+      // Iteration is error-mode-agnostic: the iterators' pointers are data-rooted, so on
+      // a result-mode client (`errorMode` is fixed at construction — `configure()`
+      // ignores it) each page's envelope is unwrapped before it reaches the capability.
+      // A failed page aborts iteration by throwing ApiError, even on result-mode
+      // clients; the `onError` middleware hook (throw-mode-only) is not invoked.
+      client[name] =
+        spec === undefined
+          ? method
+          : spec.style === 'link' || spec.style === 'body-link'
+            ? Object.assign(method, {
+                pages: (args?: OperationArgs, init?: RequestOptions) =>
+                  paginateCapability(caps, op).pagesByLink(
+                    linkPageCall(config, op, caps),
+                    spec,
+                    inputOf(op, args ?? {}, config),
+                    init
+                  ),
+                items: (args?: OperationArgs, init?: RequestOptions) =>
+                  paginateCapability(caps, op).itemsByLink(
+                    linkPageCall(config, op, caps),
+                    spec,
+                    inputOf(op, args ?? {}, config),
+                    init
+                  ),
+              })
+            : Object.assign(method, {
+                pages: (args?: OperationArgs, init?: RequestOptions) =>
+                  paginateCapability(caps, op).pages(
+                    pageCall(raw, config),
+                    spec,
+                    inputOf(op, args ?? {}, config),
+                    init
+                  ),
+                items: (args?: OperationArgs, init?: RequestOptions) =>
+                  paginateCapability(caps, op).items(
+                    pageCall(raw, config),
+                    spec,
+                    inputOf(op, args ?? {}, config),
+                    init
+                  ),
+              });
     }
+  }
 
-    // Core members are assigned AFTER the operation loop — they win over colliding op names.
-    client.configure = (next: ClientConfig): void => {
-        // `errorMode` and `argsStyle` are fixed at generate time (they shape the static types);
-        // flipping either at runtime would silently desync the calls from `Client<Ops>`, so both
-        // are ignored here.
-        const {
-            errorMode: _fixedMode,
-            argsStyle: _fixedStyle,
-            auth,
-            ...rest
-        } = next;
-        Object.assign(config, rest);
-        // `auth` merges into existing credentials (like the `auth.*` setters) rather than
-        // replacing wholesale — so `configure({ auth: { bearer } })` keeps a previously set
-        // basic/apiKey. `apiKey` merges per scheme.
-        if (auth) {
-            config.auth = {
-                ...config.auth,
-                ...auth,
-                ...(auth.apiKey
-                    ? { apiKey: { ...config.auth?.apiKey, ...auth.apiKey } }
-                    : {}),
-            };
-        }
-    };
-    client.use = (...middleware: Middleware[]): void => {
-        // Reassign (don't push) so a caller-provided `middleware` array isn't mutated.
-        config.middleware = [...(config.middleware ?? []), ...middleware];
-    };
-    client.auth = {
-        bearer(token: TokenProvider): void {
-            config.auth = { ...config.auth, bearer: token };
-        },
-        basic(username: string, password: string): void {
-            config.auth = { ...config.auth, basic: { username, password } };
-        },
-        apiKey(scheme: string, value: TokenProvider): void {
-            config.auth = {
-                ...config.auth,
-                apiKey: { ...config.auth?.apiKey, [scheme]: value },
-            };
-        },
-    };
+  // Core members are assigned AFTER the operation loop — they win over colliding op names.
+  client.configure = (next: ClientConfig): void => {
+    // `errorMode` and `argsStyle` are fixed at generate time (they shape the static types);
+    // flipping either at runtime would silently desync the calls from `Client<Ops>`, so both
+    // are ignored here.
+    const { errorMode: _fixedMode, argsStyle: _fixedStyle, auth, ...rest } = next;
+    Object.assign(config, rest);
+    // `auth` merges into existing credentials (like the `auth.*` setters) rather than
+    // replacing wholesale — so `configure({ auth: { bearer } })` keeps a previously set
+    // basic/apiKey. `apiKey` merges per scheme.
+    if (auth) {
+      config.auth = {
+        ...config.auth,
+        ...auth,
+        ...(auth.apiKey ? { apiKey: { ...config.auth?.apiKey, ...auth.apiKey } } : {}),
+      };
+    }
+  };
+  client.use = (...middleware: Middleware[]): void => {
+    // Reassign (don't push) so a caller-provided `middleware` array isn't mutated.
+    config.middleware = [...(config.middleware ?? []), ...middleware];
+  };
+  client.auth = {
+    bearer(token: TokenProvider): void {
+      config.auth = { ...config.auth, bearer: token };
+    },
+    basic(username: string, password: string): void {
+      config.auth = { ...config.auth, basic: { username, password } };
+    },
+    apiKey(scheme: string, value: TokenProvider): void {
+      config.auth = { ...config.auth, apiKey: { ...config.auth?.apiKey, [scheme]: value } };
+    },
+  };
 
-    return client as Client<Ops, OperationContext<Id, Path, Tag>>;
+  return client as Client<Ops, OperationContext<Id, Path, Tag>>;
 }
 
 /**
@@ -2076,26 +1779,18 @@ function createClientCore<
  * unions (`OperationId`/`OperationPath`/`OperationTag`) into `ctx.operation`.
  */
 export function createClient<
-    Ops extends OpsShape,
-    Id extends string = string,
-    Path extends string = string,
-    Tag extends string = string,
+  Ops extends OpsShape,
+  Id extends string = string,
+  Path extends string = string,
+  Tag extends string = string,
 >(
-    operations: Record<string, OperationDescriptor>,
-    config?: ClientConfig<OperationContext<Id, Path, Tag>>,
+  operations: Record<string, OperationDescriptor>,
+  config?: ClientConfig<OperationContext<Id, Path, Tag>>
 ): Client<Ops, OperationContext<Id, Path, Tag>> {
-    return createClientCore<Ops, Id, Path, Tag>(operations, config, {
-        resolveAuth,
-    });
+  return createClientCore<Ops, Id, Path, Tag>(operations, config, { resolveAuth });
 }
 
-export const client = createClient<Ops, OperationId, OperationPath, string>(
-    OPERATIONS,
-    {
-        serverUrl: "https://worldcubeassociation.org",
-        clientHeader: "redocly-client-generator",
-    },
-);
+export const client = createClient<Ops, OperationId, OperationPath, string>(OPERATIONS, { serverUrl: "https://worldcubeassociation.org", clientHeader: "redocly-client-generator" });
 
 export const { configure, use } = client;
 export const { getMe, getScrambleProgram, getCompetitions, getWcif } = client;
