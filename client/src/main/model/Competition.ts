@@ -1,4 +1,3 @@
-export default interface Competition {
-    id: string;
-    name: string;
-}
+import type { GetCompetitionsResult } from "../api/wca.redocly";
+
+export type Competition = GetCompetitionsResult[number];

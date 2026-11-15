@@ -22,9 +22,9 @@ import {
 } from "../util/query.param.util";
 import { defaultWcif } from "../util/wcif.util";
 import "./SideBar.css";
-import type Wcif from "../model/Wcif";
+import type { Wcif } from "../model/Wcif";
 import { setShowColorPicker } from "../redux/slice/SettingsSlice";
-import type Competition from "../model/Competition";
+import type { Competition } from "../model/Competition";
 import { useAuth } from "react-oidc-context";
 import type { CustomAuthState } from "../api/wca.oidc";
 import {
@@ -99,7 +99,7 @@ const SideBar = () => {
                         managed_by_me: true,
                         start: oneWeekAgo.toISOString(),
                         sort: "start_date",
-                    }
+                    },
                 })
                 .then((response) => setUpcomingCompetitions(response))
                 .finally(() => setLoadingCompetitions(false));
@@ -233,7 +233,10 @@ const SideBar = () => {
 
                 wcaClient
                     .getWcif({
-                        path: { competitionId, formatVersion: backendWcifVersion }
+                        path: {
+                            competitionId,
+                            formatVersion: backendWcifVersion,
+                        },
                     })
                     .then((response) => {
                         updateWcif(response);

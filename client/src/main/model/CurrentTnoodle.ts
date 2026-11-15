@@ -1,5 +1,3 @@
-export default interface CurrentTnoodle {
-    name: string;
-    information: string;
-    download: string;
-}
+import type { GetScrambleProgramResult } from "../api/wca.redocly";
+
+export type CurrentTnoodle = GetScrambleProgramResult["current"];
