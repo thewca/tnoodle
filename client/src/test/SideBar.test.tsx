@@ -10,7 +10,7 @@ import SideBar from "../main/components/SideBar";
 import { competitions, me } from "./mock/wca.api.test.mock";
 import WcaApi from "../main/api/wca.api";
 import { axiosResponse } from "./mock/util.test.mock";
-import TNoodleAuthContext from "../main/api/TNoodleAuthContext";
+import MockAuthContext from "./mock/MockAuthContext";
 
 let container = document.createElement("div");
 let wcaApi = new WcaApi("foo-bar-testing");
@@ -33,8 +33,6 @@ afterEach(() => {
 
 it("Each competition fetched from the website must become a button", async () => {
     // Turn on mocking behavior
-    vi.spyOn(wcaApi, "isLogged").mockImplementation(() => true);
-
     vi.spyOn(wcaApi, "getUpcomingManageableCompetitions").mockImplementation(
         () => Promise.resolve({ ...axiosResponse, data: competitions }),
     );
@@ -47,9 +45,9 @@ it("Each competition fetched from the website must become a button", async () =>
     await act(async () => {
         render(
             <Provider store={store}>
-                <TNoodleAuthContext>
+                <MockAuthContext isAuthenticated>
                     <SideBar />
-                </TNoodleAuthContext>
+                </MockAuthContext>
             </Provider>,
             { container },
         );
@@ -78,6 +76,6 @@ it("Each competition fetched from the website must become a button", async () =>
     expect(welcome.innerHTML).toContain(me.name);
 
     // Clear mock
-    vi.spyOn(wcaApi, "isLogged").mockRestore();
     vi.spyOn(wcaApi, "getUpcomingManageableCompetitions").mockRestore();
+    vi.spyOn(wcaApi, "fetchMe").mockRestore();
 });

@@ -18,7 +18,7 @@ import {
 import { axiosResponse, getNewStore } from "./mock/util.test.mock";
 import { scrambleProgram } from "./mock/wca.api.test.mock";
 import { getFmcLanguageTags } from "./util/extension.test.util";
-import TNoodleAuthContext from "../main/api/TNoodleAuthContext";
+import MockAuthContext from "./mock/MockAuthContext";
 
 let container = document.createElement("div");
 let wcaApi = new WcaApi("foo-bar-testing");
@@ -97,9 +97,9 @@ it("There should be only 1 button of type submit, check FMC changes", async () =
         render(
             <React.StrictMode>
                 <Provider store={store}>
-                    <TNoodleAuthContext>
+                    <MockAuthContext>
                         <Main />
-                    </TNoodleAuthContext>
+                    </MockAuthContext>
                 </Provider>
             </React.StrictMode>,
             { container },
