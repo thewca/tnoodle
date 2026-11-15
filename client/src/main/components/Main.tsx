@@ -1,10 +1,10 @@
-import { SyntheticEvent, useRef, useState } from "react";
+import { type FormEvent, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import tnoodleApi from "../api/tnoodle.api";
 import wcaApi from "../api/wca.api";
 import { ScrambleClient } from "../api/tnoodle.socket";
 import { isUsingStaging } from "../api/wca.api";
-import RootState from "../model/RootState";
+import type RootState from "../model/RootState";
 import {
     resetScramblingProgressCurrent,
     setFileZip,
@@ -17,7 +17,7 @@ import EventPickerTable from "./EventPickerTable";
 import Interceptor from "./Interceptor";
 import "./Main.css";
 import VersionInfo from "./VersionInfo";
-import WebsocketBlobResult from "../model/WebsocketBlobResult";
+import type WebsocketBlobResult from "../model/WebsocketBlobResult";
 import { frontendStatusExtensionId } from "../util/wcif.util";
 
 const Main = () => {
@@ -40,7 +40,7 @@ const Main = () => {
 
     const dispatch = useDispatch();
 
-    const onSubmit = (evt: SyntheticEvent) => {
+    const onSubmit = (evt: FormEvent) => {
         evt.preventDefault();
 
         if (generatingScrambles) {
@@ -115,7 +115,7 @@ const Main = () => {
         link.remove();
     };
 
-    const appOnlineMode = !!process.env.REACT_APP_TNOODLE_ONLINE_MODE;
+    const appOnlineMode = !!import.meta.env.VITE_TNOODLE_ONLINE_MODE;
 
     const scrambleButton = () => {
         if (generatingScrambles) {

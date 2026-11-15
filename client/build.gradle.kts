@@ -47,7 +47,7 @@ tasks.register<Zip>("packageReactFrontend") {
     archiveExtension = "jar"
 
     from(layout.buildDirectory) {
-        include("static/**/*")
+        include("assets/**/*")
         include("*.html")
         include("*.png")
         include("robots.txt")

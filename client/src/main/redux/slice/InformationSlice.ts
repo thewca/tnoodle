@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import CachedObject from "../../model/CachedObject";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type CachedObject from "../../model/CachedObject";
 
 interface InformationState {
     cachedObjects: Record<string, CachedObject>;

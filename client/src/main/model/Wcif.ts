@@ -1,7 +1,7 @@
-import Person from "./Person";
-import Schedule from "./Schedule";
-import WcifEvent from "./WcifEvent";
-import { Extendable } from "./Extension";
+import type Person from "./Person";
+import type Schedule from "./Schedule";
+import type WcifEvent from "./WcifEvent";
+import { type Extendable } from "./Extension";
 
 export default interface Wcif extends Extendable {
     events: WcifEvent[];

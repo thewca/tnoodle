@@ -1,4 +1,4 @@
-import { Extendable, Extension } from "../model/Extension";
+import type { Extendable, Extension } from "../model/Extension";
 import _ from "lodash";
 
 export const findExtension = <T extends Extendable>(

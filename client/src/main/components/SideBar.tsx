@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import tnoodleApi from "../api/tnoodle.api";
 import wcaApi from "../api/wca.api";
 import logo from "../assets/tnoodle_logo.svg";
-import RootState from "../model/RootState";
+import type RootState from "../model/RootState";
 import {
     addCachedObject,
     setIsManualSelection,
@@ -23,10 +23,10 @@ import {
 } from "../util/query.param.util";
 import { defaultWcif } from "../util/wcif.util";
 import "./SideBar.css";
-import Wcif from "../model/Wcif";
+import type Wcif from "../model/Wcif";
 import { setShowColorPicker } from "../redux/slice/SettingsSlice";
-import Competition from "../model/Competition";
-import Person from "../model/Person";
+import type Competition from "../model/Competition";
+import type Person from "../model/Person";
 
 const SideBar = () => {
     const [loadingUser, setLoadingUser] = useState(false);

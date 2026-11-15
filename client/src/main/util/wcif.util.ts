@@ -1,5 +1,5 @@
-import Wcif from "../model/Wcif";
-import WcifEvent from "../model/WcifEvent";
+import type Wcif from "../model/Wcif";
+import type WcifEvent from "../model/WcifEvent";
 import { getDefaultCompetitionName } from "./competition.name.util";
 
 export const copiesExtensionId =

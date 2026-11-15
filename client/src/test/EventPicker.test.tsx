@@ -25,15 +25,15 @@ beforeEach(() => {
     container = document.createElement("div");
     document.body.appendChild(container);
 
-    jest.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockImplementation(() =>
         Promise.resolve({ data: colorScheme, ...axiosResponse }),
     );
 
-    jest.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockImplementation(() =>
         Promise.resolve({ data: scrambleAndImage, ...axiosResponse }),
     );
 
-    jest.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockImplementation(() =>
         Promise.resolve({ data: emptySvg, ...axiosResponse }),
     );
 });
@@ -43,9 +43,9 @@ afterEach(() => {
     container.remove();
     container = document.createElement("div");
 
-    jest.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockRestore();
-    jest.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockRestore();
-    jest.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockRestore();
 });
 
 it("Changing values from event", async () => {

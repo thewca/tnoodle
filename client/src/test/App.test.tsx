@@ -5,7 +5,7 @@ import { Provider } from "react-redux";
 import App from "../App";
 import tnoodleApi from "../main/api/tnoodle.api";
 import wcaApi from "../main/api/wca.api";
-import Wcif from "../main/model/Wcif";
+import type Wcif from "../main/model/Wcif";
 import { defaultWcif, frontendStatusExtensionId } from "../main/util/wcif.util";
 import {
     bestMbldAttempt,
@@ -43,42 +43,42 @@ beforeEach(() => {
     document.body.appendChild(container);
 
     // Turn on mocking behavior
-    jest.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
         Promise.resolve({
             data: events,
             ...axiosResponse,
         }),
     );
 
-    jest.spyOn(tnoodleApi, "fetchFormats").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchFormats").mockImplementation(() =>
         Promise.resolve({ data: formats, ...axiosResponse }),
     );
 
-    jest.spyOn(tnoodleApi, "fetchBackendWcifVersion").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchBackendWcifVersion").mockImplementation(() =>
         Promise.resolve({ data: wcifTestVersion, ...axiosResponse }),
     );
 
-    jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockImplementation(
+    vi.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockImplementation(
         () => Promise.resolve({ data: languages, ...axiosResponse }),
     );
 
-    jest.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockImplementation(() =>
         Promise.resolve({ data: colorScheme, ...axiosResponse }),
     );
 
-    jest.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockImplementation(() =>
         Promise.resolve({ data: scrambleAndImage, ...axiosResponse }),
     );
 
-    jest.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockImplementation(() =>
         Promise.resolve({ data: emptySvg, ...axiosResponse }),
     );
 
-    jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
         Promise.resolve({ data: version, ...axiosResponse }),
     );
 
-    jest.spyOn(tnoodleApi, "fetchZip").mockImplementation(
+    vi.spyOn(tnoodleApi, "fetchZip").mockImplementation(
         (scrambleClient, _wcif, _password) => {
             wcif = _wcif;
             password = _password;
@@ -87,19 +87,19 @@ beforeEach(() => {
         },
     );
 
-    jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
+    vi.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
         Promise.resolve({ data: scrambleProgram, ...axiosResponse }),
     );
 
-    jest.spyOn(wcaApi, "getUpcomingManageableCompetitions").mockImplementation(
+    vi.spyOn(wcaApi, "getUpcomingManageableCompetitions").mockImplementation(
         () => Promise.resolve({ ...axiosResponse, data: competitions }),
     );
 
-    jest.spyOn(wcaApi, "fetchMe").mockImplementation(() =>
+    vi.spyOn(wcaApi, "fetchMe").mockImplementation(() =>
         Promise.resolve({ ...axiosResponse, data: { me } }),
     );
 
-    jest.spyOn(tnoodleApi, "convertToBlob").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "convertToBlob").mockImplementation(() =>
         Promise.resolve(new Blob()),
     );
 });
@@ -113,19 +113,19 @@ afterEach(() => {
     password = null;
 
     // Clear mock
-    jest.spyOn(tnoodleApi, "fetchWcaEvents").mockRestore();
-    jest.spyOn(tnoodleApi, "fetchFormats").mockRestore();
-    jest.spyOn(tnoodleApi, "fetchBackendWcifVersion").mockRestore();
-    jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockRestore();
-    jest.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockRestore();
-    jest.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockRestore();
-    jest.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockRestore();
-    jest.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
-    jest.spyOn(tnoodleApi, "fetchZip").mockRestore();
-    jest.spyOn(wcaApi, "getUpcomingManageableCompetitions").mockRestore();
-    jest.spyOn(tnoodleApi, "convertToBlob").mockRestore();
-    jest.spyOn(wcaApi, "fetchMe").mockRestore();
-    jest.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchWcaEvents").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchFormats").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchBackendWcifVersion").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchZip").mockRestore();
+    vi.spyOn(wcaApi, "getUpcomingManageableCompetitions").mockRestore();
+    vi.spyOn(tnoodleApi, "convertToBlob").mockRestore();
+    vi.spyOn(wcaApi, "fetchMe").mockRestore();
+    vi.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
 });
 
 it("Just generate scrambles", async () => {
@@ -348,23 +348,22 @@ it("Logged user", async () => {
     const store = getNewStore();
 
     // Allow downloads
-    global.URL.createObjectURL = jest.fn();
+    global.URL.createObjectURL = vi.fn();
 
-    jest.spyOn(wcaApi, "isLogged").mockImplementation(() => true);
+    vi.spyOn(wcaApi, "isLogged").mockImplementation(() => true);
 
-    jest.spyOn(wcaApi, "getCompetitionJson").mockImplementation(
-        (competitionId) =>
-            Promise.resolve({ ...axiosResponse, data: wcifs[competitionId] }),
+    vi.spyOn(wcaApi, "getCompetitionJson").mockImplementation((competitionId) =>
+        Promise.resolve({ ...axiosResponse, data: wcifs[competitionId] }),
     );
 
-    jest.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockImplementation(() =>
         Promise.resolve({
             ...axiosResponse,
             data: bestMbldAttempt,
         }),
     );
 
-    jest.spyOn(tnoodleApi, "fetchSuggestedFmcTranslations").mockImplementation(
+    vi.spyOn(tnoodleApi, "fetchSuggestedFmcTranslations").mockImplementation(
         () =>
             Promise.resolve({ ...axiosResponse, data: ["de", "es", "pt-BR"] }),
     );
@@ -471,32 +470,31 @@ it("Logged user", async () => {
         competitions.length,
     );
 
-    jest.spyOn(global.URL, "createObjectURL").mockRestore();
-    jest.spyOn(wcaApi, "isLogged").mockRestore();
-    jest.spyOn(wcaApi, "getCompetitionJson").mockRestore();
-    jest.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockRestore();
-    jest.spyOn(tnoodleApi, "fetchSuggestedFmcTranslations").mockRestore();
+    vi.spyOn(global.URL, "createObjectURL").mockRestore();
+    vi.spyOn(wcaApi, "isLogged").mockRestore();
+    vi.spyOn(wcaApi, "getCompetitionJson").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchSuggestedFmcTranslations").mockRestore();
 });
 
 it("Comfort features should not block zip generation", async () => {
     const store = getNewStore();
 
     // Allow downloads
-    global.URL.createObjectURL = jest.fn();
+    global.URL.createObjectURL = vi.fn();
 
-    jest.spyOn(wcaApi, "isLogged").mockImplementation(() => true);
+    vi.spyOn(wcaApi, "isLogged").mockImplementation(() => true);
 
-    jest.spyOn(wcaApi, "getCompetitionJson").mockImplementation(
-        (competitionId) =>
-            Promise.resolve({ ...axiosResponse, data: wcifs[competitionId] }),
+    vi.spyOn(wcaApi, "getCompetitionJson").mockImplementation((competitionId) =>
+        Promise.resolve({ ...axiosResponse, data: wcifs[competitionId] }),
     );
 
     // Comfort features
-    jest.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockImplementation(() =>
         Promise.resolve({ ...axiosResponse, data: bestMbldAttempt }),
     );
 
-    jest.spyOn(tnoodleApi, "fetchSuggestedFmcTranslations").mockImplementation(
+    vi.spyOn(tnoodleApi, "fetchSuggestedFmcTranslations").mockImplementation(
         () => Promise.resolve({ ...axiosResponse, data: [] }),
     );
 
@@ -552,9 +550,9 @@ it("Comfort features should not block zip generation", async () => {
         competitionButtons.length,
     );
 
-    jest.spyOn(global.URL, "createObjectURL").mockRestore();
-    jest.spyOn(wcaApi, "isLogged").mockRestore();
-    jest.spyOn(wcaApi, "getCompetitionJson").mockRestore();
-    jest.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockRestore();
-    jest.spyOn(tnoodleApi, "fetchSuggestedFmcTranslations").mockRestore();
+    vi.spyOn(global.URL, "createObjectURL").mockRestore();
+    vi.spyOn(wcaApi, "isLogged").mockRestore();
+    vi.spyOn(wcaApi, "getCompetitionJson").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchSuggestedFmcTranslations").mockRestore();
 });

@@ -1,4 +1,4 @@
-import Wcif from "./Wcif";
+import type Wcif from "./Wcif";
 
 export default interface CachedObject {
     bestMbldAttempt: number;

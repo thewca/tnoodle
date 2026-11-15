@@ -1,10 +1,10 @@
 import { chunk } from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import RootState from "../model/RootState";
+import type RootState from "../model/RootState";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
 import tnoodleApi from "../api/tnoodle.api";
-import WcifEvent from "../model/WcifEvent";
+import type WcifEvent from "../model/WcifEvent";
 import { fmcTranslationsExtensionId } from "../util/wcif.util";
 import { setWcifEvent } from "../redux/slice/WcifSlice";
 import { findExtension, setExtensionLazily } from "../util/extension.util";

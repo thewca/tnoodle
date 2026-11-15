@@ -26,13 +26,13 @@ afterEach(() => {
 
 it("Each competition fetched from the website must become a button", async () => {
     // Turn on mocking behavior
-    jest.spyOn(wcaApi, "isLogged").mockImplementation(() => true);
+    vi.spyOn(wcaApi, "isLogged").mockImplementation(() => true);
 
-    jest.spyOn(wcaApi, "getUpcomingManageableCompetitions").mockImplementation(
+    vi.spyOn(wcaApi, "getUpcomingManageableCompetitions").mockImplementation(
         () => Promise.resolve({ ...axiosResponse, data: competitions }),
     );
 
-    jest.spyOn(wcaApi, "fetchMe").mockImplementation(() =>
+    vi.spyOn(wcaApi, "fetchMe").mockImplementation(() =>
         Promise.resolve({ ...axiosResponse, data: { me } }),
     );
 
@@ -69,6 +69,6 @@ it("Each competition fetched from the website must become a button", async () =>
     expect(welcome.innerHTML).toContain(me.name);
 
     // Clear mock
-    jest.spyOn(wcaApi, "isLogged").mockRestore();
-    jest.spyOn(wcaApi, "getUpcomingManageableCompetitions").mockRestore();
+    vi.spyOn(wcaApi, "isLogged").mockRestore();
+    vi.spyOn(wcaApi, "getUpcomingManageableCompetitions").mockRestore();
 });

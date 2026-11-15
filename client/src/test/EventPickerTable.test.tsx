@@ -27,34 +27,34 @@ beforeEach(() => {
     container = document.createElement("div");
     document.body.appendChild(container);
 
-    jest.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
         Promise.resolve({
             data: events,
             ...axiosResponse,
         }),
     );
 
-    jest.spyOn(tnoodleApi, "fetchFormats").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchFormats").mockImplementation(() =>
         Promise.resolve({ data: formats, ...axiosResponse }),
     );
 
-    jest.spyOn(tnoodleApi, "fetchBackendWcifVersion").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchBackendWcifVersion").mockImplementation(() =>
         Promise.resolve({ data: wcifTestVersion, ...axiosResponse }),
     );
 
-    jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockImplementation(
+    vi.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockImplementation(
         () => Promise.resolve({ data: languages, ...axiosResponse }),
     );
 
-    jest.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockImplementation(() =>
         Promise.resolve({ data: colorScheme, ...axiosResponse }),
     );
 
-    jest.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockImplementation(() =>
         Promise.resolve({ data: scrambleAndImage, ...axiosResponse }),
     );
 
-    jest.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockImplementation(() =>
+    vi.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockImplementation(() =>
         Promise.resolve({ data: emptySvg, ...axiosResponse }),
     );
 });
@@ -65,13 +65,13 @@ afterEach(() => {
     container = document.createElement("div");
 
     // Clear mock
-    jest.spyOn(tnoodleApi, "fetchWcaEvents").mockRestore();
-    jest.spyOn(tnoodleApi, "fetchFormats").mockRestore();
-    jest.spyOn(tnoodleApi, "fetchBackendWcifVersion").mockRestore();
-    jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockRestore();
-    jest.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockRestore();
-    jest.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockRestore();
-    jest.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchWcaEvents").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchFormats").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchBackendWcifVersion").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockRestore();
+    vi.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockRestore();
 });
 
 it("Show editing warn if case of competition selected", async () => {

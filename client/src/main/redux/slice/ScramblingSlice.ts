@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import WebsocketBlobResult from "../../model/WebsocketBlobResult";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type WebsocketBlobResult from "../../model/WebsocketBlobResult";
 
 interface ScramblingState {
     fileZip?: WebsocketBlobResult;
