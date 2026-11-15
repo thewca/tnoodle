@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import tnoodleApi from "../api/tnoodle.api";
-import WcaApi from "../api/wca.api";
+import wcaApi from "../api/wca.api";
 import type CurrentTnoodle from "../model/CurrentTnoodle";
 import { setWcif } from "../redux/slice/WcifSlice";
 import { frontendStatusExtensionId } from "../util/wcif.util";
@@ -39,8 +39,6 @@ const VersionInfo = () => {
         if (!oidcAuth.isAuthenticated) {
             return;
         }
-
-        const wcaApi = new WcaApi(oidcAuth.user!.access_token);
 
         // Fetch from WCA API.
         wcaApi.fetchVersionInfo().then((response) => {

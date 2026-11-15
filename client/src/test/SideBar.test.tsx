@@ -8,27 +8,21 @@ import store from "../main/redux/Store";
 import SideBar from "../main/components/SideBar";
 
 import { competitions, me } from "./mock/wca.api.test.mock";
-import WcaApi from "../main/api/wca.api";
+import wcaApi from "../main/api/wca.api";
 import { axiosResponse } from "./mock/util.test.mock";
 import MockAuthContext from "./mock/MockAuthContext";
 
 let container = document.createElement("div");
-let wcaApi = new WcaApi("foo-bar-testing");
-
 beforeEach(() => {
     // setup a DOM element as a render target
     container = document.createElement("div");
     document.body.appendChild(container);
-
-    wcaApi = new WcaApi("foo-bar-testing");
 });
 
 afterEach(() => {
     // cleanup on exiting
     container.remove();
     container = document.createElement("div");
-
-    wcaApi = new WcaApi("foo-bar-testing");
 });
 
 it("Each competition fetched from the website must become a button", async () => {

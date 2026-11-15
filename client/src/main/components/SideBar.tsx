@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Collapse, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import tnoodleApi from "../api/tnoodle.api";
-import WcaApi from "../api/wca.api";
+import wcaApi from "../api/wca.api";
 import logo from "../assets/tnoodle_logo.svg";
 import type RootState from "../model/RootState";
 import {
@@ -76,13 +76,13 @@ const SideBar = () => {
             return;
         }
 
-        const wcaApi = new WcaApi(oidcAuth.user!.access_token);
+        const wcaToken = oidcAuth.user!.access_token;
 
         if (!me) {
             setLoadingUser(true);
 
             wcaApi
-                .fetchMe()
+                .fetchMe(wcaToken)
                 .then((response) => setMe(response.data.me))
                 .finally(() => setLoadingUser(false));
         }
@@ -91,7 +91,7 @@ const SideBar = () => {
             setLoadingCompetitions(true);
 
             wcaApi
-                .getUpcomingManageableCompetitions()
+                .getUpcomingManageableCompetitions(wcaToken)
                 .then((response) => setUpcomingCompetitions(response.data))
                 .finally(() => setLoadingCompetitions(false));
         }
@@ -211,11 +211,11 @@ const SideBar = () => {
                 let cachedBestMbldAttempt = cachedObject.bestMbldAttempt;
                 dispatch(setBestMbldAttempt(cachedBestMbldAttempt));
             } else if (!!backendWcifVersion) {
-                const wcaApi = new WcaApi(oidcAuth.user!.access_token);
+                const wcaToken = oidcAuth.user!.access_token;
                 setLoadingCompetitionInfo(true);
 
                 wcaApi
-                    .getCompetitionJson(competitionId, backendWcifVersion)
+                    .getCompetitionJson(competitionId, backendWcifVersion, wcaToken)
                     .then((response) => {
                         updateWcif(response.data);
                         dispatch(
