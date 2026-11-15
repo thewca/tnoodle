@@ -68,7 +68,7 @@
         "@types/react": "^18.3.31",
         "@types/react-color": "^3.0.13",
         "@types/react-dom": "^18.3.7",
-        "@vitejs/plugin-react": "^6.2.1",
+        "@vitejs/plugin-react": "^6.3.0",
         "@vitest/coverage-v8": "^5.1.0",
         "jsdom": "^31.0.1",
         "prettier": "^3.9.10",
