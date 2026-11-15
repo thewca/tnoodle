@@ -1,20 +1,19 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
-import { AuthProvider } from "react-oidc-context";
 import App from "./App";
 import "./index.css";
 import store from "./main/redux/Store";
 import reportWebVitals from "./reportWebVitals";
-import oidcConfig, { gotoPreLoginPath } from "./main/api/wca.oidc";
+import TNoodleAuthContext from "./main/api/TNoodleAuthContext";
 
 const root = createRoot(document.getElementById("root") as HTMLDivElement);
 
 root.render(
     <Provider store={store}>
-        <AuthProvider {...oidcConfig} onSigninCallback={gotoPreLoginPath}>
+        <TNoodleAuthContext>
             <App />
-        </AuthProvider>
+        </TNoodleAuthContext>
     </Provider>,
 );
 

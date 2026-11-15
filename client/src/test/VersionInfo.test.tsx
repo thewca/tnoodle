@@ -8,6 +8,7 @@ import tnoodleApi from "../main/api/tnoodle.api";
 import wcaApi from "../main/api/wca.api";
 import store from "../main/redux/Store";
 import { axiosResponse } from "./mock/util.test.mock";
+import TNoodleAuthContext from "../main/api/TNoodleAuthContext";
 
 let container = document.createElement("div");
 beforeEach(() => {
@@ -57,7 +58,9 @@ it("Current version is the correct one", async () => {
     await act(async () => {
         render(
             <Provider store={store}>
-                <VersionInfo />
+                <TNoodleAuthContext>
+                    <VersionInfo />
+                </TNoodleAuthContext>
             </Provider>,
             { container },
         );
@@ -109,7 +112,9 @@ it("Current version is allowed, but it's not the latest one", async () => {
     await act(async () => {
         render(
             <Provider store={store}>
-                <VersionInfo />
+                <TNoodleAuthContext>
+                    <VersionInfo />
+                </TNoodleAuthContext>
             </Provider>,
             { container },
         );
@@ -165,7 +170,9 @@ it("Not signed version alert", async () => {
     await act(async () => {
         render(
             <Provider store={store}>
-                <VersionInfo />
+                <TNoodleAuthContext>
+                    <VersionInfo />
+                </TNoodleAuthContext>
             </Provider>,
             { container },
         );
@@ -218,7 +225,9 @@ it("Signed with different key", async () => {
     await act(async () => {
         render(
             <Provider store={store}>
-                <VersionInfo />
+                <TNoodleAuthContext>
+                    <VersionInfo />
+                </TNoodleAuthContext>
             </Provider>,
             { container },
         );
@@ -271,7 +280,9 @@ it("Not allowed TNoodle version, despite it's official", async () => {
     await act(async () => {
         render(
             <Provider store={store}>
-                <VersionInfo />
+                <TNoodleAuthContext>
+                    <VersionInfo />
+                </TNoodleAuthContext>
             </Provider>,
             { container },
         );
@@ -317,7 +328,9 @@ it("Do not bother the user if we can't be sure", async () => {
     await act(async () => {
         render(
             <Provider store={store}>
-                <VersionInfo />
+                <TNoodleAuthContext>
+                    <VersionInfo />
+                </TNoodleAuthContext>
             </Provider>,
             { container },
         );

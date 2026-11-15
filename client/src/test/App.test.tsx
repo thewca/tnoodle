@@ -32,6 +32,7 @@ import {
     getMbldCubesCount,
 } from "./util/extension.test.util";
 import { findExtension } from "../main/util/extension.util";
+import TNoodleAuthContext from "../main/api/TNoodleAuthContext";
 
 let container = document.createElement("div");
 
@@ -136,7 +137,9 @@ it("Just generate scrambles", async () => {
         render(
             <React.StrictMode>
                 <Provider store={store}>
-                    <App />
+                    <TNoodleAuthContext>
+                        <App />
+                    </TNoodleAuthContext>
                 </Provider>
             </React.StrictMode>,
             { container },
@@ -170,7 +173,9 @@ it("Changes on 333, scramble", async () => {
         render(
             <React.StrictMode>
                 <Provider store={store}>
-                    <App />
+                    <TNoodleAuthContext>
+                        <App />
+                    </TNoodleAuthContext>
                 </Provider>
             </React.StrictMode>,
             { container },
@@ -243,7 +248,9 @@ it("Remove 333, add FMC and MBLD", async () => {
         render(
             <React.StrictMode>
                 <Provider store={store}>
-                    <App />
+                    <TNoodleAuthContext>
+                        <App />
+                    </TNoodleAuthContext>
                 </Provider>
             </React.StrictMode>,
             { container },
@@ -373,7 +380,9 @@ it("Logged user", async () => {
         render(
             <React.StrictMode>
                 <Provider store={store}>
-                    <App />
+                    <TNoodleAuthContext>
+                        <App />
+                    </TNoodleAuthContext>
                 </Provider>
             </React.StrictMode>,
             { container },
@@ -503,7 +512,9 @@ it("Comfort features should not block zip generation", async () => {
         render(
             <React.StrictMode>
                 <Provider store={store}>
-                    <App />
+                    <TNoodleAuthContext>
+                        <App />
+                    </TNoodleAuthContext>
                 </Provider>
             </React.StrictMode>,
             { container },

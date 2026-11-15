@@ -10,6 +10,7 @@ import SideBar from "../main/components/SideBar";
 import { competitions, me } from "./mock/wca.api.test.mock";
 import wcaApi from "../main/api/wca.api";
 import { axiosResponse } from "./mock/util.test.mock";
+import TNoodleAuthContext from "../main/api/TNoodleAuthContext";
 
 let container = document.createElement("div");
 beforeEach(() => {
@@ -40,7 +41,9 @@ it("Each competition fetched from the website must become a button", async () =>
     await act(async () => {
         render(
             <Provider store={store}>
-                <SideBar />
+                <TNoodleAuthContext>
+                    <SideBar />
+                </TNoodleAuthContext>
             </Provider>,
             { container },
         );
