@@ -2,7 +2,7 @@ import { render, act, fireEvent } from "@testing-library/react";
 import React from "react";
 import { Provider } from "react-redux";
 import tnoodleApi from "../main/api/tnoodle.api";
-import wcaApi from "../main/api/wca.api";
+import WcaApi from "../main/api/wca.api";
 import Main from "../main/components/Main";
 import { setSuggestedFmcTranslations } from "../main/redux/slice/EventDataSlice";
 import {
@@ -21,10 +21,14 @@ import { getFmcLanguageTags } from "./util/extension.test.util";
 import TNoodleAuthContext from "../main/api/TNoodleAuthContext";
 
 let container = document.createElement("div");
+let wcaApi = new WcaApi("foo-bar-testing");
+
 beforeEach(() => {
     // setup a DOM element as a render target
     container = document.createElement("div");
     document.body.appendChild(container);
+
+    wcaApi = new WcaApi("foo-bar-testing");
 
     vi.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
         Promise.resolve({ data: version, ...axiosResponse }),
@@ -39,6 +43,8 @@ afterEach(() => {
     // cleanup on exiting
     container.remove();
     container = document.createElement("div");
+
+    wcaApi = new WcaApi("foo-bar-testing");
 
     vi.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
     vi.spyOn(wcaApi, "fetchVersionInfo").mockRestore();

@@ -4,7 +4,7 @@ import React from "react";
 import { Provider } from "react-redux";
 import App from "../App";
 import tnoodleApi from "../main/api/tnoodle.api";
-import wcaApi from "../main/api/wca.api";
+import WcaApi from "../main/api/wca.api";
 import type Wcif from "../main/model/Wcif";
 import { defaultWcif, frontendStatusExtensionId } from "../main/util/wcif.util";
 import {
@@ -35,6 +35,7 @@ import { findExtension } from "../main/util/extension.util";
 import TNoodleAuthContext from "../main/api/TNoodleAuthContext";
 
 let container = document.createElement("div");
+let wcaApi = new WcaApi("foo-bar-testing");
 
 let wcif: Wcif | null = null;
 let password: string | null = null;
@@ -42,6 +43,8 @@ beforeEach(() => {
     // setup a DOM element as a render target
     container = document.createElement("div");
     document.body.appendChild(container);
+
+    wcaApi = new WcaApi("foo-bar-testing");
 
     // Turn on mocking behavior
     vi.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
@@ -109,6 +112,8 @@ afterEach(() => {
     // cleanup on exiting
     container.remove();
     container = document.createElement("div");
+
+    wcaApi = new WcaApi("foo-bar-testing");
 
     wcif = null;
     password = null;

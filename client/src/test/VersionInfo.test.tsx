@@ -5,22 +5,28 @@ import { Provider } from "react-redux";
 
 import VersionInfo from "../main/components/VersionInfo";
 import tnoodleApi from "../main/api/tnoodle.api";
-import wcaApi from "../main/api/wca.api";
+import WcaApi from "../main/api/wca.api";
 import store from "../main/redux/Store";
 import { axiosResponse } from "./mock/util.test.mock";
 import TNoodleAuthContext from "../main/api/TNoodleAuthContext";
 
 let container = document.createElement("div");
+let wcaApi = new WcaApi("foo-bar-testing");
+
 beforeEach(() => {
     // setup a DOM element as a render target
     container = document.createElement("div");
     document.body.appendChild(container);
+
+    wcaApi = new WcaApi("foo-bar-testing");
 });
 
 afterEach(() => {
     // cleanup on exiting
     container.remove();
     container = document.createElement("div");
+
+    wcaApi = new WcaApi("foo-bar-testing");
 });
 
 it("Current version is the correct one", async () => {
