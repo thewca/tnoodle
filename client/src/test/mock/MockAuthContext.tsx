@@ -38,6 +38,25 @@ const MockAuthContext = ({
                 startSilentRenew: userManager.startSilentRenew,
                 stopSilentRenew: userManager.stopSilentRenew,
                 removeUser: userManager.removeUser,
+                user: {
+                    session_state: null,
+                    access_token: "",
+                    token_type: "",
+                    state: undefined,
+                    expires_in: undefined,
+                    expired: undefined,
+                    scopes: [],
+                    profile: {
+                        name: "",
+                        email: "",
+                        sub: "",
+                        iss: "",
+                        aud: "",
+                        exp: 0,
+                        iat: 0,
+                    },
+                    toStorageString: () => "",
+                },
             }}
         >
             {children}
