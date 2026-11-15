@@ -53,7 +53,7 @@ google-cloud-storage = { module = "com.google.cloud:google-cloud-storage", versi
 tnoodle-scrambles = { module = "org.worldcubeassociation.tnoodle:lib-scrambles", version = "0.20.0" }
 apache-commons-lang3 = { module = "org.apache.commons:commons-lang3", version = "3.22.0" }
 kotless-ktor = { module = "io.kotless:ktor-lang", version.ref = "kotless" }
-mockk = { module = "io.mockk:mockk", version = "1.14.11" }
+mockk = { module = "io.mockk:mockk", version = "1.14.12" }
 eclipse-jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version = "7.8.1.202611041320-r" }
 
 [bundles]
