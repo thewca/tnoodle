@@ -10,12 +10,17 @@ export function toWcaUrl(path: string) {
 }
 
 class WcaApi {
-    fetchMe = (wcaAccessToken: string) => this.wcaApiFetch<{ me: Person }>("/me", wcaAccessToken);
+    fetchMe = (wcaAccessToken: string) =>
+        this.wcaApiFetch<{ me: Person }>("/me", wcaAccessToken);
 
     fetchVersionInfo = () =>
         axios.get<ScrambleProgram>(toWcaUrl("/api/v0/scramble-program"));
 
-    getCompetitionJson = (competitionId: string, formatVersion: string, wcaAccessToken: string) => {
+    getCompetitionJson = (
+        competitionId: string,
+        formatVersion: string,
+        wcaAccessToken: string,
+    ) => {
         return this.wcaApiFetch<Wcif>(
             `/competitions/${competitionId}/wcif/version/${formatVersion}`,
             wcaAccessToken,

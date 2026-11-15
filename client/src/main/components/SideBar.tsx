@@ -215,7 +215,11 @@ const SideBar = () => {
                 setLoadingCompetitionInfo(true);
 
                 wcaApi
-                    .getCompetitionJson(competitionId, backendWcifVersion, wcaToken)
+                    .getCompetitionJson(
+                        competitionId,
+                        backendWcifVersion,
+                        wcaToken,
+                    )
                     .then((response) => {
                         updateWcif(response.data);
                         dispatch(
