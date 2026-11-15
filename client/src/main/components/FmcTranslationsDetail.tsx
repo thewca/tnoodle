@@ -7,7 +7,7 @@ import {
     client,
     type GetFmcSheetLanguagesResult,
 } from "../api/tnoodle.redocly";
-import type WcifEvent from "../model/WcifEvent";
+import type { WcifEvent } from "../model/WcifEvent";
 import { fmcTranslationsExtensionId } from "../util/wcif.util";
 import { setWcifEvent } from "../redux/slice/WcifSlice";
 import { findExtension, setExtensionLazily } from "../util/extension.util";

@@ -1,6 +1,3 @@
-import type Venue from "./Venue";
+import type { GetWcifResult } from "../api/wca.redocly";
 
-export default interface Schedule {
-    numberOfDays: number;
-    venues: Venue[];
-}
+export type Schedule = GetWcifResult["schedule"];

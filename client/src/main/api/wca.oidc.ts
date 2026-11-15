@@ -1,6 +1,7 @@
 import { BASE_PATH } from "../../paths";
 import { type OidcClientSettings, User } from "oidc-client-ts";
 import { getQueryParameter } from "../util/query.param.util";
+import { configure } from "./wca.redocly.ts";
 
 export function isUsingStaging() {
     return getQueryParameter("staging") === "true";
@@ -42,6 +43,8 @@ const getTnoodleAppId = () => {
         "6145bf3e65fbad4715b049dae2d72a64b8e9a794010abf518fa9364b05a5dd40"
     );
 };
+
+configure({ serverUrl: getWcaOrigin() });
 
 // Members of the Software Team can configure this here: https://www.worldcubeassociation.org/oauth/applications/123.
 const oidcConfig = {

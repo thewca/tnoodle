@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import wcaApi from "../api/wca.api";
+import { client as wcaClient } from "../api/wca.redocly";
 import { client } from "../api/tnoodle.redocly";
 import type CurrentTnoodle from "../model/CurrentTnoodle";
 import { setWcif } from "../redux/slice/WcifSlice";
@@ -34,10 +34,10 @@ const VersionInfo = () => {
 
     useEffect(() => {
         // Fetch from WCA API.
-        wcaApi.fetchVersionInfo().then((response) => {
-            setCurrentTnoodle(response.data.current);
-            setAllowedTnoodleVersions(response.data.allowed);
-            setWcaPublicKeyBytes(response.data.publicKeyBytes);
+        wcaClient.getScrambleProgram().then((response) => {
+            setCurrentTnoodle(response.current);
+            setAllowedTnoodleVersions(response.allowed);
+            setWcaPublicKeyBytes(response.publicKeyBytes);
         });
 
         client.getVersionInfo().then((response) => {

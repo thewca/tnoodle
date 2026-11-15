@@ -2,7 +2,7 @@ import { chunk } from "lodash";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { client } from "../api/tnoodle.redocly";
-import { toWcaUrl } from "../api/wca.api";
+import { getWcaOrigin } from "../api/wca.oidc";
 import type RootState from "../model/RootState";
 import {
     setBackendWcifVersion,
@@ -10,7 +10,7 @@ import {
     setWcaFormats,
 } from "../redux/slice/WcifSlice";
 import EventPicker from "./EventPicker";
-import type WcaEvent from "../model/WcaEvent";
+import type { WcaEvent } from "../model/WcaEvent";
 import { buildMbldExtension } from "../util/wcif.util";
 import { MBLD_DEFAULT } from "../constants/wca.constants";
 
@@ -66,9 +66,7 @@ const EventPickerTable = () => {
                     <p>
                         You can view and change the rounds over on{" "}
                         <a
-                            href={toWcaUrl(
-                                `/competitions/${wcif.id}/events/edit`,
-                            )}
+                            href={`${getWcaOrigin()}/competitions/${wcif.id}/events/edit`}
                         >
                             {" "}
                             the WCA

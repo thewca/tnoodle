@@ -2,9 +2,9 @@ import { OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { MAX_WCA_ROUNDS, MBLD_DEFAULT } from "../constants/wca.constants";
 import type RootState from "../model/RootState";
-import type Round from "../model/Round";
-import type WcaEvent from "../model/WcaEvent";
-import type WcifEvent from "../model/WcifEvent";
+import type { WcaEvent } from "../model/WcaEvent";
+import type { WcifEvent } from "../model/WcifEvent";
+import type { WcifRound } from "../model/Round";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
 import { setWcifEvent } from "../redux/slice/WcifSlice";
 import {
@@ -138,7 +138,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         [dispatch],
     );
 
-    const updateEventRounds = (rounds: Round[]) => {
+    const updateEventRounds = (rounds: WcifRound[]) => {
         let event = {
             ...wcifEvent,
             rounds,
@@ -185,7 +185,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
 
     const handleNumberOfRoundsChange = (
         numberOfRounds: number,
-        rounds: Round[],
+        rounds: WcifRound[],
     ) => {
         let newRounds = [...rounds];
         // Ajust the number of rounds in case we have to remove
@@ -207,7 +207,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     const handleGeneralRoundChange = (
         roundNumber: number,
         value: string | number,
-        rounds: Round[],
+        rounds: WcifRound[],
         name: "format" | "scrambleSetCount",
     ) => {
         updateEventRounds(
@@ -220,7 +220,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     const handleNumberOfCopiesChange = (
         roundNumber: number,
         numCopies: number,
-        rounds: Round[],
+        rounds: WcifRound[],
     ) => {
         updateEventRounds(
             rounds.map((round, i) =>
@@ -404,7 +404,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                 {Array.from({ length: wcifRounds.length }, (_, i) => {
                     let copies = wcifRounds[i].extensions.find(
                         (extension) => extension.id === copiesExtensionId,
-                    )?.data.numCopies;
+                    )?.data.numCopies as number;
 
                     return (
                         <tr key={i}>

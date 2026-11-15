@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Collapse, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { client } from "../api/tnoodle.redocly";
-import wcaApi from "../api/wca.api";
 import logo from "../assets/tnoodle_logo.svg";
 import type RootState from "../model/RootState";
 import {
@@ -26,9 +25,12 @@ import "./SideBar.css";
 import type Wcif from "../model/Wcif";
 import { setShowColorPicker } from "../redux/slice/SettingsSlice";
 import type Competition from "../model/Competition";
-import type Person from "../model/Person";
 import { useAuth } from "react-oidc-context";
 import type { CustomAuthState } from "../api/wca.oidc";
+import {
+    client as wcaClient,
+    type GetMeResult,
+} from "../api/wca.redocly";
 
 const SideBar = () => {
     const [loadingUser, setLoadingUser] = useState(false);
@@ -49,7 +51,7 @@ const SideBar = () => {
         (state: RootState) => state.settingsSlice.showColorPicker,
     );
 
-    const [me, setMe] = useState<Person>();
+    const [me, setMe] = useState<GetMeResult["me"]>();
     const [upcomingCompetitions, setUpcomingCompetitions] =
         useState<Competition[]>();
 
@@ -81,18 +83,25 @@ const SideBar = () => {
         if (!me) {
             setLoadingUser(true);
 
-            wcaApi
-                .fetchMe(wcaToken)
-                .then((response) => setMe(response.data.me))
+            wcaClient
+                .getMe()
+                .then((response) => setMe(response.me))
                 .finally(() => setLoadingUser(false));
         }
 
         if (!upcomingCompetitions) {
+            const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
             setLoadingCompetitions(true);
 
-            wcaApi
-                .getUpcomingManageableCompetitions(wcaToken)
-                .then((response) => setUpcomingCompetitions(response.data))
+            wcaClient
+                .getCompetitions({
+                    query: {
+                        managed_by_me: true,
+                        start: oneWeekAgo.toISOString(),
+                        sort: "start_date",
+                    }
+                })
+                .then((response) => setUpcomingCompetitions(response))
                 .finally(() => setLoadingCompetitions(false));
         }
     }, [upcomingCompetitions, me, oidcAuth.isAuthenticated, oidcAuth.user]);
@@ -222,23 +231,21 @@ const SideBar = () => {
                 const wcaToken = oidcAuth.user!.access_token;
                 setLoadingCompetitionInfo(true);
 
-                wcaApi
-                    .getCompetitionJson(
-                        competitionId,
-                        backendWcifVersion,
-                        wcaToken,
-                    )
+                wcaClient
+                    .getWcif({
+                        path: { competitionId, formatVersion: backendWcifVersion }
+                    })
                     .then((response) => {
-                        updateWcif(response.data);
+                        updateWcif(response);
                         dispatch(
                             addCachedObject({
                                 competitionId,
                                 identifier: "wcif",
-                                object: response.data,
+                                object: response,
                             }),
                         );
-                        getAndCacheSuggestedFmcTranslations(response.data);
-                        getAndCacheBestMbldAttempt(response.data);
+                        getAndCacheSuggestedFmcTranslations(response);
+                        getAndCacheBestMbldAttempt(response);
                     })
                     .finally(() => setLoadingCompetitionInfo(false));
             }

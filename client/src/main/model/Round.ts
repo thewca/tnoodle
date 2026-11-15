@@ -1,8 +1,4 @@
 import { type Extendable } from "./Extension";
+import type { GetWcifResult } from "../api/wca.redocly";
 
-export default interface Round extends Extendable {
-    format: string;
-    id: string;
-    scrambleSetCount: number;
-    timeLimit?: number | null;
-}
+export type WcifRound = GetWcifResult["events"][number]["rounds"][number] & Extendable;

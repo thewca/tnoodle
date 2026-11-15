@@ -1,5 +1,3 @@
-export default interface WcaFormat {
-    id: string;
-    name: string;
-    short_name: string;
-}
+import type { GetWcaFormatsResult } from "../api/tnoodle.redocly";
+
+export type WcaFormat = GetWcaFormatsResult[number];
