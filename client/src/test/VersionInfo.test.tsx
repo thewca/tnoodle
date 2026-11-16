@@ -1,332 +1,97 @@
-import React from "react";
-import { render, act } from "@testing-library/react";
-
-import { Provider } from "react-redux";
-
-import VersionInfo from "../main/components/VersionInfo";
+import { screen } from "@testing-library/react";
 import tnoodleApi from "../main/api/tnoodle.api";
 import wcaApi from "../main/api/wca.api";
-import store from "../main/redux/Store";
-import { axiosResponse } from "./mock/util.test.mock";
+import type RunningVersion from "../main/model/RunningVersion";
+import VersionInfo from "../main/components/VersionInfo";
+import { mockApis, ok } from "./mock/api.mock";
+import { renderWithProviders } from "./util/render";
 
-let container = document.createElement("div");
-beforeEach(() => {
-    // setup a DOM element as a render target
-    container = document.createElement("div");
-    document.body.appendChild(container);
+const download =
+    "https://www.worldcubeassociation.org/regulations/scrambles/tnoodle/TNoodle-WCA-3.jar";
+
+const running = (overrides: Partial<RunningVersion> = {}) => ({
+    projectName: "TNoodle-WCA",
+    projectVersion: "3",
+    signedBuild: true,
+    signatureKeyBytes: "key",
+    ...overrides,
 });
 
-afterEach(() => {
-    // cleanup on exiting
-    container.remove();
-    container = document.createElement("div");
+const renderVersionInfo = async (
+    runningVersion: RunningVersion,
+    allowed: string[],
+) => {
+    vi.mocked(tnoodleApi.fetchRunningVersion).mockImplementation(() =>
+        ok(runningVersion),
+    );
+    vi.mocked(wcaApi.fetchVersionInfo).mockImplementation(() =>
+        ok({
+            current: {
+                name: "TNoodle-WCA-3",
+                information:
+                    "https://www.worldcubeassociation.org/regulations/scrambles/",
+                download,
+            },
+            allowed,
+            publicKeyBytes: "key",
+            history: ["TNoodle-WCA-1", "TNoodle-WCA-2", "TNoodle-WCA-3"],
+        }),
+    );
+
+    return renderWithProviders(<VersionInfo />);
+};
+
+beforeEach(() => mockApis());
+
+it("shows no warning when running the latest signed release", async () => {
+    await renderVersionInfo(running(), ["TNoodle-WCA-3"]);
+
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
 });
 
-it("Current version is the correct one", async () => {
-    // Mock objects
-    const version = {
-        projectName: "TNoodle-WCA",
-        projectVersion: "2",
-        signedBuild: true,
-        signatureKeyBytes: "key",
-    };
+it("asks to upgrade when the version is outdated but still allowed", async () => {
+    await renderVersionInfo(running({ projectVersion: "2" }), [
+        "TNoodle-WCA-2",
+        "TNoodle-WCA-3",
+    ]);
 
-    const scrambleProgram = {
-        current: {
-            name: "TNoodle-WCA-2",
-            information:
-                "https://www.worldcubeassociation.org/regulations/scrambles/",
-            download:
-                "https://www.worldcubeassociation.org/regulations/scrambles/tnoodle/TNoodle-WCA-2.jar",
-        },
-        allowed: ["TNoodle-WCA-2"],
-        publicKeyBytes: "key",
-        history: ["TNoodle-WCA-0", "TNoodle-WCA-1", "TNoodle-WCA-2"],
-    };
-
-    // Turn on mocking behavior
-    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: version }),
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent(
+        "You are running TNoodle-WCA-2, which is still allowed, but you should upgrade to TNoodle-WCA-3",
     );
-
-    vi.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: scrambleProgram }),
+    expect(screen.getByRole("link", { name: "here" })).toHaveAttribute(
+        "href",
+        download,
     );
+});
 
-    // Render component
-    await act(async () => {
-        render(
-            <Provider store={store}>
-                <VersionInfo />
-            </Provider>,
-            { container },
+it("forbids versions that are no longer allowed", async () => {
+    await renderVersionInfo(running({ projectVersion: "1" }), [
+        "TNoodle-WCA-2",
+        "TNoodle-WCA-3",
+    ]);
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+        "You are running TNoodle-WCA-1, which is not allowed.",
+    );
+});
+
+it.each([
+    ["is not signed", running({ signedBuild: false })],
+    ["is signed with a foreign key", running({ signatureKeyBytes: "fooBar" })],
+])(
+    "warns about an unofficial build when the latest version %s",
+    async (_, runningVersion) => {
+        await renderVersionInfo(runningVersion, ["TNoodle-WCA-3"]);
+
+        expect(screen.getByRole("alert")).toHaveTextContent(
+            "You are running an unsigned TNoodle release.",
         );
-    });
+    },
+);
 
-    // There should be no warning
-    const alert = container.querySelector(".alert");
-    expect(alert).toBe(null);
+it("does not bother the user when the running version is unknown", async () => {
+    await renderVersionInfo({} as RunningVersion, ["TNoodle-WCA-3"]);
 
-    // Clear mock
-    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
-    vi.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
-});
-
-it("Current version is allowed, but it's not the latest one", async () => {
-    const version = {
-        projectName: "TNoodle-WCA",
-        projectVersion: "2",
-        signedBuild: true,
-        signatureKeyBytes: "key",
-    };
-
-    const scrambleProgram = {
-        current: {
-            name: "TNoodle-WCA-3",
-            information:
-                "https://www.worldcubeassociation.org/regulations/scrambles/",
-            download:
-                "https://www.worldcubeassociation.org/regulations/scrambles/tnoodle/TNoodle-WCA-3.jar",
-        },
-        allowed: ["TNoodle-WCA-2", "TNoodle-WCA-3"],
-        publicKeyBytes: "key",
-        history: [
-            "TNoodle-WCA-0",
-            "TNoodle-WCA-1",
-            "TNoodle-WCA-2",
-            "TNoodle-WCA-3",
-        ],
-    };
-
-    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: version }),
-    );
-
-    vi.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: scrambleProgram }),
-    );
-
-    await act(async () => {
-        render(
-            <Provider store={store}>
-                <VersionInfo />
-            </Provider>,
-            { container },
-        );
-    });
-
-    // The warning should be "your version is ok, but please upgrade"
-    const alert = container.querySelector(".alert-info")!;
-    expect(alert.textContent).toContain(
-        "which is still allowed, but you should upgrade to",
-    );
-
-    const downloadLink = container.querySelector("a")!.href;
-    expect(downloadLink).toBe(scrambleProgram.current.download);
-
-    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
-    vi.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
-});
-
-it("Not signed version alert", async () => {
-    const version = {
-        projectName: "TNoodle-WCA",
-        projectVersion: "3",
-        signedBuild: false, // This should trigger an alert, even with currentVersion == runningVersion
-        signatureKeyBytes: "key",
-    };
-
-    const scrambleProgram = {
-        current: {
-            name: "TNoodle-WCA-3",
-            information:
-                "https://www.worldcubeassociation.org/regulations/scrambles/",
-            download:
-                "https://www.worldcubeassociation.org/regulations/scrambles/tnoodle/TNoodle-WCA-3.jar",
-        },
-        allowed: ["TNoodle-WCA-3"],
-        publicKeyBytes: "key",
-        history: [
-            "TNoodle-WCA-0",
-            "TNoodle-WCA-1",
-            "TNoodle-WCA-2",
-            "TNoodle-WCA-3",
-        ],
-    };
-
-    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: version }),
-    );
-
-    vi.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: scrambleProgram }),
-    );
-
-    await act(async () => {
-        render(
-            <Provider store={store}>
-                <VersionInfo />
-            </Provider>,
-            { container },
-        );
-    });
-
-    // The warning should be "do not use this"
-    const alert = container.querySelector(".alert-danger")!;
-    expect(alert.textContent).toContain(
-        "You are running an unsigned TNoodle release.",
-    );
-
-    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
-    vi.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
-});
-
-it("Signed with different key", async () => {
-    const version = {
-        projectName: "TNoodle-WCA",
-        projectVersion: "3",
-        signedBuild: true,
-        signatureKeyBytes: "fooBar", // This should trigger an alert, even with currentVersion == runningVersion
-    };
-
-    const scrambleProgram = {
-        current: {
-            name: "TNoodle-WCA-3",
-            information:
-                "https://www.worldcubeassociation.org/regulations/scrambles/",
-            download:
-                "https://www.worldcubeassociation.org/regulations/scrambles/tnoodle/TNoodle-WCA-3.jar",
-        },
-        allowed: ["TNoodle-WCA-3"],
-        publicKeyBytes: "key",
-        history: [
-            "TNoodle-WCA-0",
-            "TNoodle-WCA-1",
-            "TNoodle-WCA-2",
-            "TNoodle-WCA-3",
-        ],
-    };
-
-    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: version }),
-    );
-
-    vi.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: scrambleProgram }),
-    );
-
-    await act(async () => {
-        render(
-            <Provider store={store}>
-                <VersionInfo />
-            </Provider>,
-            { container },
-        );
-    });
-
-    // The warning should be "do not use this"
-    const alert = container.querySelector(".alert-danger")!;
-    expect(alert.textContent).toContain(
-        "You are running an unsigned TNoodle release.",
-    );
-
-    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
-    vi.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
-});
-
-it("Not allowed TNoodle version, despite it's official", async () => {
-    const version = {
-        projectName: "TNoodle-WCA",
-        projectVersion: "1",
-        signedBuild: true,
-        signatureKeyBytes: "key",
-    };
-
-    const scrambleProgram = {
-        current: {
-            name: "TNoodle-WCA-3",
-            information:
-                "https://www.worldcubeassociation.org/regulations/scrambles/",
-            download:
-                "https://www.worldcubeassociation.org/regulations/scrambles/tnoodle/TNoodle-WCA-3.jar",
-        },
-        allowed: ["TNoodle-WCA-2", "TNoodle-WCA-3"],
-        publicKeyBytes: "key",
-        history: [
-            "TNoodle-WCA-0",
-            "TNoodle-WCA-1",
-            "TNoodle-WCA-2",
-            "TNoodle-WCA-3",
-        ],
-    };
-
-    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: version }),
-    );
-
-    vi.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: scrambleProgram }),
-    );
-
-    await act(async () => {
-        render(
-            <Provider store={store}>
-                <VersionInfo />
-            </Provider>,
-            { container },
-        );
-    });
-
-    // The warning should be "do not use this"
-    const alert = container.querySelector(".alert-danger")!;
-    expect(alert.textContent).toContain("which is not allowed.");
-
-    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
-    vi.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
-});
-
-it("Do not bother the user if we can't be sure", async () => {
-    const version = {} as any;
-
-    const scrambleProgram = {
-        current: {
-            name: "TNoodle-WCA-3",
-            information:
-                "https://www.worldcubeassociation.org/regulations/scrambles/",
-            download:
-                "https://www.worldcubeassociation.org/regulations/scrambles/tnoodle/TNoodle-WCA-3.jar",
-        },
-        allowed: ["TNoodle-WCA-2", "TNoodle-WCA-3"],
-        publicKeyBytes: "key",
-        history: [
-            "TNoodle-WCA-0",
-            "TNoodle-WCA-1",
-            "TNoodle-WCA-2",
-            "TNoodle-WCA-3",
-        ],
-    };
-
-    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: version }),
-    );
-
-    vi.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: scrambleProgram }),
-    );
-
-    await act(async () => {
-        render(
-            <Provider store={store}>
-                <VersionInfo />
-            </Provider>,
-            { container },
-        );
-    });
-
-    // The warning should be "do not use this"
-    const alert = container.querySelector(".alert");
-    expect(alert).toBe(null);
-
-    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
-    vi.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
 });

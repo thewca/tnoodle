@@ -73,12 +73,16 @@ const EntryInterface = () => {
                         value={password}
                         disabled={generatingScrambles}
                     />
-                    <span
+                    <button
+                        type="button"
                         className="input-group-text"
                         onClick={() => setShowPassword(!showPassword)}
+                        aria-label={
+                            showPassword ? "Hide password" : "Show password"
+                        }
                     >
                         {showPassword ? <FaEye /> : <FaEyeSlash />}
-                    </span>
+                    </button>
                 </div>
             </div>
         </>

@@ -5,14 +5,19 @@ import { wcifSlice } from "./slice/WcifSlice";
 import { eventDataSlice } from "./slice/EventDataSlice";
 import { settingsSlice } from "./slice/SettingsSlice";
 
-const store = configureStore({
-    reducer: {
-        informationSlice: informationSlice.reducer,
-        scramblingSlice: scramblingSlice.reducer,
-        wcifSlice: wcifSlice.reducer,
-        eventDataSlice: eventDataSlice.reducer,
-        settingsSlice: settingsSlice.reducer,
-    },
-});
+export const createStore = () =>
+    configureStore({
+        reducer: {
+            informationSlice: informationSlice.reducer,
+            scramblingSlice: scramblingSlice.reducer,
+            wcifSlice: wcifSlice.reducer,
+            eventDataSlice: eventDataSlice.reducer,
+            settingsSlice: settingsSlice.reducer,
+        },
+    });
+
+export type AppStore = ReturnType<typeof createStore>;
+
+const store = createStore();
 
 export default store;

@@ -1,75 +1,47 @@
-import React from "react";
-
-import { render, act } from "@testing-library/react";
-
-import { Provider } from "react-redux";
-import store from "../main/redux/Store";
-
-import SideBar from "../main/components/SideBar";
-
-import { competitions, me } from "./mock/wca.api.test.mock";
+import { screen, within } from "@testing-library/react";
 import wcaApi from "../main/api/wca.api";
-import { axiosResponse } from "./mock/util.test.mock";
-import MockAuthContext from "./mock/MockAuthContext";
+import SideBar from "../main/components/SideBar";
+import { mockApis } from "./mock/api.mock";
+import { competitions, me } from "./mock/wca.api.test.mock";
+import { renderWithProviders } from "./util/render";
 
-let container = document.createElement("div");
-beforeEach(() => {
-    // setup a DOM element as a render target
-    container = document.createElement("div");
-    document.body.appendChild(container);
-});
+beforeEach(() => mockApis());
 
-afterEach(() => {
-    // cleanup on exiting
-    container.remove();
-    container = document.createElement("div");
-});
+describe("when logged in", () => {
+    it("welcomes the user and offers their upcoming competitions", async () => {
+        await renderWithProviders(<SideBar />, { isAuthenticated: true });
 
-it("Each competition fetched from the website must become a button", async () => {
-    // Turn on mocking behavior
-    vi.spyOn(wcaApi, "getUpcomingManageableCompetitions").mockImplementation(
-        () => Promise.resolve({ ...axiosResponse, data: competitions }),
-    );
+        expect(
+            screen.getByText(`Welcome, ${me.name}.`, { exact: false }),
+        ).toBeInTheDocument();
 
-    vi.spyOn(wcaApi, "fetchMe").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: { me } }),
-    );
+        expect(
+            screen.getByRole("button", { name: "Manual Selection" }),
+        ).toBeInTheDocument();
 
-    // Render component
-    await act(async () => {
-        render(
-            <Provider store={store}>
-                <MockAuthContext isAuthenticated>
-                    <SideBar />
-                </MockAuthContext>
-            </Provider>,
-            { container },
+        const competitionButtons = within(
+            screen.getByRole("group"),
+        ).getAllByRole("button");
+        expect(competitionButtons.map((button) => button.textContent)).toEqual(
+            competitions.map((competition) => competition.name),
         );
+
+        expect(
+            screen.getByRole("button", { name: "Log Out" }),
+        ).toBeInTheDocument();
     });
+});
 
-    const buttons = Array.from(container.querySelectorAll("button"));
+describe("when logged out", () => {
+    it("only offers to log in", async () => {
+        await renderWithProviders(<SideBar />);
 
-    // First button should be the collapse button
-    expect(buttons[0].innerHTML).toBe(
-        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="30" height="30"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-miterlimit="10" d="M4 7h22M4 15h22M4 23h22"></path></svg>`,
-    );
-
-    // Second button should be manual selection
-    expect(buttons[1].innerHTML).toBe("Manual Selection");
-
-    // Last button should be Log Out
-    expect(buttons[buttons.length - 1].innerHTML).toBe("Log Out");
-
-    // Each competition must have a button
-    for (let i = 0; i < competitions.length; i++) {
-        expect(competitions[i].name).toBe(buttons[i + 2].innerHTML);
-    }
-
-    // We should welcome the user
-    const welcome = container.querySelector("p")!;
-    expect(welcome.innerHTML).toContain(me.name);
-
-    // Clear mock
-    vi.spyOn(wcaApi, "getUpcomingManageableCompetitions").mockRestore();
-    vi.spyOn(wcaApi, "fetchMe").mockRestore();
+        expect(
+            screen.getByRole("button", { name: "Log In" }),
+        ).toBeInTheDocument();
+        expect(
+            screen.queryByRole("button", { name: "Manual Selection" }),
+        ).not.toBeInTheDocument();
+        expect(wcaApi.getUpcomingManageableCompetitions).not.toHaveBeenCalled();
+    });
 });

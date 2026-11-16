@@ -1,4 +1,4 @@
-import Wcif from "../../main/model/Wcif";
+import type Wcif from "../../main/model/Wcif";
 import { wcifTestVersion } from "./tnoodle.api.test.mock";
 
 export const me = {

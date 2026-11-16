@@ -1,563 +1,206 @@
-import { render, act, fireEvent } from "@testing-library/react";
-import { shuffle, difference } from "lodash";
-import React from "react";
-import { Provider } from "react-redux";
+import { screen, waitFor, within } from "@testing-library/react";
+import type { UserEvent } from "@testing-library/user-event";
 import App from "../App";
 import tnoodleApi from "../main/api/tnoodle.api";
 import wcaApi from "../main/api/wca.api";
-import type Wcif from "../main/model/Wcif";
+import { findExtension } from "../main/util/extension.util";
 import { defaultWcif, frontendStatusExtensionId } from "../main/util/wcif.util";
+import { lastZipRequest, mockApis, pending } from "./mock/api.mock";
+import { defaultStatus } from "./mock/tnoodle.api.test.mock";
+import { competitions, wcifs } from "./mock/wca.api.test.mock";
 import {
-    bestMbldAttempt,
-    colorScheme,
-    defaultStatus,
-    emptySvg,
-    events,
-    formats,
-    languages,
-    plainZip,
-    scrambleAndImage,
-    version,
-    wcifTestVersion,
-} from "./mock/tnoodle.api.test.mock";
-import { axiosResponse, getNewStore } from "./mock/util.test.mock";
-import {
-    competitions,
-    me,
-    scrambleProgram,
-    wcifs,
-} from "./mock/wca.api.test.mock";
-import {
+    getCopies,
     getFmcLanguageTags,
     getMbldCubesCount,
-} from "./util/extension.test.util";
-import { findExtension } from "../main/util/extension.util";
-import MockAuthContext from "./mock/MockAuthContext";
+    getRounds,
+    scrambledEventIds,
+} from "./util/wcif.test.util";
+import { renderWithProviders, replaceValue } from "./util/render";
 
-let container = document.createElement("div");
+const eventTable = async (name: string) =>
+    within(await screen.findByRole("table", { name }));
 
-let wcif: Wcif | null = null;
-let password: string | null = null;
-beforeEach(() => {
-    // setup a DOM element as a render target
-    container = document.createElement("div");
-    document.body.appendChild(container);
+const generateScrambles = (user: UserEvent) =>
+    user.click(screen.getByRole("button", { name: "Generate Scrambles" }));
 
-    // Turn on mocking behavior
-    vi.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
-        Promise.resolve({
-            data: events,
-            ...axiosResponse,
-        }),
-    );
+const selectCompetition = async (user: UserEvent, name: string) => {
+    await user.click(screen.getByRole("button", { name }));
+    await screen.findByText(new RegExp(`Found \\d+ events? for ${name}\\.`));
+};
 
-    vi.spyOn(tnoodleApi, "fetchFormats").mockImplementation(() =>
-        Promise.resolve({ data: formats, ...axiosResponse }),
-    );
+beforeEach(() => mockApis());
 
-    vi.spyOn(tnoodleApi, "fetchBackendWcifVersion").mockImplementation(() =>
-        Promise.resolve({ data: wcifTestVersion, ...axiosResponse }),
-    );
+describe("manual selection", () => {
+    it("generates a single round of 3x3x3 by default", async () => {
+        const { user } = await renderWithProviders(<App />);
 
-    vi.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockImplementation(
-        () => Promise.resolve({ data: languages, ...axiosResponse }),
-    );
+        await generateScrambles(user);
 
-    vi.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockImplementation(() =>
-        Promise.resolve({ data: colorScheme, ...axiosResponse }),
-    );
-
-    vi.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockImplementation(() =>
-        Promise.resolve({ data: scrambleAndImage, ...axiosResponse }),
-    );
-
-    vi.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockImplementation(() =>
-        Promise.resolve({ data: emptySvg, ...axiosResponse }),
-    );
-
-    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({ data: version, ...axiosResponse }),
-    );
-
-    vi.spyOn(tnoodleApi, "fetchZip").mockImplementation(
-        (scrambleClient, _wcif, _password) => {
-            wcif = _wcif;
-            password = _password;
-
-            return Promise.resolve(plainZip);
-        },
-    );
-
-    vi.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
-        Promise.resolve({ data: scrambleProgram, ...axiosResponse }),
-    );
-
-    vi.spyOn(wcaApi, "getUpcomingManageableCompetitions").mockImplementation(
-        () => Promise.resolve({ ...axiosResponse, data: competitions }),
-    );
-
-    vi.spyOn(wcaApi, "fetchMe").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: { me } }),
-    );
-
-    vi.spyOn(tnoodleApi, "convertToBlob").mockImplementation(() =>
-        Promise.resolve(new Blob()),
-    );
-});
-
-afterEach(() => {
-    // cleanup on exiting
-    container.remove();
-    container = document.createElement("div");
-
-    wcif = null;
-    password = null;
-
-    // Clear mock
-    vi.spyOn(tnoodleApi, "fetchWcaEvents").mockRestore();
-    vi.spyOn(tnoodleApi, "fetchFormats").mockRestore();
-    vi.spyOn(tnoodleApi, "fetchBackendWcifVersion").mockRestore();
-    vi.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockRestore();
-    vi.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockRestore();
-    vi.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockRestore();
-    vi.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockRestore();
-    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockRestore();
-    vi.spyOn(tnoodleApi, "fetchZip").mockRestore();
-    vi.spyOn(wcaApi, "getUpcomingManageableCompetitions").mockRestore();
-    vi.spyOn(tnoodleApi, "convertToBlob").mockRestore();
-    vi.spyOn(wcaApi, "fetchMe").mockRestore();
-    vi.spyOn(wcaApi, "fetchVersionInfo").mockRestore();
-});
-
-it("Just generate scrambles", async () => {
-    const store = getNewStore();
-
-    // Render component
-    await act(async () => {
-        render(
-            <React.StrictMode>
-                <Provider store={store}>
-                    <MockAuthContext>
-                        <App />
-                    </MockAuthContext>
-                </Provider>
-            </React.StrictMode>,
-            { container },
-        );
-    });
-    const scrambleButton = container.querySelector("form button")!;
-    expect(scrambleButton.innerHTML).toEqual("Generate Scrambles");
-
-    // Generate scrambles
-    await act(async () => {
-        fireEvent.click(scrambleButton);
-    });
-
-    // Only 333
-    expect(wcif!.events.length).toBe(1);
-
-    expect(password).toBe("");
-
-    let wcifStatus = findExtension(
-        store.getState().wcifSlice.wcif,
-        frontendStatusExtensionId,
-    );
-    expect(wcifStatus!.data).toEqual(defaultStatus);
-});
-
-it("Changes on 333, scramble", async () => {
-    const store = getNewStore();
-
-    // Render component
-    await act(async () => {
-        render(
-            <React.StrictMode>
-                <Provider store={store}>
-                    <MockAuthContext>
-                        <App />
-                    </MockAuthContext>
-                </Provider>
-            </React.StrictMode>,
-            { container },
+        const { wcif, password } = lastZipRequest();
+        expect(scrambledEventIds(wcif)).toEqual(["333"]);
+        expect(password).toBe("");
+        expect(findExtension(wcif, frontendStatusExtensionId)?.data).toEqual(
+            defaultStatus,
         );
     });
 
-    let selects = Array.from(container.querySelectorAll("select"));
+    it("sends round settings and the password along", async () => {
+        const { user } = await renderWithProviders(<App />);
+        const cube = await eventTable("3x3x3");
 
-    // We add rounds of 333
-    let numberOfRounds = 4;
-    fireEvent.change(selects[0], { target: { value: numberOfRounds } });
+        await user.selectOptions(cube.getByLabelText("Rounds"), "4");
+        await user.selectOptions(cube.getByLabelText("Round 2 format"), "Bo3");
+        await replaceValue(
+            user,
+            cube.getByLabelText("Round 2 scramble sets"),
+            6,
+        );
+        await replaceValue(user, cube.getByLabelText("Round 2 copies"), 7);
+        await user.type(screen.getByLabelText("Password"), "wca123");
 
-    // Look for selects again
-    selects = Array.from(container.querySelectorAll("select"));
+        await generateScrambles(user);
 
-    // Change 2nd round to mo3
-    let roundFormat = "3";
-    fireEvent.change(selects[2], { target: { value: roundFormat } });
-
-    let inputs = Array.from(container.querySelectorAll("form input"));
-
-    // Change 2nd round
-    let scrambleSets = 6;
-    let copies = 7;
-    fireEvent.change(inputs[4], { target: { value: scrambleSets } });
-    fireEvent.change(inputs[5], { target: { value: copies } });
-
-    // Change password
-    let newPassword = "wca123";
-    fireEvent.change(inputs[1], { target: { value: newPassword } });
-
-    // Generate scrambles
-    const scrambleButton = container.querySelector("form button");
-    await act(async () => {
-        fireEvent.click(scrambleButton!);
+        const { wcif, password } = lastZipRequest();
+        expect(password).toBe("wca123");
+        expect(getRounds(wcif, "333")).toEqual([
+            expect.objectContaining({
+                id: "333-r1",
+                format: "a",
+                scrambleSetCount: 1,
+            }),
+            expect.objectContaining({
+                id: "333-r2",
+                format: "3",
+                scrambleSetCount: 6,
+            }),
+            expect.objectContaining({
+                id: "333-r3",
+                format: "a",
+                scrambleSetCount: 1,
+            }),
+            expect.objectContaining({
+                id: "333-r4",
+                format: "a",
+                scrambleSetCount: 1,
+            }),
+        ]);
+        expect([0, 1, 2, 3].map((i) => getCopies(wcif, "333", i))).toEqual([
+            1, 7, 1, 1,
+        ]);
     });
 
-    // Only 333
-    expect(wcif!.events.length).toBe(1);
+    it("sends MBLD cube count and FMC translations along", async () => {
+        const { user } = await renderWithProviders(<App />);
+        const cube = await eventTable("3x3x3");
+        const fmc = await eventTable("3x3x3 Fewest Moves");
+        const mbld = await eventTable("3x3x3 Multiple Blindfolded");
 
-    // Correct number of rounds
-    expect(wcif!.events[0].rounds.length).toBe(numberOfRounds);
+        await user.selectOptions(cube.getByLabelText("Rounds"), "0");
+        await user.selectOptions(fmc.getByLabelText("Rounds"), "3");
+        await user.selectOptions(mbld.getByLabelText("Rounds"), "3");
 
-    // Changes should be done to the 2nd round only
-    wcif!.events[0].rounds.forEach((round, i) => {
-        if (i === 1) {
-            expect(round.format).toBe(roundFormat);
-            expect(round.scrambleSetCount).toBe(scrambleSets);
-            expect(round.extensions[0].data.numCopies).toBe(copies);
-        } else {
-            expect(round.format).toBe("a");
-            expect(round.scrambleSetCount).toBe(1);
-            expect(round.extensions[0].data.numCopies).toBe(1);
+        await replaceValue(
+            user,
+            mbld.getByLabelText("Select the number of scrambles"),
+            70,
+        );
+
+        await user.click(fmc.getByRole("button", { name: "Translations" }));
+        await user.click(fmc.getByRole("checkbox", { name: "German" }));
+        await user.click(fmc.getByRole("checkbox", { name: "Spanish" }));
+
+        await generateScrambles(user);
+
+        const { wcif } = lastZipRequest();
+        expect(scrambledEventIds(wcif)).toEqual(["333fm", "333mbf"]);
+        expect(getRounds(wcif, "333fm")).toHaveLength(3);
+        expect(getRounds(wcif, "333mbf")).toHaveLength(3);
+        expect(getMbldCubesCount(wcif)).toBe(70);
+        expect(getFmcLanguageTags(wcif)).toEqual(["de", "es"]);
+    });
+
+    it("downloads the generated zip named after the competition", async () => {
+        const { user } = await renderWithProviders(<App />);
+        const download = vi
+            .spyOn(HTMLAnchorElement.prototype, "click")
+            .mockImplementation(() => {});
+
+        await replaceValue(
+            user,
+            screen.getByLabelText("Competition Name"),
+            "Noodle Open",
+        );
+        await generateScrambles(user);
+        await user.click(
+            await screen.findByRole("button", { name: "Download Scrambles" }),
+        );
+
+        await waitFor(() => expect(download).toHaveBeenCalledTimes(1));
+        expect(download.mock.contexts[0]).toHaveAttribute(
+            "download",
+            "Noodle Open.zip",
+        );
+    });
+});
+
+describe("logged in", () => {
+    const [firstCompetition, secondCompetition] = competitions;
+
+    it("generates scrambles for the selected competition", async () => {
+        const { user } = await renderWithProviders(<App />, {
+            isAuthenticated: true,
+        });
+
+        for (const competition of competitions) {
+            await selectCompetition(user, competition.name);
+            await generateScrambles(user);
+
+            expect(lastZipRequest().wcif).toStrictEqual(wcifs[competition.id]);
         }
-
-        expect(round.id).toBe("333-r" + (i + 1));
-
-        // We only send 1 extension for now
-        expect(round.extensions.length).toBe(1);
     });
 
-    expect(password).toBe(newPassword);
-});
+    it("restores the default events when going back to manual selection", async () => {
+        const { user, store } = await renderWithProviders(<App />, {
+            isAuthenticated: true,
+        });
 
-it("Remove 333, add FMC and MBLD", async () => {
-    const store = getNewStore();
-
-    // Render component
-    await act(async () => {
-        render(
-            <React.StrictMode>
-                <Provider store={store}>
-                    <MockAuthContext>
-                        <App />
-                    </MockAuthContext>
-                </Provider>
-            </React.StrictMode>,
-            { container },
+        await selectCompetition(user, firstCompetition.name);
+        await user.click(
+            screen.getByRole("button", { name: "Manual Selection" }),
         );
-    });
 
-    const mbldEvent = "3x3x3 Multiple Blindfolded";
-    const fmcEvent = "3x3x3 Fewest Moves";
-
-    let events = Array.from(container.querySelectorAll("form table"));
-    const names = [mbldEvent, fmcEvent];
-
-    let mbldCubes = 70;
-
-    // Pick random indexes from fmc to deselect
-    let languageKeys = Object.keys(languages);
-    let numberOfLanguages = languageKeys.length;
-
-    // At least 1, we do not deselect every translation
-    let languagesToDeselect =
-        Math.floor(Math.random() * numberOfLanguages - 2) + 1;
-
-    let languagesIndexToSelect = shuffle([
-        ...Array.from(Array(numberOfLanguages).keys()),
-    ]).slice(languagesToDeselect);
-
-    for (let i = 0; i < events.length; i++) {
-        let event = events[i];
-        let title = event.querySelector("h5")!.innerHTML;
-
-        let rounds = event.querySelector("select")!;
-
-        if (names.includes(title)) {
-            await act(async () => {
-                fireEvent.change(rounds, { target: { value: 3 } });
-            });
-        } else {
-            await act(async () => {
-                fireEvent.change(rounds, { target: { value: 0 } });
-            });
-        }
-
-        let inputs = Array.from(event.querySelectorAll("input"));
-
-        // Change to 70 mbld
-        if (title === mbldEvent) {
-            fireEvent.change(inputs[inputs.length - 1], {
-                target: { value: mbldCubes },
-            });
-        } else if (title === fmcEvent) {
-            // Open translations
-            await act(async () => {
-                fireEvent.click(event.querySelector("button")!);
-            });
-
-            // Deselesect random translations
-            let checkboxes = Array.from(
-                event.querySelectorAll("input[type=checkbox]"),
-            );
-
-            for (
-                let index = 0;
-                index < languagesIndexToSelect.length;
-                index++
-            ) {
-                await act(async () => {
-                    fireEvent.click(checkboxes[languagesIndexToSelect[index]]);
-                });
-            }
-        }
-    }
-
-    // Generate scrambles
-    const scrambleButton = container.querySelector("form button")!;
-    await act(async () => {
-        fireEvent.click(scrambleButton);
-    });
-
-    expect(wcif!.events.length).toBe(events.length);
-
-    let mbldExtensionCubesCount = getMbldCubesCount(store);
-    expect(mbldExtensionCubesCount).toBe(mbldCubes);
-
-    let fmcExtensionLanguageTags = getFmcLanguageTags(store);
-
-    let selected = [...fmcExtensionLanguageTags].sort();
-
-    // Deselected should be with status false
-    expect(selected).toEqual(
-        languagesIndexToSelect.map((index) => languageKeys[index]).sort(),
-    );
-
-    let deselected = difference(languageKeys, selected).sort();
-
-    // Selected and deselected should cover every languages
-    expect([...selected, ...deselected].sort()).toStrictEqual(
-        languageKeys.sort(),
-    );
-});
-
-it("Logged user", async () => {
-    const store = getNewStore();
-
-    // Allow downloads
-    global.URL.createObjectURL = vi.fn();
-
-    vi.spyOn(wcaApi, "getCompetitionJson").mockImplementation((competitionId) =>
-        Promise.resolve({ ...axiosResponse, data: wcifs[competitionId] }),
-    );
-
-    vi.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockImplementation(() =>
-        Promise.resolve({
-            ...axiosResponse,
-            data: bestMbldAttempt,
-        }),
-    );
-
-    vi.spyOn(tnoodleApi, "fetchSuggestedFmcTranslations").mockImplementation(
-        () =>
-            Promise.resolve({ ...axiosResponse, data: ["de", "es", "pt-BR"] }),
-    );
-
-    // Render component
-    await act(async () => {
-        render(
-            <React.StrictMode>
-                <Provider store={store}>
-                    <MockAuthContext isAuthenticated>
-                        <App />
-                    </MockAuthContext>
-                </Provider>
-            </React.StrictMode>,
-            { container },
+        expect(store.getState().wcifSlice.wcif.events).toStrictEqual(
+            defaultWcif.events,
         );
+        expect(screen.queryByText(/Found \d+ event/)).not.toBeInTheDocument();
     });
 
-    let manualSelectionButton = container.querySelector(
-        "#manual-selection-button",
-    );
-
-    let competitionButtons = Array.from(
-        container.querySelectorAll(".btn-group-vertical button"),
-    );
-
-    let scrambleButton = container.querySelector("form button")!;
-
-    // Skip Manual Selection, click the other buttons
-    for (let i = 0; i < competitions.length; i++) {
-        // Select current competition
-        await act(async () => {
-            competitionButtons[i].dispatchEvent(
-                new MouseEvent("click", { bubbles: true }),
-            );
+    it("fetches each competition from the WCA only once", async () => {
+        const { user } = await renderWithProviders(<App />, {
+            isAuthenticated: true,
         });
 
-        await act(async () => {
-            scrambleButton.dispatchEvent(
-                new MouseEvent("click", { bubbles: true }),
-            );
-        });
+        await selectCompetition(user, firstCompetition.name);
+        await selectCompetition(user, secondCompetition.name);
+        await selectCompetition(user, firstCompetition.name);
+        await selectCompetition(user, secondCompetition.name);
 
-        // We should send received wcif to tnoodle
-        expect(wcif).toStrictEqual(wcifs[competitions[i].id]);
+        expect(wcaApi.getCompetitionJson).toHaveBeenCalledTimes(2);
+    });
 
-        // Download
-        await act(async () => {
-            scrambleButton.dispatchEvent(
-                new MouseEvent("click", { bubbles: true }),
-            );
-        });
-
-        let mbldExtensionCubesCount = getMbldCubesCount(store);
-
-        // We should warn in case of mbld
-        if (
-            !!mbldExtensionCubesCount &&
-            store.getState().eventDataSlice.bestMbldAttempt! >
-                Number(mbldExtensionCubesCount)
-        ) {
-            let items = container.querySelectorAll("tfoot tr th[colspan]");
-            expect(items[items.length - 1].innerHTML).toContain(
-                `a competitor who already tried ${bestMbldAttempt.attempted} at a competition. Proceed if you are really certain of it.`,
-            );
-        }
-    }
-
-    // Get back to manual selection
-    await act(async () => {
-        manualSelectionButton.dispatchEvent(
-            new MouseEvent("click", { bubbles: true }),
+    it("does not wait for suggested MBLD and FMC settings to generate scrambles", async () => {
+        vi.mocked(tnoodleApi.fetchBestMbldAttempt).mockReturnValue(pending());
+        vi.mocked(tnoodleApi.fetchSuggestedFmcTranslations).mockReturnValue(
+            pending(),
         );
+
+        const { user } = await renderWithProviders(<App />, {
+            isAuthenticated: true,
+        });
+
+        await selectCompetition(user, firstCompetition.name);
+        await generateScrambles(user);
+
+        expect(tnoodleApi.fetchZip).toHaveBeenCalledTimes(1);
     });
-
-    await act(async () => {
-        scrambleButton.dispatchEvent(
-            new MouseEvent("click", { bubbles: true }),
-        );
-    });
-
-    // After manual selection, events should be restored
-    expect(store.getState().wcifSlice.wcif.events).toStrictEqual(
-        defaultWcif.events,
-    );
-
-    // Wcifs should be cached
-    Object.keys(wcifs).forEach((competitionId) => {
-        expect(
-            store.getState().informationSlice.cachedObjects[competitionId].wcif,
-        ).toEqual(wcifs[competitionId]);
-    });
-
-    // Click all buttons again
-    for (let i = 0; i < competitionButtons.length; i++) {
-        await act(async () => {
-            competitionButtons[i].dispatchEvent(
-                new MouseEvent("click", { bubbles: true }),
-            );
-        });
-    }
-
-    // On the 2nd competition selection, we should use cached information,
-    // so no wcif should be called
-    expect(wcaApi.getCompetitionJson).toHaveBeenCalledTimes(
-        competitions.length,
-    );
-
-    vi.spyOn(global.URL, "createObjectURL").mockRestore();
-    vi.spyOn(wcaApi, "getCompetitionJson").mockRestore();
-    vi.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockRestore();
-    vi.spyOn(tnoodleApi, "fetchSuggestedFmcTranslations").mockRestore();
-});
-
-it("Comfort features should not block zip generation", async () => {
-    const store = getNewStore();
-
-    // Allow downloads
-    global.URL.createObjectURL = vi.fn();
-
-    vi.spyOn(wcaApi, "getCompetitionJson").mockImplementation((competitionId) =>
-        Promise.resolve({ ...axiosResponse, data: wcifs[competitionId] }),
-    );
-
-    // Comfort features
-    vi.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: bestMbldAttempt }),
-    );
-
-    vi.spyOn(tnoodleApi, "fetchSuggestedFmcTranslations").mockImplementation(
-        () => Promise.resolve({ ...axiosResponse, data: [] }),
-    );
-
-    // Render component
-    await act(async () => {
-        render(
-            <React.StrictMode>
-                <Provider store={store}>
-                    <MockAuthContext isAuthenticated>
-                        <App />
-                    </MockAuthContext>
-                </Provider>
-            </React.StrictMode>,
-            { container },
-        );
-    });
-
-    let competitionButtons = Array.from(
-        container.querySelectorAll("ul button"),
-    );
-
-    let scrambleButton = container.querySelector("form button")!;
-
-    // Click competitions
-    for (let i = 0; i < competitionButtons.length; i++) {
-        await act(async () => {
-            competitionButtons[i].dispatchEvent(
-                new MouseEvent("click", { bubbles: true }),
-            );
-        });
-
-        // Round changes from previous tests also changes defaultWcif
-        // to avoid empty rounds, we try to change rounds here
-        // It should have effect just on in Manual Selection
-        await act(async () => {
-            fireEvent.change(container.querySelector("select")!, {
-                target: { value: 1 },
-            });
-        });
-
-        await act(async () => {
-            scrambleButton.dispatchEvent(
-                new MouseEvent("click", { bubbles: true }),
-            );
-        });
-
-        await act(async () => {
-            scrambleButton.dispatchEvent(
-                new MouseEvent("click", { bubbles: true }),
-            );
-        });
-    }
-
-    expect(tnoodleApi.fetchZip).toHaveBeenCalledTimes(
-        competitionButtons.length,
-    );
-
-    vi.spyOn(global.URL, "createObjectURL").mockRestore();
-    vi.spyOn(wcaApi, "getCompetitionJson").mockRestore();
-    vi.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockRestore();
-    vi.spyOn(tnoodleApi, "fetchSuggestedFmcTranslations").mockRestore();
 });
