@@ -3,11 +3,6 @@ export const getQueryParameter = (name: string) => {
     return params.get(name);
 };
 
-export const getHashParameter = (name: string) => {
-    let params = new URLSearchParams(window.location.hash.replace("#", ""));
-    return params.get(name);
-};
-
 export const setQueryParameter = (name: string, value: string | number) => {
     let searchParams = new URLSearchParams(window.location.search);
     searchParams.set(name, "" + value);

@@ -7,7 +7,7 @@ export default defineConfig({
     build: {
         outDir: "build",
     },
-    base: "/scramble/",
+    base: "/scramble",
     test: {
         globals: true,
         environment: "jsdom",

@@ -32,6 +32,7 @@ import {
     getMbldCubesCount,
 } from "./util/extension.test.util";
 import { findExtension } from "../main/util/extension.util";
+import MockAuthContext from "./mock/MockAuthContext";
 
 let container = document.createElement("div");
 
@@ -136,7 +137,9 @@ it("Just generate scrambles", async () => {
         render(
             <React.StrictMode>
                 <Provider store={store}>
-                    <App />
+                    <MockAuthContext>
+                        <App />
+                    </MockAuthContext>
                 </Provider>
             </React.StrictMode>,
             { container },
@@ -170,7 +173,9 @@ it("Changes on 333, scramble", async () => {
         render(
             <React.StrictMode>
                 <Provider store={store}>
-                    <App />
+                    <MockAuthContext>
+                        <App />
+                    </MockAuthContext>
                 </Provider>
             </React.StrictMode>,
             { container },
@@ -243,7 +248,9 @@ it("Remove 333, add FMC and MBLD", async () => {
         render(
             <React.StrictMode>
                 <Provider store={store}>
-                    <App />
+                    <MockAuthContext>
+                        <App />
+                    </MockAuthContext>
                 </Provider>
             </React.StrictMode>,
             { container },
@@ -350,8 +357,6 @@ it("Logged user", async () => {
     // Allow downloads
     global.URL.createObjectURL = vi.fn();
 
-    vi.spyOn(wcaApi, "isLogged").mockImplementation(() => true);
-
     vi.spyOn(wcaApi, "getCompetitionJson").mockImplementation((competitionId) =>
         Promise.resolve({ ...axiosResponse, data: wcifs[competitionId] }),
     );
@@ -373,7 +378,9 @@ it("Logged user", async () => {
         render(
             <React.StrictMode>
                 <Provider store={store}>
-                    <App />
+                    <MockAuthContext isAuthenticated>
+                        <App />
+                    </MockAuthContext>
                 </Provider>
             </React.StrictMode>,
             { container },
@@ -471,7 +478,6 @@ it("Logged user", async () => {
     );
 
     vi.spyOn(global.URL, "createObjectURL").mockRestore();
-    vi.spyOn(wcaApi, "isLogged").mockRestore();
     vi.spyOn(wcaApi, "getCompetitionJson").mockRestore();
     vi.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockRestore();
     vi.spyOn(tnoodleApi, "fetchSuggestedFmcTranslations").mockRestore();
@@ -482,8 +488,6 @@ it("Comfort features should not block zip generation", async () => {
 
     // Allow downloads
     global.URL.createObjectURL = vi.fn();
-
-    vi.spyOn(wcaApi, "isLogged").mockImplementation(() => true);
 
     vi.spyOn(wcaApi, "getCompetitionJson").mockImplementation((competitionId) =>
         Promise.resolve({ ...axiosResponse, data: wcifs[competitionId] }),
@@ -503,7 +507,9 @@ it("Comfort features should not block zip generation", async () => {
         render(
             <React.StrictMode>
                 <Provider store={store}>
-                    <App />
+                    <MockAuthContext isAuthenticated>
+                        <App />
+                    </MockAuthContext>
                 </Provider>
             </React.StrictMode>,
             { container },
@@ -551,7 +557,6 @@ it("Comfort features should not block zip generation", async () => {
     );
 
     vi.spyOn(global.URL, "createObjectURL").mockRestore();
-    vi.spyOn(wcaApi, "isLogged").mockRestore();
     vi.spyOn(wcaApi, "getCompetitionJson").mockRestore();
     vi.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockRestore();
     vi.spyOn(tnoodleApi, "fetchSuggestedFmcTranslations").mockRestore();

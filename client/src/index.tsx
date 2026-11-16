@@ -5,12 +5,16 @@ import App from "./App";
 import "./index.css";
 import store from "./main/redux/Store";
 import reportWebVitals from "./reportWebVitals";
+import { AuthProvider } from "react-oidc-context";
+import oidcConfig, { gotoPreLoginPath } from "./main/api/wca.oidc";
 
 const root = createRoot(document.getElementById("root") as HTMLDivElement);
 
 root.render(
     <Provider store={store}>
-        <App />
+        <AuthProvider {...oidcConfig} onSigninCallback={gotoPreLoginPath}>
+            <App />
+        </AuthProvider>
     </Provider>,
 );
 
