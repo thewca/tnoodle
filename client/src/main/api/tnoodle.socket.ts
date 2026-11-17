@@ -12,7 +12,7 @@ const ScramblingState = {
     ComputingData: 4,
     Done: 5,
     Error: -1,
-}
+};
 
 type ScramblingState = (typeof ScramblingState)[keyof typeof ScramblingState];
 
