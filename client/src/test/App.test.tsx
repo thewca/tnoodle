@@ -5,7 +5,7 @@ import tnoodleApi from "../main/api/tnoodle.api";
 import wcaApi from "../main/api/wca.api";
 import { findExtension } from "../main/util/extension.util";
 import { defaultWcif, frontendStatusExtensionId } from "../main/util/wcif.util";
-import { lastZipRequest, mockApis, pending } from "./mock/api.mock";
+import { mockApis, pending } from "./mock/api.mock";
 import { defaultStatus } from "./mock/tnoodle.api.test.mock";
 import { competitions, wcifs } from "./mock/wca.api.test.mock";
 import {
@@ -92,7 +92,7 @@ describe("manual selection", () => {
     });
 
     it("sends MBLD cube count and FMC translations along", async () => {
-        const { user } = await renderWithProviders(<App />);
+        const { user, store } = await renderWithProviders(<App />);
         const cube = await eventTable("3x3x3");
         const fmc = await eventTable("3x3x3 Fewest Moves");
         const mbld = await eventTable("3x3x3 Multiple Blindfolded");

@@ -76,15 +76,3 @@ export const mockApis = () => {
         ok(wcifs[competitionId]),
     );
 };
-
-/** The `[wcif, password]` of the most recent scramble generation request. */
-export const lastZipRequest = () => {
-    const call = vi.mocked(tnoodleApi.fetchZip).mock.lastCall;
-
-    if (call === undefined) {
-        throw new Error("No scrambles were requested");
-    }
-
-    const [, wcif, password] = call;
-    return { wcif, password };
-};
