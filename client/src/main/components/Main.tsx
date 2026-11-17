@@ -1,6 +1,5 @@
 import { type FormEvent, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import tnoodleApi from "../api/tnoodle.api";
 import { ScrambleClient } from "../api/tnoodle.socket";
 import { isUsingStaging } from "../api/wca.oidc";
 import type RootState from "../model/RootState";
@@ -16,16 +15,18 @@ import EventPickerTable from "./EventPickerTable";
 import Interceptor from "./Interceptor";
 import "./Main.css";
 import VersionInfo from "./VersionInfo";
-import type WebsocketBlobResult from "../model/WebsocketBlobResult";
 import { frontendStatusExtensionId } from "../util/wcif.util";
 import { useAuth } from "react-oidc-context";
+import { convertToBlob } from "../util/data.util.ts";
 
 const Main = () => {
     const [competitionNameFileZip, setCompetitionNameFileZip] = useState("");
     const password = useSelector(
         (state: RootState) => state.scramblingSlice.password,
     );
-    const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
+    const wcif = useSelector(
+        (state: RootState) => state.wcifSlice.wcif,
+    );
     const isManualSelection = useSelector(
         (state: RootState) => state.informationSlice.isManualSelection,
     );
@@ -50,7 +51,7 @@ const Main = () => {
         }
 
         if (!!fileZip) {
-            tnoodleApi.convertToBlob(fileZip).then((blob) => downloadZip(blob));
+            convertToBlob(fileZip).then((blob) => downloadZip(blob));
         } else {
             generateZip();
         }
@@ -70,12 +71,12 @@ const Main = () => {
             onScrambleProgress,
         );
 
-        tnoodleApi
-            .fetchZip(scrambleClient, wcif, password)
-            .then((plainZip: WebsocketBlobResult) =>
+        scrambleClient
+            .loadScrambles({ wcif, zipPassword: password }, wcif.id)
+            .then((plainZip) =>
                 dispatch(setFileZip(plainZip)),
             )
-            .catch((err: any) => interceptorRef.current?.updateMessage(err))
+            .catch((err) => interceptorRef.current?.updateMessage(err))
             .finally(() => {
                 dispatch(setGeneratingScrambles(false));
                 dispatch(resetScramblingProgressCurrent());

@@ -51,12 +51,11 @@ export class ScrambleClient {
     };
 
     loadScrambles(
-        endpoint: String,
         payload: object,
         targetMarker: String,
     ): Promise<WebsocketBlobResult> {
         return new Promise((resolve, reject) => {
-            let ws = new WebSocket(BASE_URL + endpoint);
+            let ws = new WebSocket(WEBSOCKET_API + WEBSOCKET_ZIP_ENDPOINT);
 
             ws.onopen = () => {
                 this.state = ScramblingState.Initiate;
@@ -123,7 +122,8 @@ wsTNoodleBackend.protocol =
 
 const FALLBACK_APPLICATION_TYPE = "application/octet-stream";
 
-const BASE_URL = wsTNoodleBackend.toString().replace(/\/$/g, "");
+const WEBSOCKET_API = wsTNoodleBackend.toString().replace(/\/$/g, "");
+const WEBSOCKET_ZIP_ENDPOINT = "/wcif/zip";
 
 // this has to be identical with backend value in JobSchedulingHandler.kt
 const MARKER_ERROR_MESSAGE = "%%ERROR%%";
