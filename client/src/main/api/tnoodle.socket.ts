@@ -4,15 +4,17 @@ import type WebsocketBlobResult from "../model/WebsocketBlobResult";
 export type ScrambleHandshakeFn = (payload: Record<string, number>) => void;
 export type ScrambleProgressFn = (payload: string) => void;
 
-enum ScramblingState {
-    Idle,
-    Initiate,
-    Scrambling,
-    ComputingType,
-    ComputingData,
-    Done,
-    Error = -1,
+const ScramblingState = {
+    Idle: 0,
+    Initiate: 1,
+    Scrambling: 2,
+    ComputingType: 3,
+    ComputingData: 4,
+    Done: 5,
+    Error: -1,
 }
+
+type ScramblingState = (typeof ScramblingState)[keyof typeof ScramblingState];
 
 export class ScrambleClient {
     onHandshake: ScrambleHandshakeFn;
