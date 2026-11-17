@@ -109,7 +109,7 @@ const VersionInfo = () => {
         // Running version is allowed, but not the latest.
         if (versionAllowed) {
             return (
-                <div className="alert alert-info m-0">
+                <div className="alert alert-info m-0" role="alert">
                     You are running {runningVersion}, which is still allowed,
                     but you should upgrade to {currentTnoodle.name} available{" "}
                     <a href={currentTnoodle.download}>here</a> as soon as
@@ -119,7 +119,7 @@ const VersionInfo = () => {
         }
 
         return (
-            <div className="alert alert-danger m-0">
+            <div className="alert alert-danger m-0" role="alert">
                 You are running {runningVersion}, which is not allowed. Do not
                 use scrambles generated in any official competition and consider
                 downloading the latest version{" "}
@@ -131,7 +131,7 @@ const VersionInfo = () => {
     // Generated version is not an officially signed jar
     if (!signatureValid) {
         return (
-            <div className="alert alert-danger m-0">
+            <div className="alert alert-danger m-0" role="alert">
                 You are running an unsigned TNoodle release. Do not use
                 scrambles generated in any official competition and consider
                 downloading the official program{" "}

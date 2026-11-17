@@ -1,84 +1,64 @@
-import { render, act, fireEvent } from "@testing-library/react";
-import React from "react";
-import { Provider } from "react-redux";
+import { screen } from "@testing-library/react";
 import EntryInterface from "../main/components/EntryInterface";
-import store from "../main/redux/Store";
+import { setIsManualSelection } from "../main/redux/slice/InformationSlice";
+import { createStore } from "../main/redux/Store";
+import { renderWithProviders, replaceValue } from "./util/render";
 
-let container = document.createElement("div");
-beforeEach(() => {
-    // setup a DOM element as a render target
-    container = document.createElement("div");
-    document.body.appendChild(container);
-});
+describe("competition name", () => {
+    it("defaults to today's date", async () => {
+        await renderWithProviders(<EntryInterface />);
 
-afterEach(() => {
-    // cleanup on exiting
-    container.remove();
-    container = document.createElement("div");
-});
-
-it("Competition name should be already filled with current date and changes should go to the store", async () => {
-    // Render component
-    await act(async () => {
-        render(
-            <React.StrictMode>
-                <Provider store={store}>
-                    <EntryInterface />
-                </Provider>
-            </React.StrictMode>,
-            { container },
+        const today = new Date().toISOString().split("T")[0];
+        expect(screen.getByLabelText("Competition Name")).toHaveValue(
+            `Scrambles for ${today}`,
         );
     });
 
-    const today = new Date().toISOString().split("T")[0];
+    it("renames the competition when edited", async () => {
+        const { store, user } = await renderWithProviders(<EntryInterface />);
 
-    const input = document.getElementById(
-        "competition-name",
-    )! as HTMLInputElement;
-    const expected = "Scrambles for " + today;
-    expect(input.value).toEqual(expected);
+        await replaceValue(
+            user,
+            screen.getByLabelText("Competition Name"),
+            "Competition Name 2020",
+        );
 
-    const typed = "Competition Name 2020";
-    fireEvent.change(input, { target: { value: typed } });
+        const { wcif } = store.getState().wcifSlice;
+        expect(wcif.name).toBe("Competition Name 2020");
+        expect(wcif.shortName).toBe("Competition Name 2020");
+    });
 
-    // New competition name should go to the store
-    expect(store.getState().wcifSlice.wcif.name).toBe(typed);
-    expect(store.getState().wcifSlice.wcif.shortName).toBe(typed);
+    it("cannot be edited for a competition selected from the WCA", async () => {
+        const store = createStore();
+        store.dispatch(setIsManualSelection(false));
+
+        await renderWithProviders(<EntryInterface />, { store });
+
+        expect(screen.getByLabelText("Competition Name")).toBeDisabled();
+    });
 });
 
-it("Password should toggle and changes to it should go to the store", async () => {
-    // Render component
-    await act(async () => {
-        render(
-            <React.StrictMode>
-                <Provider store={store}>
-                    <EntryInterface />
-                </Provider>
-            </React.StrictMode>,
-            { container },
-        );
+describe("password", () => {
+    it("is hidden until the visibility toggle is clicked", async () => {
+        const { user } = await renderWithProviders(<EntryInterface />);
+        const password = screen.getByLabelText("Password");
+
+        expect(password).toHaveAttribute("type", "password");
+
+        await user.click(screen.getByRole("button", { name: "Show password" }));
+        expect(password).not.toHaveAttribute("type", "password");
+
+        await user.click(screen.getByRole("button", { name: "Hide password" }));
+        expect(password).toHaveAttribute("type", "password");
     });
 
-    const input = container.querySelector("#password")! as HTMLInputElement;
-    const passwordToggler = container.querySelector(".input-group-text")!;
+    it("is stored as it is typed", async () => {
+        const { store, user } = await renderWithProviders(<EntryInterface />);
 
-    expect(store.getState().scramblingSlice.password).toBe("");
+        expect(store.getState().scramblingSlice.password).toBe("");
 
-    const password = "123456";
-    await act(async () => {
-        fireEvent.change(input, { target: { value: password } });
+        await user.type(screen.getByLabelText("Password"), "123456");
+
+        expect(store.getState().scramblingSlice.password).toBe("123456");
     });
-
-    // Type password at first
-    expect(input.type).toBe("password");
-
-    // After the click, it should be type text
-    await act(async () => {
-        fireEvent.click(passwordToggler);
-    });
-
-    expect(input.type).toBe("text");
-
-    // Password should go to the store
-    expect(store.getState().scramblingSlice.password).toBe(password);
 });

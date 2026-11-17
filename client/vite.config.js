@@ -12,6 +12,7 @@ export default defineConfig({
         globals: true,
         environment: "jsdom",
         setupFiles: ["./src/setupTests.ts"],
+        restoreMocks: true,
         coverage: {
             enabled: true,
             reporter: ["lcov"],

@@ -396,6 +396,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                             <td className="align-middle">
                                 <select
                                     className="form-control"
+                                    aria-label={`Round ${i + 1} format`}
                                     value={wcifRounds[i].format}
                                     onChange={(evt) =>
                                         handleGeneralRoundChange(
@@ -421,6 +422,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                 <input
                                     className="form-control"
                                     type="number"
+                                    aria-label={`Round ${i + 1} scramble sets`}
                                     value={wcifRounds[i].scrambleSetCount}
                                     onChange={(evt) =>
                                         handleGeneralRoundChange(
@@ -442,6 +444,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                 <input
                                     className="form-control"
                                     type="number"
+                                    aria-label={`Round ${i + 1} copies`}
                                     value={copies}
                                     onChange={(evt) =>
                                         handleNumberOfCopiesChange(
@@ -493,7 +496,10 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     };
 
     return (
-        <table className="table table-sm shadow rounded overflow-hidden">
+        <table
+            className="table table-sm shadow rounded overflow-hidden"
+            aria-label={wcaEvent.name}
+        >
             <thead>
                 <tr
                     className={
@@ -555,8 +561,14 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                     </OverlayTrigger>
                                 </div>
                             )}
-                        <label className="form-label">Rounds</label>
+                        <label
+                            className="form-label"
+                            htmlFor={`${wcaEvent.id}-rounds`}
+                        >
+                            Rounds
+                        </label>
                         <select
+                            id={`${wcaEvent.id}-rounds`}
                             className="form-select"
                             value={wcifEvent.rounds.length}
                             onChange={(evt) =>

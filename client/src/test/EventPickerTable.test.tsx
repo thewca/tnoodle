@@ -1,203 +1,83 @@
-import { render, act, fireEvent } from "@testing-library/react";
-import React from "react";
-import { Provider } from "react-redux";
-import tnoodleApi from "../main/api/tnoodle.api";
+import { screen } from "@testing-library/react";
 import EventPickerTable from "../main/components/EventPickerTable";
-import { setWcif, setWcifEvent } from "../main/redux/slice/WcifSlice";
 import { setIsManualSelection } from "../main/redux/slice/InformationSlice";
-import {
-    getDefaultCopiesExtension,
-    mbldCubesExtensionId,
-} from "../main/util/wcif.util";
-import {
-    colorScheme,
-    emptySvg,
-    events,
-    formats,
-    languages,
-    scrambleAndImage,
-    wcifTestVersion,
-} from "./mock/tnoodle.api.test.mock";
-import { axiosResponse, getNewStore } from "./mock/util.test.mock";
+import { setWcif } from "../main/redux/slice/WcifSlice";
+import { createStore } from "../main/redux/Store";
+import type Wcif from "../main/model/Wcif";
+import { defaultWcif } from "../main/util/wcif.util";
+import { mockApis } from "./mock/api.mock";
+import { events } from "./mock/tnoodle.api.test.mock";
 import { competitions, wcifs } from "./mock/wca.api.test.mock";
+import { renderWithProviders } from "./util/render";
+import { getWcaOrigin } from "../main/api/wca.oidc";
 
-let container = document.createElement("div");
-beforeEach(() => {
-    // setup a DOM element as a render target
-    container = document.createElement("div");
-    document.body.appendChild(container);
-
-    vi.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
-        Promise.resolve({
-            data: events,
-            ...axiosResponse,
-        }),
-    );
-
-    vi.spyOn(tnoodleApi, "fetchFormats").mockImplementation(() =>
-        Promise.resolve({ data: formats, ...axiosResponse }),
-    );
-
-    vi.spyOn(tnoodleApi, "fetchBackendWcifVersion").mockImplementation(() =>
-        Promise.resolve({ data: wcifTestVersion, ...axiosResponse }),
-    );
-
-    vi.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockImplementation(
-        () => Promise.resolve({ data: languages, ...axiosResponse }),
-    );
-
-    vi.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockImplementation(() =>
-        Promise.resolve({ data: colorScheme, ...axiosResponse }),
-    );
-
-    vi.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockImplementation(() =>
-        Promise.resolve({ data: scrambleAndImage, ...axiosResponse }),
-    );
-
-    vi.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockImplementation(() =>
-        Promise.resolve({ data: emptySvg, ...axiosResponse }),
-    );
-});
-
-afterEach(() => {
-    // cleanup on exiting
-    container.remove();
-    container = document.createElement("div");
-
-    // Clear mock
-    vi.spyOn(tnoodleApi, "fetchWcaEvents").mockRestore();
-    vi.spyOn(tnoodleApi, "fetchFormats").mockRestore();
-    vi.spyOn(tnoodleApi, "fetchBackendWcifVersion").mockRestore();
-    vi.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockRestore();
-    vi.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockRestore();
-    vi.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockRestore();
-    vi.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockRestore();
-});
-
-it("Show editing warn if case of competition selected", async () => {
-    const store = getNewStore();
-
-    // Choose a competition
-    const competition = wcifs[competitions[0].id];
-    store.dispatch(setWcif(competition));
-
-    // Disable editing
+const competitionStore = (wcif: Wcif) => {
+    const store = createStore();
+    store.dispatch(setWcif(wcif));
     store.dispatch(setIsManualSelection(false));
+    return store;
+};
 
-    // Add one more round
-    const newEvent = {
-        id: "222",
-        rounds: [
-            {
-                id: "222-r1",
-                format: "a",
-                scrambleSetCount: 5,
-                extensions: [getDefaultCopiesExtension()],
-            },
-        ],
-        extensions: [],
-    };
-    store.dispatch(setWcifEvent(newEvent));
+// Only the top-level tables: nested ones (translations, colors) are unnamed.
+const eventTableNames = () =>
+    screen
+        .getAllByRole("table")
+        .map((table) => table.getAttribute("aria-label"))
+        .filter((name) => name !== null);
 
-    // Render component
-    await act(async () => {
-        render(
-            <React.StrictMode>
-                <Provider store={store}>
-                    <EventPickerTable />
-                </Provider>
-            </React.StrictMode>,
-            { container },
-        );
-    });
+beforeEach(() => mockApis());
 
-    const paragraphs = Array.from(container.querySelectorAll("p"));
+it("offers every WCA event for manual selection", async () => {
+    await renderWithProviders(<EventPickerTable />);
 
-    // Plural since we have 2 events
-    expect(paragraphs[0].innerHTML).toContain("events ");
-
-    // Show link to edit events
-    const link = paragraphs[1].querySelector("a")!;
-    expect(link.href).toContain(
-        `https://www.worldcubeassociation.org/competitions/${competition.id}/events/edit`,
-    );
-
-    // Disabled events should not appear
-    const tables = Array.from(container.querySelectorAll("table"));
-    expect(tables.length).toBe(store.getState().wcifSlice.wcif.events.length);
+    expect(eventTableNames()).toEqual(events.map((event) => event.name));
+    expect(screen.queryByText(/Found \d+ event/)).not.toBeInTheDocument();
 });
 
-it("Plural events", async () => {
-    const store = getNewStore();
-
-    // Choose a competition
+describe("for a competition selected from the WCA", () => {
     const competition = wcifs[competitions[0].id];
-    store.dispatch(setWcif(competition));
 
-    // Disable editing
-    store.dispatch(setIsManualSelection(false));
-
-    // Render component
-    await act(async () => {
-        render(
-            <React.StrictMode>
-                <Provider store={store}>
-                    <EventPickerTable />
-                </Provider>
-            </React.StrictMode>,
-            { container },
-        );
-    });
-
-    // Plural for multiple events
-    expect(container.querySelector("p")!.innerHTML).toContain("events ");
-});
-
-it("Changes in MBLD should go to the store", async () => {
-    const store = getNewStore();
-
-    // Render component
-    await act(async () => {
-        render(
-            <React.StrictMode>
-                <Provider store={store}>
-                    <EventPickerTable />
-                </Provider>
-            </React.StrictMode>,
-            { container },
-        );
-    });
-    const names = ["3x3x3 Multiple Blindfolded"];
-
-    // Increase number of rounds from FMC and MBLD
-    const tables = Array.from(container.querySelectorAll("table"))
-        .filter(
-            (table) => names.indexOf(table.querySelector("h5")!.innerHTML) >= 0,
-        )
-        .map((table) => {
-            let select = table.querySelector("select")!;
-            fireEvent.change(select, { target: { value: 1 } });
-            return table;
+    it("only shows the competition's events", async () => {
+        await renderWithProviders(<EventPickerTable />, {
+            store: competitionStore(competition),
         });
 
-    // MBLD should be the last table
-    const mbldTable = tables[tables.length - 1];
-    const mbldInputs = mbldTable.querySelectorAll("input");
-    const newMbldScrambles = 70;
+        const competitionEventNames = events
+            .filter((event) =>
+                competition.events.some(({ id }) => id === event.id),
+            )
+            .map((event) => event.name);
 
-    await act(async () => {
-        fireEvent.change(mbldInputs[mbldInputs.length - 1], {
-            target: { value: newMbldScrambles },
-        });
+        expect(eventTableNames()).toEqual(competitionEventNames);
+        expect(
+            screen.getByText(
+                `Found ${competition.events.length} events for ${competition.name}.`,
+            ),
+        ).toBeInTheDocument();
     });
 
-    let mbldWcifEvent = store
-        .getState()
-        .wcifSlice.wcif.events.find((event) => event.id === "333mbf");
-    let mbldExtensionCubesCount = mbldWcifEvent?.extensions?.find(
-        (extension) => extension.id === mbldCubesExtensionId,
-    )?.data["requestedScrambles"];
+    it("links to the WCA website for editing rounds", async () => {
+        await renderWithProviders(<EventPickerTable />, {
+            store: competitionStore(competition),
+        });
 
-    // It should go to the store
-    expect(mbldExtensionCubesCount).toBe(newMbldScrambles);
+        expect(screen.getByRole("link", { name: "the WCA" })).toHaveAttribute(
+            "href",
+            `${getWcaOrigin()}/competitions/${competition.id}/events/edit`,
+        );
+    });
+
+    it("uses singular wording for a single event", async () => {
+        await renderWithProviders(<EventPickerTable />, {
+            store: competitionStore({
+                ...defaultWcif,
+                id: "TinyOpen",
+                name: "Tiny Open",
+            }),
+        });
+
+        expect(
+            screen.getByText("Found 1 event for Tiny Open."),
+        ).toBeInTheDocument();
+    });
 });
