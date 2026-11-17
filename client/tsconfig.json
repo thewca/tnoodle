@@ -1,30 +1,28 @@
 {
     "compilerOptions": {
-        "esModuleInterop": true,
-        "skipLibCheck": true,
         "target": "esnext",
-        "allowJs": true,
-        "resolveJsonModule": true,
-        "moduleDetection": "force",
-        "isolatedModules": true,
-        "verbatimModuleSyntax": true,
-        "strict": true,
-        "noImplicitOverride": true,
-        "module": "preserve",
-        "noEmit": true,
         "lib": ["esnext", "dom", "dom.iterable"],
-        "allowSyntheticDefaultImports": true,
-        "forceConsistentCasingInFileNames": true,
-        "noFallthroughCasesInSwitch": true,
-        "moduleResolution": "node",
         "jsx": "react-jsx",
+
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "moduleDetection": "force",
+        "allowImportingTsExtensions": true,
+        "verbatimModuleSyntax": true,
+        "isolatedModules": true,
+        "noEmit": true,
+
+        "strict": true,
+        "allowJs": true,
+        "skipLibCheck": true,
+        "noImplicitOverride": true,
+        "noFallthroughCasesInSwitch": true,
+        "erasableSyntaxOnly": true,
         "types": [
-            "react/next",
-            "react-dom/next",
+            "vite/client",
             "vitest/globals",
             "@testing-library/jest-dom"
         ]
     },
     "include": ["src"],
-    "exclude": ["node_modules"]
 }
