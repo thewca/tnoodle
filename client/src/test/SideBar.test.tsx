@@ -22,6 +22,7 @@ describe("when logged in", () => {
         const competitionButtons = within(
             screen.getByRole("group"),
         ).getAllByRole("button");
+
         expect(competitionButtons.map((button) => button.textContent)).toEqual(
             competitions.map((competition) => competition.name),
         );
@@ -39,9 +40,11 @@ describe("when logged out", () => {
         expect(
             screen.getByRole("button", { name: "Log In" }),
         ).toBeInTheDocument();
+
         expect(
             screen.queryByRole("button", { name: "Manual Selection" }),
         ).not.toBeInTheDocument();
+
         expect(wcaApi.getUpcomingManageableCompetitions).not.toHaveBeenCalled();
     });
 });

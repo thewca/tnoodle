@@ -20,8 +20,10 @@ import { renderWithProviders, replaceValue } from "./util/render";
 const eventTable = async (name: string) =>
     within(await screen.findByRole("table", { name }));
 
-const generateScrambles = (user: UserEvent) =>
-    user.click(screen.getByRole("button", { name: "Generate Scrambles" }));
+const generateScrambles = async (user: UserEvent) =>
+    await user.click(
+        screen.getByRole("button", { name: "Generate Scrambles" }),
+    );
 
 const selectCompetition = async (user: UserEvent, name: string) => {
     await user.click(screen.getByRole("button", { name }));

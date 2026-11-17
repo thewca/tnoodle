@@ -9,6 +9,7 @@ import { mockApis } from "./mock/api.mock";
 import { events } from "./mock/tnoodle.api.test.mock";
 import { competitions, wcifs } from "./mock/wca.api.test.mock";
 import { renderWithProviders } from "./util/render";
+import { getWcaOrigin } from "../main/api/wca.oidc";
 
 const competitionStore = (wcif: Wcif) => {
     const store = createStore();
@@ -62,7 +63,7 @@ describe("for a competition selected from the WCA", () => {
 
         expect(screen.getByRole("link", { name: "the WCA" })).toHaveAttribute(
             "href",
-            `https://www.worldcubeassociation.org/competitions/${competition.id}/events/edit`,
+            `${getWcaOrigin()}/competitions/${competition.id}/events/edit`,
         );
     });
 
