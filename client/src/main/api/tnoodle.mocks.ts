@@ -3,7 +3,7 @@
 
 import { http, HttpResponse } from 'msw';
 
-import type { ColorScheme, FmcCompetitor, FmcLanguage, MbldAttempt, MbldCompetitor, VersionInfo, WcaEvent, WcaFormat, WcifPersonalBest, WcifRegistration } from "./tnoodle.redocly.js";
+import type { ColorScheme, FmcCompetitor, FmcLanguage, MbldAttempt, MbldCompetitor, VersionInfo, WcaEvent, WcaFormat, WcifPersonalBest, WcifRegistration } from "./tnoodle.js";
 
 export function createVersionInfo(overrides?: Partial<VersionInfo>): VersionInfo {
     return {

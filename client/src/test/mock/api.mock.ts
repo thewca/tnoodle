@@ -1,8 +1,8 @@
 import { AxiosHeaders, type AxiosResponse } from "axios";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
-import { handlers as tnoodleHandlers } from "../../main/api/tnoodle.redocly.mocks.ts";
-import { handlers as wcaHandlers } from "../../main/api/wca.redocly.mocks.ts";
+import { handlers as tnoodleHandlers } from "../../main/api/tnoodle.mocks.ts";
+import { handlers as wcaHandlers } from "../../main/api/wca.mocks.ts";
 import { mockCompetitions } from "./wcif.mock.ts";
 
 /** Wraps data in a successful axios response. */

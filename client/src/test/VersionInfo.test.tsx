@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react";
 import tnoodleApi from "../main/api/tnoodle.api";
 import wcaApi from "../main/api/wca.api";
-import type { VersionInfo as ApiVersionInfo } from "../main/api/tnoodle.redocly.schemas";
+import type { VersionInfo as ApiVersionInfo } from "../main/api/tnoodle.schemas";
 import VersionInfo from "../main/components/VersionInfo";
 import { mockApis, ok } from "./mock/api.mock";
 import { renderWithProviders } from "./util/render";

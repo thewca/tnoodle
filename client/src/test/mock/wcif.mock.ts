@@ -3,7 +3,7 @@ import {
     createWcifEvent,
     createWcifExtension,
     createWcifRound,
-} from "../../main/api/wca.redocly.mocks.ts";
+} from "../../main/api/wca.mocks.ts";
 import { testServerWcifVersion } from "./api.mock.ts";
 
 const year = new Date().getFullYear();

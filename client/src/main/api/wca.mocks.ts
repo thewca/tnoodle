@@ -3,7 +3,7 @@
 
 import { http, HttpResponse } from 'msw';
 
-import type { CompetitionSummary, MeResponse, ScrambleProgramInfo, ScrambleProgramVersion, User, Wcif, WcifEvent, WcifExtension, WcifPerson, WcifPersonalBest, WcifRegistration, WcifRound, WcifSchedule } from "./wca.redocly.js";
+import type { CompetitionSummary, MeResponse, ScrambleProgramInfo, ScrambleProgramVersion, User, Wcif, WcifEvent, WcifExtension, WcifPerson, WcifPersonalBest, WcifRegistration, WcifRound, WcifSchedule } from "./wca.js";
 
 export function createUser(overrides?: Partial<User>): User {
     return {

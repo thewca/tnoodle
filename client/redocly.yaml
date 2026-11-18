@@ -10,7 +10,7 @@ client:
 apis:
     tnoodle:
         root: ../openapi/tnoodle.yaml
-        clientOutput: ./src/main/api/tnoodle.redocly.ts
+        clientOutput: ./src/main/api/tnoodle.ts
     wca:
         root: ../openapi/wca_v0.yaml
-        clientOutput: ./src/main/api/wca.redocly.ts
+        clientOutput: ./src/main/api/wca.ts

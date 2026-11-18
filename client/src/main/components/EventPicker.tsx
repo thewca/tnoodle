@@ -2,8 +2,8 @@ import { OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { MAX_WCA_ROUNDS, MBLD_DEFAULT } from "../constants/wca.constants";
 import type RootState from "../model/RootState";
-import type { WcaEvent } from "../api/tnoodle.redocly.schemas";
-import type { WcifEvent, WcifRound } from "../api/wca.redocly.schemas";
+import type { WcaEvent } from "../api/tnoodle.schemas";
+import type { WcifEvent, WcifRound } from "../api/wca.schemas";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
 import { setWcifEvent } from "../redux/slice/WcifSlice";
 import {
@@ -12,7 +12,7 @@ import {
     copiesExtensionId,
     getDefaultCopiesExtension,
 } from "../util/wcif.util";
-import { client } from "../api/tnoodle.redocly";
+import { client as tnoodleClient } from "../api/tnoodle";
 import "./EventPicker.css";
 import FmcTranslationsDetail from "./FmcTranslationsDetail";
 import MbldDetail from "./MbldDetail";
@@ -76,12 +76,12 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             // we need this additional boolean to make sure we can fetch only once
             // when the overlay is hidden, because its callback yields a `show` boolean.
             if (fetchNewScramble && colorScheme !== undefined) {
-                client
+                tnoodleClient
                     .getRandomScramble({
                         path: { puzzleId: wcaEvent.puzzle_id },
                     })
                     .then((scramble) => {
-                        client
+                        tnoodleClient
                             .paintScramble({
                                 path: { puzzleId: wcaEvent.puzzle_id },
                                 query: { scramble },
@@ -99,7 +99,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
 
     useEffect(() => {
         if (colorScheme !== undefined) {
-            client
+            tnoodleClient
                 .paintScramble({
                     path: { puzzleId: wcaEvent.puzzle_id },
                     body: colorScheme,
@@ -118,7 +118,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     useEffect(() => {
         if (wcifEvent.rounds.length > 0) {
             if (defaultColorScheme === undefined) {
-                client
+                tnoodleClient
                     .getDefaultColorScheme({
                         path: { puzzleId: wcaEvent.puzzle_id },
                     })

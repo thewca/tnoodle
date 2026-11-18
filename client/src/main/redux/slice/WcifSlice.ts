@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { WcaEvent, WcaFormat } from "../../api/tnoodle.redocly.schemas";
-import type { Wcif, WcifEvent } from "../../api/wca.redocly.schemas";
+import type { WcaEvent, WcaFormat } from "../../api/tnoodle.schemas";
+import type { Wcif, WcifEvent } from "../../api/wca.schemas";
 import { competitionName2Id } from "../../util/competition.name.util";
 import {
     copiesExtensionId,

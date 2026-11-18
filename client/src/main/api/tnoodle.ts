@@ -6,51 +6,83 @@
  * Endpoints exposed by the backend server
  */
 
-import type { CompetitionSummary, MeResponse, ScrambleProgramInfo, Wcif } from './wca.redocly.schemas.js';
-export * from './wca.redocly.schemas.js';
+import type { ColorScheme, FmcCompetitor, FmcLanguage, MbldAttempt, MbldCompetitor, VersionInfo, WcaEvent, WcaFormat } from './tnoodle.schemas.js';
+export * from './tnoodle.schemas.js';
 
-export type GetMeResult = MeResponse;
+export type GetVersionInfoResult = VersionInfo;
 
-export type GetScrambleProgramResult = ScrambleProgramInfo;
+export type GetWcaEventsResult = WcaEvent[];
 
-export type GetCompetitionsResult = CompetitionSummary[];
+export type GetWcaFormatsResult = WcaFormat[];
 
-export type GetCompetitionsQuery = {
+export type GetBackendWcifVersionResult = string;
+
+export type GetDefaultColorSchemeResult = ColorScheme;
+
+export type GetDefaultColorSchemePath = {
     /**
-     * Limit to competitions managed by the authenticated user
+     * The ID of the puzzle
      */
-    managed_by_me?: boolean;
-    /**
-     * Limit to competitions starting after this date
-     * @format date-time
-     */
-    start?: string;
-    /**
-     * Field to determine sorting order of result competitions
-     */
-    sort?: string;
+    puzzleId: string;
 };
 
-export type GetCompetitionsVariables = {
-    query?: GetCompetitionsQuery;
+export type GetDefaultColorSchemeVariables = {
+    path: GetDefaultColorSchemePath;
 };
 
-export type GetWcifResult = Wcif;
+export type GetRandomScrambleResult = string;
 
-export type GetWcifPath = {
+export type GetRandomScramblePath = {
     /**
-     * The ID of the competition to fetch
+     * The ID of the puzzle
      */
-    competitionId: string;
-    /**
-     * The format version of the resulting WCIF
-     * @format semver
-     */
-    formatVersion: string;
+    puzzleId: string;
 };
 
-export type GetWcifVariables = {
-    path: GetWcifPath;
+export type GetRandomScrambleVariables = {
+    path: GetRandomScramblePath;
+};
+
+export type PaintScrambleResult = Blob;
+
+export type PaintScramblePath = {
+    /**
+     * The ID of the puzzle
+     */
+    puzzleId: string;
+};
+
+export type PaintScrambleQuery = {
+    /**
+     * Optional scramble to paint (otherwise paints solved puzzle)
+     */
+    scramble?: string;
+};
+
+export type PaintScrambleBody = ColorScheme;
+
+export type PaintScrambleVariables = {
+    path: PaintScramblePath;
+    query?: PaintScrambleQuery;
+    body?: PaintScrambleBody;
+};
+
+export type GetFmcSheetLanguagesResult = FmcLanguage[];
+
+export type CalculateSuggestedFmcTranslationsResult = string[];
+
+export type CalculateSuggestedFmcTranslationsBody = FmcCompetitor[];
+
+export type CalculateSuggestedFmcTranslationsVariables = {
+    body: CalculateSuggestedFmcTranslationsBody;
+};
+
+export type CalculateMbldBestResult = MbldAttempt;
+
+export type CalculateMbldBestBody = MbldCompetitor[];
+
+export type CalculateMbldBestVariables = {
+    body: CalculateMbldBestBody;
 };
 
 /**
@@ -58,25 +90,57 @@ export type GetWcifVariables = {
  * type-level companion of `OPERATIONS` that gives `createClient<Ops>` its typed methods.
  */
 export type Ops = {
-    getMe: {
+    getVersionInfo: {
         args: {};
-        result: GetMeResult;
+        result: GetVersionInfoResult;
     };
-    getScrambleProgram: {
+    getWcaEvents: {
         args: {};
-        result: GetScrambleProgramResult;
+        result: GetWcaEventsResult;
     };
-    getCompetitions: {
-        args: {
-            query?: GetCompetitionsQuery;
-        };
-        result: GetCompetitionsResult;
+    getWcaFormats: {
+        args: {};
+        result: GetWcaFormatsResult;
     };
-    getWcif: {
+    getBackendWcifVersion: {
+        args: {};
+        result: GetBackendWcifVersionResult;
+    };
+    getDefaultColorScheme: {
         args: {
-            path: GetWcifPath;
+            path: GetDefaultColorSchemePath;
         };
-        result: GetWcifResult;
+        result: GetDefaultColorSchemeResult;
+    };
+    getRandomScramble: {
+        args: {
+            path: GetRandomScramblePath;
+        };
+        result: GetRandomScrambleResult;
+    };
+    paintScramble: {
+        args: {
+            path: PaintScramblePath;
+            query?: PaintScrambleQuery;
+            body?: PaintScrambleBody;
+        };
+        result: PaintScrambleResult;
+    };
+    getFmcSheetLanguages: {
+        args: {};
+        result: GetFmcSheetLanguagesResult;
+    };
+    calculateSuggestedFmcTranslations: {
+        args: {
+            body: CalculateSuggestedFmcTranslationsBody;
+        };
+        result: CalculateSuggestedFmcTranslationsResult;
+    };
+    calculateMbldBest: {
+        args: {
+            body: CalculateMbldBestBody;
+        };
+        result: CalculateMbldBestResult;
     };
 };
 
@@ -86,10 +150,16 @@ export type Ops = {
  * tags) for cache keys, tracing span names, and request logging.
  */
 export const OPERATIONS = {
-    getMe: { id: "getMe", method: "GET", path: "/api/v0/me", security: [[{ scheme: "bearerAuth", kind: "bearer" }]] },
-    getScrambleProgram: { id: "getScrambleProgram", method: "GET", path: "/api/v0/scramble-program" },
-    getCompetitions: { id: "getCompetitions", method: "GET", path: "/api/v0/competitions", params: [{ name: "managed_by_me", in: "query" }, { name: "start", in: "query" }, { name: "sort", in: "query" }], security: [[{ scheme: "bearerAuth", kind: "bearer" }]] },
-    getWcif: { id: "getWcif", method: "GET", path: "/api/v0/competitions/{competitionId}/wcif/version/{formatVersion}", params: [{ name: "competitionId", in: "path" }, { name: "formatVersion", in: "path" }], security: [[{ scheme: "bearerAuth", kind: "bearer" }]] }
+    getVersionInfo: { id: "getVersionInfo", method: "GET", path: "/version" },
+    getWcaEvents: { id: "getWcaEvents", method: "GET", path: "/frontend/data/events" },
+    getWcaFormats: { id: "getWcaFormats", method: "GET", path: "/frontend/data/formats" },
+    getBackendWcifVersion: { id: "getBackendWcifVersion", method: "GET", path: "/frontend/data/wcif-version" },
+    getDefaultColorScheme: { id: "getDefaultColorScheme", method: "GET", path: "/frontend/puzzle/{puzzleId}/colors", params: [{ name: "puzzleId", in: "path" }] },
+    getRandomScramble: { id: "getRandomScramble", method: "GET", path: "/frontend/puzzle/{puzzleId}/scramble", params: [{ name: "puzzleId", in: "path" }] },
+    paintScramble: { id: "paintScramble", method: "POST", path: "/frontend/puzzle/{puzzleId}/svg", params: [{ name: "puzzleId", in: "path" }, { name: "scramble", in: "query" }], body: { contentType: "application/json" }, responseKind: "blob" },
+    getFmcSheetLanguages: { id: "getFmcSheetLanguages", method: "GET", path: "/frontend/fmc/languages/available" },
+    calculateSuggestedFmcTranslations: { id: "calculateSuggestedFmcTranslations", method: "POST", path: "/frontend/fmc/languages/competitors", body: { contentType: "application/json" } },
+    calculateMbldBest: { id: "calculateMbldBest", method: "POST", path: "/frontend/mbld/best", body: { contentType: "application/json" } }
 } as const satisfies Record<string, OperationDescriptor>;
 
 export type OperationId = (typeof OPERATIONS)[keyof typeof OPERATIONS]["id"];
@@ -768,69 +838,6 @@ function sleep(ms: number, signal?: AbortSignal): Promise<void> {
     }, ms);
     if (signal) signal.addEventListener('abort', onAbort, { once: true });
   });
-}
-
-/** Resolve a credential: a literal passes through; a function is awaited per request. */
-async function resolveToken(provider: TokenProvider): Promise<string> {
-  return typeof provider === 'function' ? await provider() : provider;
-}
-
-/** UTF-8-safe base64: bare `btoa` throws on non-Latin-1 credentials (RFC 7617 allows UTF-8). */
-function encodeBase64(text: string): string {
-  let binary = '';
-  for (const byte of new TextEncoder().encode(text)) binary += String.fromCharCode(byte);
-  return btoa(binary);
-}
-
-/** Whether a credential for this scheme is configured on the instance. */
-function isConfigured(scheme: SecuritySpec, config: ClientConfig): boolean {
-  if (scheme.kind === 'apiKey') return config.auth?.apiKey?.[scheme.scheme] !== undefined;
-  if (scheme.kind === 'bearer') return config.auth?.bearer !== undefined;
-  return config.auth?.basic !== undefined;
-}
-
-/**
- * Build the auth headers/query for one operation's `security` OR-alternatives from the
- * instance credentials (`config.auth`) — capability module, wired into `createClient`.
- * The first alternative whose schemes (an AND-set) are all configured is applied, so
- * "bearer OR apiKey" works with either credential and never sends both. When none is
- * fully configured, the first alternative's configured schemes are still sent (the
- * server rejects the request, mirroring the previous behavior).
- * Cookie-borne apiKeys fold into a single `Cookie` header joined with `; `.
- */
-async function resolveAuth(
-  security: readonly (readonly SecuritySpec[])[],
-  config: ClientConfig
-): Promise<{ headers: Record<string, string>; query: Record<string, string> }> {
-  const alternative =
-    security.find((schemes) => schemes.every((scheme) => isConfigured(scheme, config))) ??
-    security[0] ??
-    [];
-  const headers: Record<string, string> = {};
-  const query: Record<string, string> = {};
-  const cookies: string[] = [];
-  for (const scheme of alternative) {
-    if (scheme.kind === 'apiKey') {
-      const provider = config.auth?.apiKey?.[scheme.scheme];
-      if (provider === undefined) continue;
-      const value = await resolveToken(provider);
-      if (scheme.in === 'header') headers[scheme.name] = value;
-      else if (scheme.in === 'query') query[scheme.name] = value;
-      // Cookie values may contain reserved characters (`;`, `=`, space, …); percent-encode
-      // so the credential can't break the `Cookie` header syntax.
-      else cookies.push(`${scheme.name}=${encodeURIComponent(value)}`);
-    } else if (scheme.kind === 'bearer') {
-      const provider = config.auth?.bearer;
-      if (provider !== undefined) headers.Authorization = `Bearer ${await resolveToken(provider)}`;
-    } else {
-      const basic = config.auth?.basic;
-      if (basic !== undefined) {
-        headers.Authorization = `Basic ${encodeBase64(`${basic.username}:${basic.password}`)}`;
-      }
-    }
-  }
-  if (cookies.length > 0) headers.Cookie = cookies.join('; ');
-  return { headers, query };
 }
 
 /**
@@ -1715,10 +1722,10 @@ export function createClient<
   operations: Record<string, OperationDescriptor>,
   config?: ClientConfig<OperationContext<Id, Path, Tag>>
 ): Client<Ops, OperationContext<Id, Path, Tag>> {
-  return createClientCore<Ops, Id, Path, Tag>(operations, config, { resolveAuth });
+  return createClientCore<Ops, Id, Path, Tag>(operations, config, {});
 }
 
-export const client = createClient<Ops, OperationId, OperationPath, string>(OPERATIONS, { serverUrl: "https://worldcubeassociation.org", clientHeader: "redocly-client-generator" });
+export const client = createClient<Ops, OperationId, OperationPath, string>(OPERATIONS, { serverUrl: "http://localhost:2014", clientHeader: "redocly-client-generator" });
 
 export const { configure, use } = client;
-export const { getMe, getScrambleProgram, getCompetitions, getWcif } = client;
+export const { getVersionInfo, getWcaEvents, getWcaFormats, getBackendWcifVersion, getDefaultColorScheme, getRandomScramble, paintScramble, getFmcSheetLanguages, calculateSuggestedFmcTranslations, calculateMbldBest } = client;

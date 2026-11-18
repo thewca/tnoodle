@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Collapse, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { client } from "../api/tnoodle.redocly";
+import { client as tnoodleClient } from "../api/tnoodle";
 import logo from "../assets/tnoodle_logo.svg";
 import type RootState from "../model/RootState";
 import {
@@ -22,16 +22,16 @@ import {
 } from "../util/query.param.util";
 import { defaultWcif } from "../util/wcif.util";
 import "./SideBar.css";
-import type { Wcif } from "../api/wca.redocly.schemas";
+import type { Wcif } from "../api/wca.schemas";
 import { setShowColorPicker } from "../redux/slice/SettingsSlice";
-import type { CompetitionSummary } from "../api/wca.redocly.schemas";
+import type { CompetitionSummary } from "../api/wca.schemas";
 import { useAuth } from "react-oidc-context";
 import type { CustomAuthState } from "../api/wca.oidc";
 import {
     client as wcaClient,
     configure,
     type GetMeResult,
-} from "../api/wca.redocly";
+} from "../api/wca";
 
 const SideBar = () => {
     const [loadingUser, setLoadingUser] = useState(false);
@@ -150,7 +150,7 @@ const SideBar = () => {
 
     const getAndCacheBestMbldAttempt = useCallback(
         (wcif: Wcif) => {
-            client
+            tnoodleClient
                 .calculateMbldBest({
                     body: wcif.persons,
                 })
@@ -174,7 +174,7 @@ const SideBar = () => {
 
     const getAndCacheSuggestedFmcTranslations = useCallback(
         (wcif: Wcif) => {
-            client
+            tnoodleClient
                 .calculateSuggestedFmcTranslations({
                     body: wcif.persons,
                 })

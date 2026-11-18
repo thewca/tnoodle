@@ -1,7 +1,7 @@
 import { BASE_PATH } from "../../paths";
 import { type OidcClientSettings, User } from "oidc-client-ts";
 import { getQueryParameter } from "../util/query.param.util";
-import { configure } from "./wca.redocly.ts";
+import { configure } from "./wca.ts";
 
 export function isUsingStaging() {
     return getQueryParameter("staging") === "true";

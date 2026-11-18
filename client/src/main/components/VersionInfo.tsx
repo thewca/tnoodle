@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { client as wcaClient } from "../api/wca.redocly";
-import { client } from "../api/tnoodle.redocly";
-import type { ScrambleProgramVersion } from "../api/wca.redocly.schemas";
+import { client as wcaClient } from "../api/wca";
+import { client as tnoodleClient } from "../api/tnoodle";
+import type { ScrambleProgramVersion } from "../api/wca.schemas";
 import { setWcif } from "../redux/slice/WcifSlice";
 import { frontendStatusExtensionId } from "../util/wcif.util";
 import type RootState from "../model/RootState";
@@ -40,7 +40,7 @@ const VersionInfo = () => {
             setWcaPublicKeyBytes(response.publicKeyBytes);
         });
 
-        client.getVersionInfo().then((response) => {
+        tnoodleClient.getVersionInfo().then((response) => {
             let versionString =
                 !!response.project_name && !!response.project_version
                     ? `${response.project_name}-${response.project_version}`

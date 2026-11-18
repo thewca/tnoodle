@@ -6,9 +6,11 @@ coverage
 public/manifest.json
 src/serviceWorker.js
 
-src/main/api/tnoodle.redocly.schema.ts
-src/main/api/tnoodle.redocly.ts
-src/main/api/wca.redocly.schema.ts
-src/main/api/wca.redocly.ts
+src/main/api/tnoodle.mock.ts
+src/main/api/tnoodle.schema.ts
+src/main/api/tnoodle.ts
+src/main/api/wca.mock.ts
+src/main/api/wca.schema.ts
+src/main/api/wca.ts
 
 yarn.lock

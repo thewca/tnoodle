@@ -1,7 +1,7 @@
 import { chunk } from "lodash";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { client } from "../api/tnoodle.redocly";
+import { client as tnoodleClient } from "../api/tnoodle";
 import { getWcaOrigin } from "../api/wca.oidc";
 import type RootState from "../model/RootState";
 import {
@@ -10,7 +10,7 @@ import {
     setWcaFormats,
 } from "../redux/slice/WcifSlice";
 import EventPicker from "./EventPicker";
-import type { WcaEvent } from "../api/tnoodle.redocly.schemas";
+import type { WcaEvent } from "../api/tnoodle.schemas";
 import { buildMbldExtension } from "../util/wcif.util";
 import { MBLD_DEFAULT } from "../constants/wca.constants";
 
@@ -28,13 +28,13 @@ const EventPickerTable = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        client.getWcaFormats().then((response) => {
+        tnoodleClient.getWcaFormats().then((response) => {
             dispatch(setWcaFormats(response));
         });
-        client.getWcaEvents().then((response) => {
+        tnoodleClient.getWcaEvents().then((response) => {
             dispatch(setWcaEvents(response));
         });
-        client.getBackendWcifVersion().then((response) => {
+        tnoodleClient.getBackendWcifVersion().then((response) => {
             dispatch(setBackendWcifVersion(response));
         });
     }, [dispatch]);
