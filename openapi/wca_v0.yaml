@@ -5,11 +5,6 @@ info:
     version: 1.0.0
 servers:
     - url: 'https://worldcubeassociation.org'
-components:
-    securitySchemes:
-        bearerAuth:
-            type: http
-            scheme: bearer
 paths:
     /api/v0/me:
         get:
@@ -23,18 +18,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                type: object
-                                properties:
-                                    me:
-                                        type: object
-                                        properties:
-                                            name:
-                                                type: string
-                                                example: John Doe
-                                        required:
-                                            - name
-                                required:
-                                    - me
+                                $ref: '#/components/schemas/MeResponse'
     /api/v0/scramble-program:
         get:
             summary: Show information about scramble program(s) permitted by the WCA
@@ -45,38 +29,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                type: object
-                                properties:
-                                    current:
-                                        type: object
-                                        properties:
-                                            name:
-                                                type: string
-                                            information:
-                                                type: string
-                                            download:
-                                                type: string
-                                                format: url
-                                        required:
-                                            - name
-                                            - information
-                                            - download
-                                    allowed:
-                                        type: array
-                                        items:
-                                            type: string
-                                    publicKeyBytes:
-                                        type: string
-                                        format: byte
-                                    history:
-                                        type: array
-                                        items:
-                                            type: string
-                                required:
-                                    - current
-                                    - allowed
-                                    - publicKeyBytes
-                                    - history
+                                $ref: '#/components/schemas/ScrambleProgramInfo'
     /api/v0/competitions:
         get:
             summary: Get a list of competitions
@@ -109,15 +62,7 @@ paths:
                             schema:
                                 type: array
                                 items:
-                                    type: object
-                                    properties:
-                                        id:
-                                            type: string
-                                        name:
-                                            type: string
-                                    required:
-                                        - id
-                                        - name
+                                    $ref: '#/components/schemas/CompetitionSummary'
     /api/v0/competitions/{competitionId}/wcif/version/{formatVersion}:
         get:
             summary: Retrieve the WCIF of a specific competition in a specific format version
@@ -145,147 +90,218 @@ paths:
                     content:
                         application/json:
                             schema:
-                                type: object
-                                properties:
-                                    id:
-                                        type: string
-                                    formatVersion:
-                                        type: string
-                                    name:
-                                        type: string
-                                    shortName:
-                                        type: string
-                                    events:
-                                        type: array
-                                        items:
-                                            type: object
-                                            properties:
-                                                id:
-                                                    type: string
-                                                rounds:
-                                                    type: array
-                                                    items:
-                                                        type: object
-                                                        properties:
-                                                            id:
-                                                                type: string
-                                                            format:
-                                                                type: string
-                                                            scrambleSetCount:
-                                                                type: integer
-                                                            timeLimit:
-                                                                type: number
-                                                            extensions:
-                                                                type: array
-                                                                items:
-                                                                    type: object
-                                                                    properties:
-                                                                        id:
-                                                                            type: string
-                                                                        specUrl:
-                                                                            type: string
-                                                                            format: uri
-                                                                        data:
-                                                                            type: object
-                                                                    required:
-                                                                        - id
-                                                                        - specUrl
-                                                                        - data
-                                                        required:
-                                                            - id
-                                                            - format
-                                                            - scrambleSetCount
-                                                            - extensions
-                                                extensions:
-                                                    type: array
-                                                    items:
-                                                        type: object
-                                                        properties:
-                                                            id:
-                                                                type: string
-                                                            specUrl:
-                                                                type: string
-                                                                format: uri
-                                                            data:
-                                                                type: object
-                                                        required:
-                                                            - id
-                                                            - specUrl
-                                                            - data
-                                            required:
-                                                - id
-                                                - rounds
-                                                - extensions
-                                    persons:
-                                        type: array
-                                        items:
-                                            type: object
-                                            properties:
-                                                name:
-                                                    type: string
-                                                registration:
-                                                    type: object
-                                                    properties:
-                                                        status:
-                                                            type: string
-                                                            enum:
-                                                                - accepted
-                                                                - pending
-                                                                - rejected
-                                                                - cancelled
-                                                    required:
-                                                        - status
-                                                countryIso2:
-                                                    type: string
-                                                personalBests:
-                                                    type: array
-                                                    items:
-                                                        type: object
-                                                        properties:
-                                                            eventId:
-                                                                type: string
-                                                            value:
-                                                                type: integer
-                                                        required:
-                                                            - eventId
-                                                            - value
-                                            required:
-                                                - name
-                                                - registration
-                                                - countryIso2
-                                                - personalBests
-                                    schedule:
-                                        type: object
-                                        properties:
-                                            numberOfDays:
-                                                type: integer
-                                            venues:
-                                                type: array
-                                        required:
-                                            - numberOfDays
-                                            - venues
-                                    extensions:
-                                        type: array
-                                        items:
-                                            type: object
-                                            properties:
-                                                id:
-                                                    type: string
-                                                specUrl:
-                                                    type: string
-                                                    format: uri
-                                                data:
-                                                    type: object
-                                            required:
-                                                - id
-                                                - specUrl
-                                                - data
-                                required:
-                                    - id
-                                    - formatVersion
-                                    - name
-                                    - shortName
-                                    - events
-                                    - persons
-                                    - schedule
-                                    - extensions
+                                $ref: '#/components/schemas/Wcif'
+components:
+    securitySchemes:
+        bearerAuth:
+            type: http
+            scheme: bearer
+
+    schemas:
+        User:
+            type: object
+            properties:
+                name:
+                    type: string
+                    example: John Doe
+            required:
+                - name
+
+        MeResponse:
+            type: object
+            properties:
+                me:
+                    $ref: '#/components/schemas/User'
+            required:
+                - me
+
+        ScrambleProgramVersion:
+            type: object
+            properties:
+                name:
+                    type: string
+                information:
+                    type: string
+                download:
+                    type: string
+                    format: url
+            required:
+                - name
+                - information
+                - download
+
+        ScrambleProgramInfo:
+            type: object
+            properties:
+                current:
+                    $ref: '#/components/schemas/ScrambleProgramVersion'
+                allowed:
+                    type: array
+                    items:
+                        type: string
+                publicKeyBytes:
+                    type: string
+                    format: byte
+                history:
+                    type: array
+                    items:
+                        type: string
+            required:
+                - current
+                - allowed
+                - publicKeyBytes
+                - history
+
+        CompetitionSummary:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+            required:
+                - id
+                - name
+
+        WcifExtension:
+            type: object
+            properties:
+                id:
+                    type: string
+                specUrl:
+                    type: string
+                    format: uri
+                data:
+                    type: object
+            required:
+                - id
+                - specUrl
+                - data
+
+        WcifRound:
+            type: object
+            properties:
+                id:
+                    type: string
+                format:
+                    type: string
+                scrambleSetCount:
+                    type: integer
+                timeLimit:
+                    type: number
+                extensions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/WcifExtension'
+            required:
+                - id
+                - format
+                - scrambleSetCount
+                - extensions
+
+        WcifEvent:
+            type: object
+            properties:
+                id:
+                    type: string
+                rounds:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/WcifRound'
+                extensions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/WcifExtension'
+            required:
+                - id
+                - rounds
+                - extensions
+
+        WcifRegistration:
+            type: object
+            properties:
+                status:
+                    type: string
+                    enum:
+                        - accepted
+                        - pending
+                        - rejected
+                        - cancelled
+            required:
+                - status
+
+        WcifPersonalBest:
+            type: object
+            properties:
+                eventId:
+                    type: string
+                value:
+                    type: integer
+            required:
+                - eventId
+                - value
+
+        WcifPerson:
+            type: object
+            properties:
+                name:
+                    type: string
+                registration:
+                    $ref: '#/components/schemas/WcifRegistration'
+                countryIso2:
+                    type: string
+                personalBests:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/WcifPersonalBest'
+            required:
+                - name
+                - registration
+                - countryIso2
+                - personalBests
+
+        WcifSchedule:
+            type: object
+            properties:
+                numberOfDays:
+                    type: integer
+                venues:
+                    type: array
+            required:
+                - numberOfDays
+                - venues
+
+        Wcif:
+            type: object
+            properties:
+                id:
+                    type: string
+                formatVersion:
+                    type: string
+                name:
+                    type: string
+                shortName:
+                    type: string
+                events:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/WcifEvent'
+                persons:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/WcifPerson'
+                schedule:
+                    $ref: '#/components/schemas/WcifSchedule'
+                extensions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/WcifExtension'
+            required:
+                - id
+                - formatVersion
+                - name
+                - shortName
+                - events
+                - persons
+                - schedule
+                - extensions
