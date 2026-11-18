@@ -63,6 +63,11 @@ paths:
                                 type: array
                                 items:
                                     $ref: '#/components/schemas/CompetitionSummary'
+                                example:
+                                    - id: Worlds2026
+                                      name: "World Championship 2026"
+                                    - id: ExamplistanNationals2026
+                                      name: "Examplistan Nationals 2026"
     /api/v0/competitions/{competitionId}/wcif/version/{formatVersion}:
         get:
             summary: Retrieve the WCIF of a specific competition in a specific format version
@@ -104,8 +109,12 @@ components:
                 name:
                     type: string
                     example: John Doe
+                wca_id:
+                    type: string
+                    example: "2003DOEJ01"
             required:
                 - name
+                - wca_id
 
         MeResponse:
             type: object
@@ -120,11 +129,15 @@ components:
             properties:
                 name:
                     type: string
+                    example: "TNoodle-WCA-2"
                 information:
                     type: string
+                    format: uri
+                    example: "https://www.worldcubeassociation.org/regulations/scrambles/"
                 download:
                     type: string
                     format: url
+                    example: "https://www.worldcubeassociation.org/regulations/scrambles/tnoodle/TNoodle-WCA-2.jar"
             required:
                 - name
                 - information
@@ -139,13 +152,19 @@ components:
                     type: array
                     items:
                         type: string
+                        example: "TNoodle-WCA-2"
                 publicKeyBytes:
                     type: string
                     format: byte
+                    example: dG5vb2RsZQ==
                 history:
                     type: array
                     items:
                         type: string
+                    example:
+                        - "TNoodle-WCA-0"
+                        - "TNoodle-WCA-1"
+                        - "TNoodle-WCA-2"
             required:
                 - current
                 - allowed
@@ -157,8 +176,10 @@ components:
             properties:
                 id:
                     type: string
+                    example: Worlds2026
                 name:
                     type: string
+                    example: "World Championship 2026"
             required:
                 - id
                 - name

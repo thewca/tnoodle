@@ -6,7 +6,6 @@ import wcaApi from "../main/api/wca.api";
 import { findExtension } from "../main/util/extension.util";
 import { defaultWcif, frontendStatusExtensionId } from "../main/util/wcif.util";
 import { mockApis, pending } from "./mock/api.mock";
-import { defaultStatus } from "./mock/tnoodle.api.test.mock";
 import { competitions, wcifs } from "./mock/wca.api.test.mock";
 import {
     getCopies,
@@ -41,9 +40,12 @@ describe("manual selection", () => {
         const { wcif, password } = lastZipRequest();
         expect(scrambledEventIds(wcif)).toEqual(["333"]);
         expect(password).toBe("");
-        expect(findExtension(wcif, frontendStatusExtensionId)?.data).toEqual(
-            defaultStatus,
-        );
+        expect(findExtension(wcif, frontendStatusExtensionId)?.data).toEqual({
+            isStaging: false,
+            isManual: true,
+            isSignedBuild: true,
+            isAllowedVersion: true,
+        });
     });
 
     it("sends round settings and the password along", async () => {

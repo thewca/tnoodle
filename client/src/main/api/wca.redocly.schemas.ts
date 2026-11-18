@@ -8,6 +8,7 @@
 
 export type User = {
     name: string;
+    wca_id: string;
 };
 
 export type MeResponse = {
@@ -16,6 +17,9 @@ export type MeResponse = {
 
 export type ScrambleProgramVersion = {
     name: string;
+    /**
+     * @format uri
+     */
     information: string;
     /**
      * @format url

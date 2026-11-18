@@ -30,6 +30,160 @@ paths:
                                 type: array
                                 items:
                                     $ref: '#/components/schemas/WcaEvent'
+                                example:
+                                    - id: "333"
+                                      name: 3x3x3
+                                      puzzle_id: "333"
+                                      puzzle_group_id: nbyn
+                                      format_ids: [ a, "3", "2", "1" ]
+                                      can_change_time_limit: true
+                                      is_timed_event: true
+                                      is_fewest_moves: false
+                                      is_multiple_blindfolded: false
+                                    - id: "222"
+                                      name: 2x2x2
+                                      puzzle_id: "222"
+                                      puzzle_group_id: nbyn
+                                      format_ids: [ a, "3", "2", "1" ]
+                                      can_change_time_limit: true
+                                      is_timed_event: true
+                                      is_fewest_moves: false
+                                      is_multiple_blindfolded: false
+                                    - id: "444"
+                                      name: 4x4x4
+                                      puzzle_id: "444"
+                                      puzzle_group_id: nbyn
+                                      format_ids: [ a, "3", "2", "1" ]
+                                      can_change_time_limit: true
+                                      is_timed_event: true
+                                      is_fewest_moves: false
+                                      is_multiple_blindfolded: false
+                                    - id: "555"
+                                      name: 5x5x5
+                                      puzzle_id: "555"
+                                      puzzle_group_id: nbyn
+                                      format_ids: [ a, "3", "2", "1" ]
+                                      can_change_time_limit: true
+                                      is_timed_event: true
+                                      is_fewest_moves: false
+                                      is_multiple_blindfolded: false
+                                    - id: "666"
+                                      name: 6x6x6
+                                      puzzle_id: "666"
+                                      puzzle_group_id: nbyn
+                                      format_ids: [ m, "2", "1" ]
+                                      can_change_time_limit: true
+                                      is_timed_event: true
+                                      is_fewest_moves: false
+                                      is_multiple_blindfolded: false
+                                    - id: "777"
+                                      name: 7x7x7
+                                      puzzle_id: "777"
+                                      puzzle_group_id: nbyn
+                                      format_ids: [ m, "2", "1" ]
+                                      can_change_time_limit: true
+                                      is_timed_event: true
+                                      is_fewest_moves: false
+                                      is_multiple_blindfolded: false
+                                    - id: 333bf
+                                      name: 3x3x3 Blindfolded
+                                      puzzle_id: "333"
+                                      puzzle_group_id: nbyn
+                                      format_ids: [ "3", "2", "1" ]
+                                      can_change_time_limit: true
+                                      is_timed_event: true
+                                      is_fewest_moves: false
+                                      is_multiple_blindfolded: false
+                                    - id: 333fm
+                                      name: 3x3x3 Fewest Moves
+                                      puzzle_id: "333"
+                                      puzzle_group_id: nbyn
+                                      format_ids: [ m, "2", "1" ]
+                                      can_change_time_limit: false
+                                      is_timed_event: false
+                                      is_fewest_moves: true
+                                      is_multiple_blindfolded: false
+                                    - id: 333oh
+                                      name: 3x3x3 One-Handed
+                                      puzzle_id: "333"
+                                      puzzle_group_id: nbyn
+                                      format_ids: [ a, "3", "2", "1" ]
+                                      can_change_time_limit: true
+                                      is_timed_event: true
+                                      is_fewest_moves: false
+                                      is_multiple_blindfolded: false
+                                    - id: clock
+                                      name: Clock
+                                      puzzle_id: clock
+                                      puzzle_group_id: null
+                                      format_ids: [ a, "3", "2", "1" ]
+                                      can_change_time_limit: true
+                                      is_timed_event: true
+                                      is_fewest_moves: false
+                                      is_multiple_blindfolded: false
+                                    - id: minx
+                                      name: Megaminx
+                                      puzzle_id: minx
+                                      puzzle_group_id: null
+                                      format_ids: [ a, "3", "2", "1" ]
+                                      can_change_time_limit: true
+                                      is_timed_event: true
+                                      is_fewest_moves: false
+                                      is_multiple_blindfolded: false
+                                    - id: pyram
+                                      name: Pyraminx
+                                      puzzle_id: pyram
+                                      puzzle_group_id: null
+                                      format_ids: [ a, "3", "2", "1" ]
+                                      can_change_time_limit: true
+                                      is_timed_event: true
+                                      is_fewest_moves: false
+                                      is_multiple_blindfolded: false
+                                    - id: skewb
+                                      name: Skewb
+                                      puzzle_id: skewb
+                                      puzzle_group_id: null
+                                      format_ids: [ a, "3", "2", "1" ]
+                                      can_change_time_limit: true
+                                      is_timed_event: true
+                                      is_fewest_moves: false
+                                      is_multiple_blindfolded: false
+                                    - id: sq1
+                                      name: Square-1
+                                      puzzle_id: sq1
+                                      puzzle_group_id: null
+                                      format_ids: [ a, "3", "2", "1" ]
+                                      can_change_time_limit: true
+                                      is_timed_event: true
+                                      is_fewest_moves: false
+                                      is_multiple_blindfolded: false
+                                    - id: 444bf
+                                      name: 4x4x4 Blindfolded
+                                      puzzle_id: "444"
+                                      puzzle_group_id: nbyn
+                                      format_ids: [ "3", "2", "1" ]
+                                      can_change_time_limit: true
+                                      is_timed_event: true
+                                      is_fewest_moves: false
+                                      is_multiple_blindfolded: false
+                                    - id: 555bf
+                                      name: 5x5x5 Blindfolded
+                                      puzzle_id: "555"
+                                      puzzle_group_id: null
+                                      format_ids: [ "3", "2", "1" ]
+                                      can_change_time_limit: true
+                                      is_timed_event: true
+                                      is_fewest_moves: false
+                                      is_multiple_blindfolded: false
+                                    - id: 333mbf
+                                      name: 3x3x3 Multiple Blindfolded
+                                      puzzle_id: "333"
+                                      puzzle_group_id: null
+                                      format_ids: [ "3", "2", "1" ]
+                                      can_change_time_limit: false
+                                      is_timed_event: false
+                                      is_fewest_moves: false
+                                      is_multiple_blindfolded: true
     /frontend/data/formats:
         get:
             summary: Get a list of formats that the backend knows about
@@ -43,6 +197,22 @@ paths:
                                 type: array
                                 items:
                                     $ref: '#/components/schemas/WcaFormat'
+                                example:
+                                    - id: "1"
+                                      name: "Best of 1"
+                                      short_name: "Bo1"
+                                    - id: "2"
+                                      name: "Best of 2"
+                                      short_name: "Bo2"
+                                    - id: "3"
+                                      name: "Best of 3"
+                                      short_name: "Bo3"
+                                    - id: a
+                                      name: "Average of 5"
+                                      short_name: "Ao5"
+                                    - id: m
+                                      name: "Mean of 3"
+                                      short_name: "Mo3"
     /frontend/data/wcif-version:
         get:
             summary: Get the WCIF version that the backend supports
@@ -92,6 +262,7 @@ paths:
                         application/json:
                             schema:
                                 type: string
+                                example: "R U R' U' R' F R2 U' R' U' R U R' F'"
     /frontend/puzzle/{puzzleId}/svg:
         post:
             summary: Paint a given scramble into SVG for a given color scheme
@@ -121,6 +292,7 @@ paths:
                         image/svg+xml:
                             schema:
                                 type: string
+                                example: "<svg></svg>"
     /frontend/fmc/languages/available:
         get:
             summary: Get a list of languages for the FMC sheet that the backend supports
@@ -134,6 +306,51 @@ paths:
                                 type: array
                                 items:
                                     $ref: '#/components/schemas/FmcLanguage'
+                                example:
+                                    - code: da
+                                      name: Danish
+                                    - code: de
+                                      name: German
+                                    - code: en
+                                      name: English
+                                    - code: es
+                                      name: Spanish
+                                    - code: et
+                                      name: Estonian
+                                    - code: fi
+                                      name: Finnish
+                                    - code: fr
+                                      name: French
+                                    - code: hr
+                                      name: Croatian
+                                    - code: hu
+                                      name: Hungarian
+                                    - code: id
+                                      name: Indonesian
+                                    - code: it
+                                      name: Italian
+                                    - code: ja
+                                      name: Japanese
+                                    - code: ko
+                                      name: Korean
+                                    - code: pl
+                                      name: Polish
+                                    - code: pt
+                                      name: Portuguese
+                                    - code: pt-BR
+                                      name: Brazilian Portuguese
+                                    - code: ro
+                                      name: Romanian
+                                    - code: ru
+                                      name: Russian
+                                    - code: sl
+                                      name: Slovenian
+                                    - code: vi
+                                      name: Vietnamese
+                                    - code: zh-CN
+                                      name: Chinese (Simplified)
+                                    - code: zh-TW
+                                      name: Chinese (Traditional)
     /frontend/fmc/languages/competitors:
         post:
             summary: Calculate a suggested list of FMC translations based on competitor nationalities
@@ -192,9 +409,11 @@ components:
                     format: semver
                 is_signed_build:
                     type: boolean
+                    example: true
                 signature_key_bytes:
                     type: string
                     format: byte
+                    example: dG5vb2RsZQ==
             required:
                 - project_name
                 - project_version
@@ -206,30 +425,45 @@ components:
             properties:
                 id:
                     type: string
-                    example: 333
+                    example: "333"
                 name:
                     type: string
-                    example: 3x3 Rubik's Cube
+                    example: 3x3x3
                 puzzle_id:
                     type: string
-                    example: 333
+                    example: "333"
                 puzzle_group_id:
                     type: string
-                    example: nxn
+                    example: nbyn
                 format_ids:
                     type: array
                     items:
                         type: string
                         example: ao5
+                    example:
+                        - a
+                        - "3"
+                        - "2"
+                        - "1"
+                can_change_time_limit:
+                    type: boolean
+                    example: true
+                is_timed_event:
+                    type: boolean
+                    example: true
                 is_fewest_moves:
                     type: boolean
+                    example: false
                 is_multiple_blindfolded:
                     type: boolean
+                    example: false
             required:
                 - id
                 - name
                 - puzzle_id
                 - format_ids
+                - can_change_time_limit
+                - is_timed_event
                 - is_fewest_moves
                 - is_multiple_blindfolded
 
@@ -244,7 +478,7 @@ components:
                     example: Average of 5
                 short_name:
                     type: string
-                    example: AO5
+                    example: Ao5
             required:
                 - id
                 - name
@@ -254,16 +488,24 @@ components:
             type: object
             additionalProperties:
                 type: string
+            example:
+                U: "#FFFFFF"
+                F: "#00FF00"
+                R: "#FF0000"
+                D: "#FFFF00"
+                B: "#0000FF"
+                L: "#FF8000"
 
         FmcLanguage:
             type: object
             properties:
                 code:
                     type: string
-                    example: en
+                    example: jp
                     description: The ISO 639-1 code of the language
                 name:
                     type: string
+                    example: Japanese
                     description: The English display name of the language
             required:
                 - code
@@ -322,12 +564,15 @@ components:
                 solved:
                     type: integer
                     description: The number of cubes which were solved
+                    example: 60
                 attempted:
                     type: integer
                     description: The number of cubes which were attempted
+                    example: 60
                 duration:
                     type: integer
                     description: The duration of the attempt in whole seconds
+                    example: 3012
             required:
                 - solved
                 - attempted

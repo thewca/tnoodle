@@ -25,6 +25,8 @@ export type WcaEvent = {
     puzzle_id: string;
     puzzle_group_id?: string;
     format_ids: string[];
+    can_change_time_limit: boolean;
+    is_timed_event: boolean;
     is_fewest_moves: boolean;
     is_multiple_blindfolded: boolean;
 };

@@ -5,6 +5,7 @@ client:
     outputMode: split
     generators:
         - typescript
+        - mock
 
 apis:
     tnoodle:
