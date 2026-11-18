@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react";
 import tnoodleApi from "../main/api/tnoodle.api";
 import wcaApi from "../main/api/wca.api";
-import type RunningVersion from "../main/model/RunningVersion";
+import type { VersionInfo as ApiVersionInfo } from "../main/api/tnoodle.redocly.schemas";
 import VersionInfo from "../main/components/VersionInfo";
 import { mockApis, ok } from "./mock/api.mock";
 import { renderWithProviders } from "./util/render";
@@ -9,16 +9,16 @@ import { renderWithProviders } from "./util/render";
 const download =
     "https://www.worldcubeassociation.org/regulations/scrambles/tnoodle/TNoodle-WCA-3.jar";
 
-const running = (overrides: Partial<RunningVersion> = {}) => ({
-    projectName: "TNoodle-WCA",
-    projectVersion: "3",
-    signedBuild: true,
-    signatureKeyBytes: "key",
+const running = (overrides: Partial<ApiVersionInfo> = {}) => ({
+    project_name: "TNoodle-WCA",
+    project_version: "3",
+    is_signed_build: true,
+    signature_key_bytes: "key",
     ...overrides,
 });
 
 const renderVersionInfo = async (
-    runningVersion: RunningVersion,
+    runningVersion: ApiVersionInfo,
     allowed: string[],
 ) => {
     vi.mocked(tnoodleApi.fetchRunningVersion).mockImplementation(() =>
@@ -50,7 +50,7 @@ it("shows no warning when running the latest signed release", async () => {
 });
 
 it("asks to upgrade when the version is outdated but still allowed", async () => {
-    await renderVersionInfo(running({ projectVersion: "2" }), [
+    await renderVersionInfo(running({ project_version: "2" }), [
         "TNoodle-WCA-2",
         "TNoodle-WCA-3",
     ]);
@@ -66,7 +66,7 @@ it("asks to upgrade when the version is outdated but still allowed", async () =>
 });
 
 it("forbids versions that are no longer allowed", async () => {
-    await renderVersionInfo(running({ projectVersion: "1" }), [
+    await renderVersionInfo(running({ project_version: "1" }), [
         "TNoodle-WCA-2",
         "TNoodle-WCA-3",
     ]);
@@ -77,8 +77,8 @@ it("forbids versions that are no longer allowed", async () => {
 });
 
 it.each([
-    ["is not signed", running({ signedBuild: false })],
-    ["is signed with a foreign key", running({ signatureKeyBytes: "fooBar" })],
+    ["is not signed", running({ is_signed_build: false })],
+    ["is signed with a foreign key", running({ signature_key_bytes: "fooBar" })],
 ])(
     "warns about an unofficial build when the latest version %s",
     async (_, runningVersion) => {
@@ -91,7 +91,7 @@ it.each([
 );
 
 it("does not bother the user when the running version is unknown", async () => {
-    await renderVersionInfo({} as RunningVersion, ["TNoodle-WCA-3"]);
+    await renderVersionInfo({} as ApiVersionInfo, ["TNoodle-WCA-3"]);
 
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
 });

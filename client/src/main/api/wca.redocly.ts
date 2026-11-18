@@ -6,33 +6,14 @@
  * Endpoints exposed by the backend server
  */
 
-export type GetMeResult = {
-    me: {
-        name: string;
-    };
-};
+import type { CompetitionSummary, MeResponse, ScrambleProgramInfo, Wcif } from './wca.redocly.schemas.js';
+export * from './wca.redocly.schemas.js';
 
-export type GetScrambleProgramResult = {
-    current: {
-        name: string;
-        information: string;
-        /**
-         * @format url
-         */
-        download: string;
-    };
-    allowed: string[];
-    /**
-     * @format byte
-     */
-    publicKeyBytes: string;
-    history: string[];
-};
+export type GetMeResult = MeResponse;
 
-export type GetCompetitionsResult = {
-    id: string;
-    name: string;
-}[];
+export type GetScrambleProgramResult = ScrambleProgramInfo;
+
+export type GetCompetitionsResult = CompetitionSummary[];
 
 export type GetCompetitionsQuery = {
     /**
@@ -54,60 +35,7 @@ export type GetCompetitionsVariables = {
     query?: GetCompetitionsQuery;
 };
 
-export type GetWcifResult = {
-    id: string;
-    formatVersion: string;
-    name: string;
-    shortName: string;
-    events: {
-        id: string;
-        rounds: {
-            id: string;
-            format: string;
-            scrambleSetCount: number;
-            timeLimit?: number;
-            extensions: {
-                id: string;
-                /**
-                 * @format uri
-                 */
-                specUrl: string;
-                data: Record<string, unknown>;
-            }[];
-        }[];
-        extensions: {
-            id: string;
-            /**
-             * @format uri
-             */
-            specUrl: string;
-            data: Record<string, unknown>;
-        }[];
-    }[];
-    persons: {
-        name: string;
-        registration: {
-            status: "accepted" | "pending" | "rejected" | "cancelled";
-        };
-        countryIso2: string;
-        personalBests: {
-            eventId: string;
-            value: number;
-        }[];
-    }[];
-    schedule: {
-        numberOfDays: number;
-        venues: unknown[];
-    };
-    extensions: {
-        id: string;
-        /**
-         * @format uri
-         */
-        specUrl: string;
-        data: Record<string, unknown>;
-    }[];
-};
+export type GetWcifResult = Wcif;
 
 export type GetWcifPath = {
     /**

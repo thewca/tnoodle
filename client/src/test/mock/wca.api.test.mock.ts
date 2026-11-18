@@ -1,4 +1,4 @@
-import type Wcif from "../../main/model/Wcif";
+import type { Wcif } from "../../main/api/wca.redocly.schemas";
 import { wcifTestVersion } from "./tnoodle.api.test.mock";
 
 export const me = {
@@ -669,7 +669,6 @@ export const wcifs: Record<string, Wcif> = {
                     {
                         id: "333fm-r1",
                         format: "m",
-                        timeLimit: null,
                         extensions: [
                             {
                                 data: {
@@ -698,7 +697,6 @@ export const wcifs: Record<string, Wcif> = {
                     {
                         id: "333mbf-r1",
                         format: "2",
-                        timeLimit: null,
                         extensions: [
                             {
                                 data: {

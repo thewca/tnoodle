@@ -1,4 +1,4 @@
-import type { Wcif } from "./Wcif";
+import type { Wcif } from "../api/wca.redocly.schemas";
 
 export default interface CachedObject {
     bestMbldAttempt: number;

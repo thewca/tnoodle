@@ -1,4 +1,4 @@
-import type Wcif from "../../main/model/Wcif";
+import type { Wcif } from "../../main/api/wca.redocly.schemas";
 import { findExtension } from "../../main/util/extension.util";
 import {
     copiesExtensionId,

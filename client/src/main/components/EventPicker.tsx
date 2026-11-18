@@ -2,9 +2,8 @@ import { OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { MAX_WCA_ROUNDS, MBLD_DEFAULT } from "../constants/wca.constants";
 import type RootState from "../model/RootState";
-import type { WcaEvent } from "../model/WcaEvent";
-import type { WcifEvent } from "../model/WcifEvent";
-import type { WcifRound } from "../model/Round";
+import type { WcaEvent } from "../api/tnoodle.redocly.schemas";
+import type { WcifEvent, WcifRound } from "../api/wca.redocly.schemas";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
 import { setWcifEvent } from "../redux/slice/WcifSlice";
 import {

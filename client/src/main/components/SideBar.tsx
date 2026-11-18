@@ -22,9 +22,9 @@ import {
 } from "../util/query.param.util";
 import { defaultWcif } from "../util/wcif.util";
 import "./SideBar.css";
-import type { Wcif } from "../model/Wcif";
+import type { Wcif } from "../api/wca.redocly.schemas";
 import { setShowColorPicker } from "../redux/slice/SettingsSlice";
-import type { Competition } from "../model/Competition";
+import type { CompetitionSummary } from "../api/wca.redocly.schemas";
 import { useAuth } from "react-oidc-context";
 import type { CustomAuthState } from "../api/wca.oidc";
 import {
@@ -54,7 +54,7 @@ const SideBar = () => {
 
     const [me, setMe] = useState<GetMeResult["me"]>();
     const [upcomingCompetitions, setUpcomingCompetitions] =
-        useState<Competition[]>();
+        useState<CompetitionSummary[]>();
 
     const [isOpen, setIsOpen] = useState(true);
 

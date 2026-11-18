@@ -2,6 +2,7 @@ extends:
     - spec
 
 client:
+    outputMode: split
     generators:
         - typescript
 

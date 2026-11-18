@@ -3,7 +3,7 @@ import EventPickerTable from "../main/components/EventPickerTable";
 import { setIsManualSelection } from "../main/redux/slice/InformationSlice";
 import { setWcif } from "../main/redux/slice/WcifSlice";
 import { createStore } from "../main/redux/Store";
-import type Wcif from "../main/model/Wcif";
+import type { Wcif } from "../main/api/wca.redocly.schemas";
 import { defaultWcif } from "../main/util/wcif.util";
 import { mockApis } from "./mock/api.mock";
 import { events } from "./mock/tnoodle.api.test.mock";

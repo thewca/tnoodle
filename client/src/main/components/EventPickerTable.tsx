@@ -10,7 +10,7 @@ import {
     setWcaFormats,
 } from "../redux/slice/WcifSlice";
 import EventPicker from "./EventPicker";
-import type { WcaEvent } from "../model/WcaEvent";
+import type { WcaEvent } from "../api/tnoodle.redocly.schemas";
 import { buildMbldExtension } from "../util/wcif.util";
 import { MBLD_DEFAULT } from "../constants/wca.constants";
 

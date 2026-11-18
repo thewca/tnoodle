@@ -6,38 +6,18 @@
  * Endpoints exposed by the backend server
  */
 
-export type GetVersionInfoResult = {
-    project_name: string;
-    /**
-     * @format semver
-     */
-    project_version: string;
-    is_signed_build: boolean;
-    /**
-     * @format byte
-     */
-    signature_key_bytes: string;
-};
+import type { ColorScheme, FmcCompetitor, FmcLanguage, MbldAttempt, MbldCompetitor, VersionInfo, WcaEvent, WcaFormat } from './tnoodle.redocly.schemas.js';
+export * from './tnoodle.redocly.schemas.js';
 
-export type GetWcaEventsResult = {
-    id: string;
-    name: string;
-    puzzle_id: string;
-    puzzle_group_id?: string;
-    format_ids: string[];
-    is_fewest_moves: boolean;
-    is_multiple_blindfolded: boolean;
-}[];
+export type GetVersionInfoResult = VersionInfo;
 
-export type GetWcaFormatsResult = {
-    id: string;
-    name: string;
-    short_name: string;
-}[];
+export type GetWcaEventsResult = WcaEvent[];
+
+export type GetWcaFormatsResult = WcaFormat[];
 
 export type GetBackendWcifVersionResult = string;
 
-export type GetDefaultColorSchemeResult = Record<string, string>;
+export type GetDefaultColorSchemeResult = ColorScheme;
 
 export type GetDefaultColorSchemePath = {
     /**
@@ -79,7 +59,7 @@ export type PaintScrambleQuery = {
     scramble?: string;
 };
 
-export type PaintScrambleBody = Record<string, string>;
+export type PaintScrambleBody = ColorScheme;
 
 export type PaintScrambleVariables = {
     path: PaintScramblePath;
@@ -87,69 +67,19 @@ export type PaintScrambleVariables = {
     body?: PaintScrambleBody;
 };
 
-export type GetFmcSheetLanguagesResult = {
-    /**
-     * The ISO 639-1 code of the language
-     */
-    code: string;
-    /**
-     * The English display name of the language
-     */
-    name: string;
-}[];
+export type GetFmcSheetLanguagesResult = FmcLanguage[];
 
 export type CalculateSuggestedFmcTranslationsResult = string[];
 
-export type CalculateSuggestedFmcTranslationsBody = {
-    registration: {
-        /**
-         * The registration status of the competitor
-         */
-        status: string;
-    };
-    /**
-     * The ISO 3166-1 alpha-2 code of the competitor's nationality
-     */
-    countryIso2: string;
-}[];
+export type CalculateSuggestedFmcTranslationsBody = FmcCompetitor[];
 
 export type CalculateSuggestedFmcTranslationsVariables = {
     body: CalculateSuggestedFmcTranslationsBody;
 };
 
-export type CalculateMbldBestResult = {
-    /**
-     * The number of cubes which were solved
-     */
-    solved: number;
-    /**
-     * The number of cubes which were attempted
-     */
-    attempted: number;
-    /**
-     * The duration of the attempt in whole seconds
-     */
-    duration: number;
-};
+export type CalculateMbldBestResult = MbldAttempt;
 
-export type CalculateMbldBestBody = {
-    registration: {
-        /**
-         * The registration status of the competitor
-         */
-        status: string;
-    };
-    personalBests: {
-        /**
-         * The event ID
-         */
-        eventId: string;
-        /**
-         * The competitor's PB
-         */
-        value: number;
-    }[];
-}[];
+export type CalculateMbldBestBody = MbldCompetitor[];
 
 export type CalculateMbldBestVariables = {
     body: CalculateMbldBestBody;
