@@ -375,6 +375,7 @@ paths:
                                     type: string
                                     description: The suggested FMC translation locale
                                     example: de
+                                example: ["de", "es", "pt-BR"]
     /frontend/mbld/best:
         post:
             summary: Calculate the number of cubes you should generate for MBLD given a list of competitors and their PBs

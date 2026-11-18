@@ -54,8 +54,8 @@ export function createScrambleProgramInfo(overrides?: Partial<ScrambleProgramInf
 
 export function createCompetitionSummary(overrides?: Partial<CompetitionSummary>): CompetitionSummary {
     return {
-        id: "string",
-        name: "string",
+        id: "Worlds2026",
+        name: "World Championship 2026",
         ...overrides
     };
 }
@@ -242,8 +242,12 @@ export const getScrambleProgramHandler = (override?: Partial<ScrambleProgramInfo
 
 export const getCompetitionsHandler = () => http.get("*/api/v0/competitions", () => HttpResponse.json([
     {
-        id: "string",
-        name: "string"
+        id: "Worlds2026",
+        name: "World Championship 2026"
+    },
+    {
+        id: "ExamplistanNationals2026",
+        name: "Examplistan Nationals 2026"
     }
 ]));
 

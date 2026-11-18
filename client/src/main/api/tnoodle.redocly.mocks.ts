@@ -511,7 +511,9 @@ export const getFmcSheetLanguagesHandler = () => http.get("*/frontend/fmc/langua
 ]));
 
 export const calculateSuggestedFmcTranslationsHandler = () => http.post("*/frontend/fmc/languages/competitors", () => HttpResponse.json([
-    "de"
+    "de",
+    "es",
+    "pt-BR"
 ]));
 
 export const calculateMbldBestHandler = (override?: Partial<MbldAttempt>) => http.post("*/frontend/mbld/best", () => HttpResponse.json(createMbldAttempt(override)));
