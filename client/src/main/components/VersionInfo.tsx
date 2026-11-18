@@ -16,7 +16,8 @@ const VersionInfo = () => {
     );
 
     // WCA API response
-    const [currentTnoodle, setCurrentTnoodle] = useState<ScrambleProgramVersion>();
+    const [currentTnoodle, setCurrentTnoodle] =
+        useState<ScrambleProgramVersion>();
     const [allowedTnoodleVersions, setAllowedTnoodleVersions] =
         useState<string[]>();
     const [wcaPublicKeyBytes, setWcaPublicKeyBytes] = useState<string>();

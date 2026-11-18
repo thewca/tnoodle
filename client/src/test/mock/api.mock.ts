@@ -18,7 +18,7 @@ export const ok = <T>(data: T): Promise<AxiosResponse<T>> =>
 /** A request that never comes back, e.g. a slow backend. */
 export const pending = <T>(): Promise<T> => new Promise<T>(() => {});
 
-export const testServerWcifVersion = "2.2.0"
+export const testServerWcifVersion = "2.2.0";
 
 export const tnoodleMockServer = setupServer(...tnoodleHandlers);
 
@@ -28,4 +28,7 @@ const specificWcifHandlers = mockCompetitions.map((competition) =>
         () => HttpResponse.json(competition),
     ),
 );
-export const wcaMockServer = setupServer(...specificWcifHandlers, ...wcaHandlers);
+export const wcaMockServer = setupServer(
+    ...specificWcifHandlers,
+    ...wcaHandlers,
+);

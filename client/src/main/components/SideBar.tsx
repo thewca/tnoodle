@@ -27,11 +27,7 @@ import { setShowColorPicker } from "../redux/slice/SettingsSlice";
 import type { CompetitionSummary } from "../api/wca.schemas";
 import { useAuth } from "react-oidc-context";
 import type { CustomAuthState } from "../api/wca.oidc";
-import {
-    client as wcaClient,
-    configure,
-    type GetMeResult,
-} from "../api/wca";
+import { client as wcaClient, configure, type GetMeResult } from "../api/wca";
 
 const SideBar = () => {
     const [loadingUser, setLoadingUser] = useState(false);

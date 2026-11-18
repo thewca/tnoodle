@@ -24,9 +24,7 @@ const Main = () => {
     const password = useSelector(
         (state: RootState) => state.scramblingSlice.password,
     );
-    const wcif = useSelector(
-        (state: RootState) => state.wcifSlice.wcif,
-    );
+    const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
     const isManualSelection = useSelector(
         (state: RootState) => state.informationSlice.isManualSelection,
     );
@@ -73,9 +71,7 @@ const Main = () => {
 
         scrambleClient
             .loadScrambles({ wcif, zipPassword: password }, wcif.id)
-            .then((plainZip) =>
-                dispatch(setFileZip(plainZip)),
-            )
+            .then((plainZip) => dispatch(setFileZip(plainZip)))
             .catch((err) => interceptorRef.current?.updateMessage(err))
             .finally(() => {
                 dispatch(setGeneratingScrambles(false));

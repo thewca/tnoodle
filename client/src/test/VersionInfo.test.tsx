@@ -78,7 +78,10 @@ it("forbids versions that are no longer allowed", async () => {
 
 it.each([
     ["is not signed", running({ is_signed_build: false })],
-    ["is signed with a foreign key", running({ signature_key_bytes: "fooBar" })],
+    [
+        "is signed with a foreign key",
+        running({ signature_key_bytes: "fooBar" }),
+    ],
 ])(
     "warns about an unofficial build when the latest version %s",
     async (_, runningVersion) => {
