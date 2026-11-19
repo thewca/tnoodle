@@ -5,7 +5,7 @@ import tnoodleApi from "../main/api/tnoodle.api";
 import wcaApi from "../main/api/wca.api";
 import { findExtension } from "../main/util/extension.util";
 import { defaultWcif, frontendStatusExtensionId } from "../main/util/wcif.util";
-import { mockApis, pending } from "./mock/api.mock";
+import { pending } from "./mock/api.mock";
 import { competitions, wcifs } from "./mock/wca.api.test.mock";
 import {
     getCopies,
@@ -28,8 +28,6 @@ const selectCompetition = async (user: UserEvent, name: string) => {
     await user.click(screen.getByRole("button", { name }));
     await screen.findByText(new RegExp(`Found \\d+ events? for ${name}\\.`));
 };
-
-beforeEach(() => mockApis());
 
 describe("manual selection", () => {
     it("generates a single round of 3x3x3 by default", async () => {

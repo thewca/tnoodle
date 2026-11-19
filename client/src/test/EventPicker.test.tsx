@@ -8,7 +8,6 @@ import {
     setScramblingProgressTarget,
 } from "../main/redux/slice/ScramblingSlice";
 import { createStore } from "../main/redux/Store";
-import { mockApis } from "./mock/api.mock";
 import { getCopies, getMbldCubesCount, getRounds } from "./util/wcif.test.util";
 import { renderWithProviders, replaceValue } from "./util/render";
 
@@ -18,8 +17,6 @@ const renderEvents = (store = createStore()) =>
     renderWithProviders(<EventPickerTable />, { store });
 
 const eventTable = (name: string) => screen.getByRole("table", { name });
-
-beforeEach(() => mockApis());
 
 describe("rounds", () => {
     it("adds and removes rounds with default settings", async () => {

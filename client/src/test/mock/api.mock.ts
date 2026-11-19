@@ -20,15 +20,15 @@ export const pending = <T>(): Promise<T> => new Promise<T>(() => {});
 
 export const testServerWcifVersion = "2.2.0";
 
-export const tnoodleMockServer = setupServer(...tnoodleHandlers);
-
 const specificWcifHandlers = mockCompetitions.map((competition) =>
     http.get(
         `*/api/v0/competitions/${competition.id}/wcif/version/${testServerWcifVersion}`,
         () => HttpResponse.json(competition),
     ),
 );
-export const wcaMockServer = setupServer(
+
+export const testMockServer = setupServer(
     ...specificWcifHandlers,
     ...wcaHandlers,
+    ...tnoodleHandlers,
 );

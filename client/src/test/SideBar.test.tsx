@@ -1,11 +1,8 @@
 import { screen, within } from "@testing-library/react";
 import wcaApi from "../main/api/wca.api";
 import SideBar from "../main/components/SideBar";
-import { mockApis } from "./mock/api.mock";
 import { competitions, me } from "./mock/wca.api.test.mock";
 import { renderWithProviders } from "./util/render";
-
-beforeEach(() => mockApis());
 
 describe("when logged in", () => {
     it("welcomes the user and offers their upcoming competitions", async () => {

@@ -3,7 +3,7 @@ import tnoodleApi from "../main/api/tnoodle.api";
 import wcaApi from "../main/api/wca.api";
 import type { VersionInfo as ApiVersionInfo } from "../main/api/tnoodle.schemas";
 import VersionInfo from "../main/components/VersionInfo";
-import { mockApis, ok } from "./mock/api.mock";
+import { ok } from "./mock/api.mock";
 import { renderWithProviders } from "./util/render";
 
 const download =
@@ -40,8 +40,6 @@ const renderVersionInfo = async (
 
     return renderWithProviders(<VersionInfo />);
 };
-
-beforeEach(() => mockApis());
 
 it("shows no warning when running the latest signed release", async () => {
     await renderVersionInfo(running(), ["TNoodle-WCA-3"]);

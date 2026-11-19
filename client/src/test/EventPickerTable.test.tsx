@@ -5,7 +5,6 @@ import { setWcif } from "../main/redux/slice/WcifSlice";
 import { createStore } from "../main/redux/Store";
 import type { Wcif } from "../main/api/wca.schemas";
 import { defaultWcif } from "../main/util/wcif.util";
-import { mockApis } from "./mock/api.mock";
 import { events } from "./mock/tnoodle.api.test.mock";
 import { competitions, wcifs } from "./mock/wca.api.test.mock";
 import { renderWithProviders } from "./util/render";
@@ -24,8 +23,6 @@ const eventTableNames = () =>
         .getAllByRole("table")
         .map((table) => table.getAttribute("aria-label"))
         .filter((name) => name !== null);
-
-beforeEach(() => mockApis());
 
 it("offers every WCA event for manual selection", async () => {
     await renderWithProviders(<EventPickerTable />);

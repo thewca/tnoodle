@@ -4,7 +4,6 @@ import tnoodleApi from "../main/api/tnoodle.api";
 import Main from "../main/components/Main";
 import { setSuggestedFmcTranslations } from "../main/redux/slice/EventDataSlice";
 import { createStore } from "../main/redux/Store";
-import { mockApis } from "./mock/api.mock";
 import { languages } from "./mock/tnoodle.api.test.mock";
 import { getFmcLanguageTags } from "./util/wcif.test.util";
 import { renderWithProviders } from "./util/render";
@@ -30,8 +29,6 @@ const openFmcTranslations = async (user: UserEvent) => {
     await user.click(fmc.getByRole("button", { name: "Translations" }));
     return fmc;
 };
-
-beforeEach(() => mockApis());
 
 it("only submits the form through the Generate Scrambles button", async () => {
     const { user } = await renderMain();
