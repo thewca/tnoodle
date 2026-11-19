@@ -55,7 +55,7 @@ describe("password", () => {
     it("is stored as it is typed", async () => {
         const { store, user } = await renderWithProviders(<EntryInterface />);
 
-        expect(store.getState().scramblingSlice.password).toBe("");
+        expect(store.getState().scramblingSlice.password).toBeNull();
 
         await user.type(screen.getByLabelText("Password"), "123456");
 

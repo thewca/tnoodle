@@ -136,7 +136,7 @@ const FmcTranslationsDetail = ({
         return translationsChunks.map((translationsChunk, i) => (
             <tr key={i}>
                 {translationsChunk.map((translation, j) => {
-                    let checkboxId = `fmc-${translation}`;
+                    let checkboxId = `fmc-${translation.code}`;
                     let translationStatus = selectedTranslations.includes(
                         translation.code,
                     );
