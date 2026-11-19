@@ -75,7 +75,30 @@ describe("FMC translations", () => {
         );
 
         await user.click(fmc.getByRole("button", { name: "Select All" }));
-        expect(fmcLanguageTags()).toEqual(["da", "de", "en", "es", "et", "fi", "fr", "hr", "hu", "id", "it", "ja", "ko", "pl", "pt", "pt-BR", "ro", "ru", "sl", "vi", "zh-CN", "zh-TW"]);
+        expect(fmcLanguageTags()).toEqual([
+            "da",
+            "de",
+            "en",
+            "es",
+            "et",
+            "fi",
+            "fr",
+            "hr",
+            "hu",
+            "id",
+            "it",
+            "ja",
+            "ko",
+            "pl",
+            "pt",
+            "pt-BR",
+            "ro",
+            "ru",
+            "sl",
+            "vi",
+            "zh-CN",
+            "zh-TW",
+        ]);
         expect(fmc.queryAllByRole("checkbox", { checked: false })).toHaveLength(
             0,
         );

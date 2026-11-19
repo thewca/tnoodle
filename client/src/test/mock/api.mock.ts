@@ -19,19 +19,22 @@ const specificWcifHandlers = mockCompetitions.map((competition) =>
 
 const zipWebsocket = ws.link(WEBSOCKET_API + WEBSOCKET_ZIP_ENDPOINT);
 
-const fetchZipHandler = zipWebsocket.addEventListener("connection", ({ client }) => {
-    client.addEventListener("message", (event) => {
-        const zipRequest = JSON.parse(event.data.toString());
+const fetchZipHandler = zipWebsocket.addEventListener(
+    "connection",
+    ({ client }) => {
+        client.addEventListener("message", (event) => {
+            const zipRequest = JSON.parse(event.data.toString());
 
-        // mock target data
-        client.send("{}");
-        // "computation done" target marker
-        client.send(zipRequest.wcif.id);
-        // end result: dummy empty zip
-        client.send("application/zip");
-        client.send("UEsFBgAAAAAAAAAAAAAAAAAAAAAAAA==");
-    });
-});
+            // mock target data
+            client.send("{}");
+            // "computation done" target marker
+            client.send(zipRequest.wcif.id);
+            // end result: dummy empty zip
+            client.send("application/zip");
+            client.send("UEsFBgAAAAAAAAAAAAAAAAAAAAAAAA==");
+        });
+    },
+);
 
 export const testMockServer = setupServer(
     ...specificWcifHandlers,
@@ -47,7 +50,7 @@ export const httpSpy = (server: SetupServer, route: string) => {
         http.all(route, async ({ request }) => {
             const body = await request.json();
             routeSpy(body);
-        })
+        }),
     );
 
     return routeSpy;
@@ -57,13 +60,17 @@ export const websocketSpy = (server: SetupServer, once: boolean = true) => {
     const routeSpy = vi.fn();
 
     server.use(
-        zipWebsocket.addEventListener('connection', ({ client }) =>  {
-            client.addEventListener("message", (event) => {
-                const body = JSON.parse(event.data.toString());
-                routeSpy(body);
-            }, { once })
+        zipWebsocket.addEventListener("connection", ({ client }) => {
+            client.addEventListener(
+                "message",
+                (event) => {
+                    const body = JSON.parse(event.data.toString());
+                    routeSpy(body);
+                },
+                { once },
+            );
         }),
     );
 
     return routeSpy;
-}
+};

@@ -38,8 +38,9 @@ describe("for a competition selected from the WCA", () => {
             store: competitionStore(competition),
         });
 
-        const competitionEventNames = competition.events
-            .map((event) => eventsWithNames[event.id]);
+        const competitionEventNames = competition.events.map(
+            (event) => eventsWithNames[event.id],
+        );
 
         expect(eventTableNames()).toEqual(competitionEventNames);
         expect(

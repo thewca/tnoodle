@@ -18,7 +18,10 @@ import type { Mock } from "vitest";
 
 const lastZipRequest = (routeSpy: Mock) => {
     const [, websocketPayload] = routeSpy.mock.lastCall!;
-    return { wcif: websocketPayload.wcif, password: websocketPayload.zipPassword };
+    return {
+        wcif: websocketPayload.wcif,
+        password: websocketPayload.zipPassword,
+    };
 };
 
 const eventTable = async (name: string) =>
