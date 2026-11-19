@@ -69,8 +69,10 @@ const Main = () => {
             onScrambleProgress,
         );
 
+        const zipPassword = !password ? null : password;
+
         scrambleClient
-            .loadScrambles({ wcif, zipPassword: password }, wcif.id)
+            .loadScrambles({ wcif, zipPassword }, wcif.id)
             .then((plainZip) => dispatch(setFileZip(plainZip)))
             .catch((err) => interceptorRef.current?.updateMessage(err))
             .finally(() => {
