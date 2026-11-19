@@ -5,8 +5,7 @@ import { setWcif } from "../main/redux/slice/WcifSlice";
 import { createStore } from "../main/redux/Store";
 import type { Wcif } from "../main/api/wca.schemas";
 import { defaultWcif } from "../main/util/wcif.util";
-import { events } from "./mock/tnoodle.api.test.mock";
-import { competitions, wcifs } from "./mock/wca.api.test.mock";
+import { eventsWithNames, mockCompetitions } from "./mock/wcif.mock.ts";
 import { renderWithProviders } from "./util/render";
 import { getWcaOrigin } from "../main/api/wca.oidc";
 
@@ -27,23 +26,20 @@ const eventTableNames = () =>
 it("offers every WCA event for manual selection", async () => {
     await renderWithProviders(<EventPickerTable />);
 
-    expect(eventTableNames()).toEqual(events.map((event) => event.name));
+    expect(eventTableNames()).toEqual(Object.values(eventsWithNames));
     expect(screen.queryByText(/Found \d+ event/)).not.toBeInTheDocument();
 });
 
 describe("for a competition selected from the WCA", () => {
-    const competition = wcifs[competitions[0].id];
+    const competition = mockCompetitions[0];
 
     it("only shows the competition's events", async () => {
         await renderWithProviders(<EventPickerTable />, {
             store: competitionStore(competition),
         });
 
-        const competitionEventNames = events
-            .filter((event) =>
-                competition.events.some(({ id }) => id === event.id),
-            )
-            .map((event) => event.name);
+        const competitionEventNames = competition.events
+            .map((event) => eventsWithNames[event.id]);
 
         expect(eventTableNames()).toEqual(competitionEventNames);
         expect(

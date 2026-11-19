@@ -4,7 +4,6 @@ import tnoodleApi from "../main/api/tnoodle.api";
 import Main from "../main/components/Main";
 import { setSuggestedFmcTranslations } from "../main/redux/slice/EventDataSlice";
 import { createStore } from "../main/redux/Store";
-import { languages } from "./mock/tnoodle.api.test.mock";
 import { getFmcLanguageTags } from "./util/wcif.test.util";
 import { renderWithProviders } from "./util/render";
 
@@ -74,7 +73,7 @@ describe("FMC translations", () => {
         );
 
         await user.click(fmc.getByRole("button", { name: "Select All" }));
-        expect(fmcLanguageTags()).toEqual(Object.keys(languages));
+        expect(fmcLanguageTags()).toEqual(["da", "de", "en", "es", "et", "fi", "fr", "hr", "hu", "id", "it", "ja", "ko", "pl", "pt", "pt-BR", "ro", "ru", "sl", "vi", "zh-CN", "zh-TW"]);
         expect(fmc.queryAllByRole("checkbox", { checked: false })).toHaveLength(
             0,
         );

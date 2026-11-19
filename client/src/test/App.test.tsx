@@ -6,7 +6,7 @@ import wcaApi from "../main/api/wca.api";
 import { findExtension } from "../main/util/extension.util";
 import { defaultWcif, frontendStatusExtensionId } from "../main/util/wcif.util";
 import { testMockServer } from "./mock/api.mock";
-import { competitions, wcifs } from "./mock/wca.api.test.mock";
+import { mockCompetitions } from "./mock/wcif.mock.ts";
 import {
     getCopies,
     getFmcLanguageTags,
@@ -147,14 +147,14 @@ describe("manual selection", () => {
 });
 
 describe("logged in", () => {
-    const [firstCompetition, secondCompetition] = competitions;
+    const [firstCompetition, secondCompetition] = mockCompetitions;
 
     it("generates scrambles for the selected competition", async () => {
         const { user } = await renderWithProviders(<App />, {
             isAuthenticated: true,
         });
 
-        for (const competition of competitions) {
+        for (const competition of mockCompetitions) {
             await selectCompetition(user, competition.name);
             await generateScrambles(user);
 

@@ -1,7 +1,7 @@
 import { screen, within } from "@testing-library/react";
 import wcaApi from "../main/api/wca.api";
 import SideBar from "../main/components/SideBar";
-import { competitions, me } from "./mock/wca.api.test.mock";
+import { mockCompetitions } from "./mock/wcif.mock.ts";
 import { renderWithProviders } from "./util/render";
 
 describe("when logged in", () => {
@@ -9,7 +9,7 @@ describe("when logged in", () => {
         await renderWithProviders(<SideBar />, { isAuthenticated: true });
 
         expect(
-            screen.getByText(`Welcome, ${me.name}.`, { exact: false }),
+            screen.getByText("Welcome, John Doe.", { exact: false }),
         ).toBeInTheDocument();
 
         expect(
@@ -21,7 +21,7 @@ describe("when logged in", () => {
         ).getAllByRole("button");
 
         expect(competitionButtons.map((button) => button.textContent)).toEqual(
-            competitions.map((competition) => competition.name),
+            mockCompetitions.map((competition) => competition.name),
         );
 
         expect(
