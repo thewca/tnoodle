@@ -5,6 +5,7 @@ import { setSuggestedFmcTranslations } from "../main/redux/slice/EventDataSlice"
 import { createStore } from "../main/redux/Store";
 import { getFmcLanguageTags } from "./util/wcif.test.util";
 import { renderWithProviders } from "./util/render";
+import { testMockServer, websocketSpy } from "./mock/api.mock.ts";
 
 const suggestedTranslations = ["de", "en", "pt-BR"];
 
@@ -29,6 +30,8 @@ const openFmcTranslations = async (user: UserEvent) => {
 };
 
 it("only submits the form through the Generate Scrambles button", async () => {
+    const routeSpy = websocketSpy(testMockServer);
+
     const { user } = await renderMain();
     const fmc = await openFmcTranslations(user);
 
@@ -43,12 +46,12 @@ it("only submits the form through the Generate Scrambles button", async () => {
     ]) {
         await user.click(screen.getByRole("button", { name }));
     }
-    expect(tnoodleApi.fetchZip).not.toHaveBeenCalled();
+    expect(routeSpy).not.toHaveBeenCalled();
 
     await user.click(
         screen.getByRole("button", { name: "Generate Scrambles" }),
     );
-    expect(tnoodleApi.fetchZip).toHaveBeenCalledTimes(1);
+    expect(routeSpy).toHaveBeenCalledTimes(1);
 });
 
 describe("FMC translations", () => {

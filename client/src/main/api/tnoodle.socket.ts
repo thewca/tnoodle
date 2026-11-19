@@ -122,8 +122,8 @@ wsTNoodleBackend.protocol =
 
 const FALLBACK_APPLICATION_TYPE = "application/octet-stream";
 
-const WEBSOCKET_API = wsTNoodleBackend.toString().replace(/\/$/g, "");
-const WEBSOCKET_ZIP_ENDPOINT = "/wcif/zip";
+export const WEBSOCKET_API = wsTNoodleBackend.toString().replace(/\/$/g, "");
+export const WEBSOCKET_ZIP_ENDPOINT = "/wcif/zip";
 
 // this has to be identical with backend value in JobSchedulingHandler.kt
 const MARKER_ERROR_MESSAGE = "%%ERROR%%";

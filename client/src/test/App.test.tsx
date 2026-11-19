@@ -3,7 +3,7 @@ import type { UserEvent } from "@testing-library/user-event";
 import App from "../App";
 import { findExtension } from "../main/util/extension.util";
 import { defaultWcif, frontendStatusExtensionId } from "../main/util/wcif.util";
-import { httpSpy, testMockServer } from "./mock/api.mock";
+import { httpSpy, testMockServer, websocketSpy } from "./mock/api.mock";
 import { mockCompetitions } from "./mock/wcif.mock.ts";
 import {
     getCopies,
@@ -14,6 +14,12 @@ import {
 } from "./util/wcif.test.util";
 import { renderWithProviders, replaceValue } from "./util/render";
 import { delay, http } from "msw";
+import type { Mock } from "vitest";
+
+const lastZipRequest = (routeSpy: Mock) => {
+    const [, websocketPayload] = routeSpy.mock.lastCall!;
+    return { wcif: websocketPayload.wcif, password: websocketPayload.zipPassword };
+};
 
 const eventTable = async (name: string) =>
     within(await screen.findByRole("table", { name }));
@@ -30,11 +36,12 @@ const selectCompetition = async (user: UserEvent, name: string) => {
 
 describe("manual selection", () => {
     it("generates a single round of 3x3x3 by default", async () => {
+        const routeSpy = websocketSpy(testMockServer);
         const { user } = await renderWithProviders(<App />);
 
         await generateScrambles(user);
 
-        const { wcif, password } = lastZipRequest();
+        const { wcif, password } = lastZipRequest(routeSpy);
         expect(scrambledEventIds(wcif)).toEqual(["333"]);
         expect(password).toBe("");
         expect(findExtension(wcif, frontendStatusExtensionId)?.data).toEqual({
@@ -46,6 +53,7 @@ describe("manual selection", () => {
     });
 
     it("sends round settings and the password along", async () => {
+        const routeSpy = websocketSpy(testMockServer);
         const { user } = await renderWithProviders(<App />);
         const cube = await eventTable("3x3x3");
 
@@ -61,7 +69,7 @@ describe("manual selection", () => {
 
         await generateScrambles(user);
 
-        const { wcif, password } = lastZipRequest();
+        const { wcif, password } = lastZipRequest(routeSpy);
         expect(password).toBe("wca123");
         expect(getRounds(wcif, "333")).toEqual([
             expect.objectContaining({
@@ -91,7 +99,8 @@ describe("manual selection", () => {
     });
 
     it("sends MBLD cube count and FMC translations along", async () => {
-        const { user, store } = await renderWithProviders(<App />);
+        const routeSpy = websocketSpy(testMockServer);
+        const { user } = await renderWithProviders(<App />);
         const cube = await eventTable("3x3x3");
         const fmc = await eventTable("3x3x3 Fewest Moves");
         const mbld = await eventTable("3x3x3 Multiple Blindfolded");
@@ -112,7 +121,7 @@ describe("manual selection", () => {
 
         await generateScrambles(user);
 
-        const { wcif } = lastZipRequest();
+        const { wcif } = lastZipRequest(routeSpy);
         expect(scrambledEventIds(wcif)).toEqual(["333fm", "333mbf"]);
         expect(getRounds(wcif, "333fm")).toHaveLength(3);
         expect(getRounds(wcif, "333mbf")).toHaveLength(3);
@@ -153,10 +162,11 @@ describe("logged in", () => {
         });
 
         for (const competition of mockCompetitions) {
+            const routeSpy = websocketSpy(testMockServer);
             await selectCompetition(user, competition.name);
             await generateScrambles(user);
 
-            expect(lastZipRequest().wcif).toStrictEqual(wcifs[competition.id]);
+            expect(lastZipRequest(routeSpy).wcif).toStrictEqual(competition);
         }
     });
 
@@ -195,6 +205,8 @@ describe("logged in", () => {
     });
 
     it("does not wait for suggested MBLD and FMC settings to generate scrambles", async () => {
+        const routeSpy = websocketSpy(testMockServer);
+
         testMockServer.use(
             http.post(
                 "/frontend/fmc/languages/competitors",
@@ -213,6 +225,6 @@ describe("logged in", () => {
         await selectCompetition(user, firstCompetition.name);
         await generateScrambles(user);
 
-        expect(tnoodleApi.fetchZip).toHaveBeenCalledTimes(1);
+        expect(routeSpy).toHaveBeenCalledTimes(1);
     });
 });
