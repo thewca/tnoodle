@@ -5,7 +5,7 @@ import tnoodleApi from "../main/api/tnoodle.api";
 import wcaApi from "../main/api/wca.api";
 import { findExtension } from "../main/util/extension.util";
 import { defaultWcif, frontendStatusExtensionId } from "../main/util/wcif.util";
-import { pending } from "./mock/api.mock";
+import { testMockServer } from "./mock/api.mock";
 import { competitions, wcifs } from "./mock/wca.api.test.mock";
 import {
     getCopies,
@@ -15,6 +15,7 @@ import {
     scrambledEventIds,
 } from "./util/wcif.test.util";
 import { renderWithProviders, replaceValue } from "./util/render";
+import { delay, http } from "msw";
 
 const eventTable = async (name: string) =>
     within(await screen.findByRole("table", { name }));
@@ -191,9 +192,15 @@ describe("logged in", () => {
     });
 
     it("does not wait for suggested MBLD and FMC settings to generate scrambles", async () => {
-        vi.mocked(tnoodleApi.fetchBestMbldAttempt).mockReturnValue(pending());
-        vi.mocked(tnoodleApi.fetchSuggestedFmcTranslations).mockReturnValue(
-            pending(),
+        testMockServer.use(
+            http.post(
+                "/frontend/fmc/languages/competitors",
+                async () => await delay("infinite"),
+            ),
+            http.post(
+                "/frontend/mbld/best",
+                async () => await delay("infinite"),
+            ),
         );
 
         const { user } = await renderWithProviders(<App />, {

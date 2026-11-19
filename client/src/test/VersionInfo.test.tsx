@@ -1,10 +1,10 @@
 import { screen } from "@testing-library/react";
-import tnoodleApi from "../main/api/tnoodle.api";
-import wcaApi from "../main/api/wca.api";
 import type { VersionInfo as ApiVersionInfo } from "../main/api/tnoodle.schemas";
 import VersionInfo from "../main/components/VersionInfo";
-import { ok } from "./mock/api.mock";
+import { testMockServer } from "./mock/api.mock";
 import { renderWithProviders } from "./util/render";
+import { getVersionInfoHandler } from "../main/api/tnoodle.mocks.ts";
+import { getScrambleProgramHandler } from "../main/api/wca.mocks.ts";
 
 const download =
     "https://www.worldcubeassociation.org/regulations/scrambles/tnoodle/TNoodle-WCA-3.jar";
@@ -21,11 +21,9 @@ const renderVersionInfo = async (
     runningVersion: ApiVersionInfo,
     allowed: string[],
 ) => {
-    vi.mocked(tnoodleApi.fetchRunningVersion).mockImplementation(() =>
-        ok(runningVersion),
-    );
-    vi.mocked(wcaApi.fetchVersionInfo).mockImplementation(() =>
-        ok({
+    testMockServer.use(
+        getVersionInfoHandler(runningVersion),
+        getScrambleProgramHandler({
             current: {
                 name: "TNoodle-WCA-3",
                 information:
