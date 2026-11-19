@@ -1,8 +1,8 @@
 import { screen, within } from "@testing-library/react";
-import wcaApi from "../main/api/wca.api";
 import SideBar from "../main/components/SideBar";
 import { mockCompetitions } from "./mock/wcif.mock.ts";
 import { renderWithProviders } from "./util/render";
+import { httpSpy, testMockServer } from "./mock/api.mock.ts";
 
 describe("when logged in", () => {
     it("welcomes the user and offers their upcoming competitions", async () => {
@@ -32,6 +32,8 @@ describe("when logged in", () => {
 
 describe("when logged out", () => {
     it("only offers to log in", async () => {
+        const routeSpy = httpSpy(testMockServer, "/api/v0/competitions");
+
         await renderWithProviders(<SideBar />);
 
         expect(
@@ -42,6 +44,6 @@ describe("when logged out", () => {
             screen.queryByRole("button", { name: "Manual Selection" }),
         ).not.toBeInTheDocument();
 
-        expect(wcaApi.getUpcomingManageableCompetitions).not.toHaveBeenCalled();
+        expect(routeSpy).not.toHaveBeenCalled();
     });
 });

@@ -1,11 +1,9 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import type { UserEvent } from "@testing-library/user-event";
 import App from "../App";
-import tnoodleApi from "../main/api/tnoodle.api";
-import wcaApi from "../main/api/wca.api";
 import { findExtension } from "../main/util/extension.util";
 import { defaultWcif, frontendStatusExtensionId } from "../main/util/wcif.util";
-import { testMockServer } from "./mock/api.mock";
+import { httpSpy, testMockServer } from "./mock/api.mock";
 import { mockCompetitions } from "./mock/wcif.mock.ts";
 import {
     getCopies,
@@ -179,6 +177,11 @@ describe("logged in", () => {
     });
 
     it("fetches each competition from the WCA only once", async () => {
+        const routeSpy = httpSpy(
+            testMockServer,
+            "/api/v0/competitions/:competitionId/wcif/version/:formatVersion",
+        );
+
         const { user } = await renderWithProviders(<App />, {
             isAuthenticated: true,
         });
@@ -188,7 +191,7 @@ describe("logged in", () => {
         await selectCompetition(user, firstCompetition.name);
         await selectCompetition(user, secondCompetition.name);
 
-        expect(wcaApi.getCompetitionJson).toHaveBeenCalledTimes(2);
+        expect(routeSpy).toHaveBeenCalledTimes(2);
     });
 
     it("does not wait for suggested MBLD and FMC settings to generate scrambles", async () => {

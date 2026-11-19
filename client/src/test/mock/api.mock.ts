@@ -1,5 +1,5 @@
 import { http, HttpResponse } from "msw";
-import { setupServer } from "msw/node";
+import { type SetupServer, setupServer } from "msw/node";
 import { handlers as tnoodleHandlers } from "../../main/api/tnoodle.mocks.ts";
 import { handlers as wcaHandlers } from "../../main/api/wca.mocks.ts";
 import { mockCompetitions } from "./wcif.mock.ts";
@@ -18,3 +18,16 @@ export const testMockServer = setupServer(
     ...wcaHandlers,
     ...tnoodleHandlers,
 );
+
+export const httpSpy = (server: SetupServer, route: string) => {
+    const routeSpy = vi.fn();
+
+    server.use(
+        http.all(route, async ({ request }) => {
+            const body = await request.json();
+            routeSpy(body);
+        })
+    );
+
+    return routeSpy;
+};

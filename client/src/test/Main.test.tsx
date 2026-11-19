@@ -1,6 +1,5 @@
 import { screen, within } from "@testing-library/react";
 import type { UserEvent } from "@testing-library/user-event";
-import tnoodleApi from "../main/api/tnoodle.api";
 import Main from "../main/components/Main";
 import { setSuggestedFmcTranslations } from "../main/redux/slice/EventDataSlice";
 import { createStore } from "../main/redux/Store";
