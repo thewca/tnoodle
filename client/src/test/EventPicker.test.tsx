@@ -16,12 +16,12 @@ import { renderWithProviders, replaceValue } from "./util/render";
 const renderEvents = (store = createStore()) =>
     renderWithProviders(<EventPickerTable />, { store });
 
-const eventTable = (name: string) => screen.getByRole("table", { name });
+const eventTable = (name: string) => screen.findByRole("table", { name });
 
 describe("rounds", () => {
     it("adds and removes rounds with default settings", async () => {
         const { store, user } = await renderEvents();
-        const cube = within(eventTable("3x3x3"));
+        const cube = within(await eventTable("3x3x3"));
 
         await user.selectOptions(cube.getByLabelText("Rounds"), "4");
 
@@ -43,7 +43,7 @@ describe("rounds", () => {
 
     it("stores edits to a single round", async () => {
         const { store, user } = await renderEvents();
-        const cube = within(eventTable("3x3x3"));
+        const cube = within(await eventTable("3x3x3"));
 
         await user.selectOptions(cube.getByLabelText("Rounds"), "2");
         await user.selectOptions(cube.getByLabelText("Round 2 format"), "Bo3");
@@ -69,7 +69,7 @@ describe("rounds", () => {
         store.dispatch(setIsManualSelection(false));
 
         await renderEvents(store);
-        const cube = within(eventTable("3x3x3"));
+        const cube = within(await eventTable("3x3x3"));
 
         expect(cube.getByLabelText("Rounds")).toBeDisabled();
         expect(cube.getByLabelText("Round 1 format")).toBeDisabled();
@@ -81,7 +81,7 @@ describe("rounds", () => {
 describe("progress bar", () => {
     it("tracks scramble generation for the event", async () => {
         const { store } = await renderEvents();
-        const cube = within(eventTable("3x3x3"));
+        const cube = within(await eventTable("3x3x3"));
 
         expect(cube.queryByRole("progressbar")).not.toBeInTheDocument();
 
@@ -116,7 +116,7 @@ describe("progress bar", () => {
 describe("multi-blind", () => {
     it("stores the requested number of cubes", async () => {
         const { store, user } = await renderEvents();
-        const mbld = within(eventTable("3x3x3 Multiple Blindfolded"));
+        const mbld = within(await eventTable("3x3x3 Multiple Blindfolded"));
 
         await user.selectOptions(mbld.getByLabelText("Rounds"), "1");
         await replaceValue(
@@ -133,7 +133,7 @@ describe("multi-blind", () => {
         store.dispatch(setBestMbldAttempt(60));
 
         const { user } = await renderEvents(store);
-        const mbld = within(eventTable("3x3x3 Multiple Blindfolded"));
+        const mbld = within(await eventTable("3x3x3 Multiple Blindfolded"));
 
         await user.selectOptions(mbld.getByLabelText("Rounds"), "1");
         const cubes = mbld.getByLabelText("Select the number of scrambles");

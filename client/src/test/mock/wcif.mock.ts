@@ -26,8 +26,6 @@ export const eventsWithNames = {
     "333mbf": "3x3x3 Multiple Blindfolded",
 } as Record<string, string>;
 
-const year = new Date().getFullYear();
-
 const createCopyExtension = (numCopies: number) =>
     createWcifExtension({
         id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
@@ -36,10 +34,10 @@ const createCopyExtension = (numCopies: number) =>
 
 export const mockCompetitions = [
     createWcif({
-        id: "WCAWorldChampionship" + year,
+        id: "Worlds2026",
         formatVersion: testServerWcifVersion,
-        name: "WCA World Championship " + year,
-        shortName: "WCA World Championship " + year,
+        name: "World Championship 2026",
+        shortName: "World Championship 2026",
         events: [
             createWcifEvent({
                 id: "333",
@@ -404,10 +402,10 @@ export const mockCompetitions = [
         ],
     }),
     createWcif({
-        id: "Nationals" + year,
+        id: "ExamplistanNationals2026",
         formatVersion: testServerWcifVersion,
-        name: "Nationals " + year,
-        shortName: "Nationals " + year,
+        name: "Examplistan Nationals 2026",
+        shortName: "Examplistan Nationals 2026",
         events: [
             createWcifEvent({
                 id: "333",

@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { beforeAll, afterEach, afterAll } from "vitest";
 import { testMockServer as server } from "./test/mock/api.mock";
+import { cleanup } from "@testing-library/react";
 
 // jsdom does not implement object URLs, which the zip download relies on.
 URL.createObjectURL ??= () => "blob:mock";
@@ -13,5 +14,8 @@ afterEach(() => {
 
 // per https://main.vitest.dev/guide/mocking/requests#configuration
 beforeAll(() => server.listen({ onUnhandledFrame: "error" }));
-afterEach(() => server.resetHandlers());
+afterEach(() => {
+    cleanup();
+    server.resetHandlers();
+});
 afterAll(() => server.close());
