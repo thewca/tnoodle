@@ -51,7 +51,7 @@ it("asks to upgrade when the version is outdated but still allowed", async () =>
         "TNoodle-WCA-3",
     ]);
 
-    const alert = screen.getByRole("alert");
+    const alert = await screen.findByRole("alert");
     expect(alert).toHaveTextContent(
         "You are running TNoodle-WCA-2, which is still allowed, but you should upgrade to TNoodle-WCA-3",
     );
@@ -67,7 +67,7 @@ it("forbids versions that are no longer allowed", async () => {
         "TNoodle-WCA-3",
     ]);
 
-    expect(screen.getByRole("alert")).toHaveTextContent(
+    expect(await screen.findByRole("alert")).toHaveTextContent(
         "You are running TNoodle-WCA-1, which is not allowed.",
     );
 });
@@ -83,7 +83,7 @@ it.each([
     async (_, runningVersion) => {
         await renderVersionInfo(runningVersion, ["TNoodle-WCA-3"]);
 
-        expect(screen.getByRole("alert")).toHaveTextContent(
+        expect(await screen.findByRole("alert")).toHaveTextContent(
             "You are running an unsigned TNoodle release.",
         );
     },
