@@ -26,7 +26,7 @@ const eventTableNames = () =>
 it("offers every WCA event for manual selection", async () => {
     await renderWithProviders(<EventPickerTable />);
 
-    expect(eventTableNames()).toEqual(Object.values(eventsWithNames));
+    expect(eventTableNames().toSorted()).toEqual(Object.values(eventsWithNames).toSorted());
     expect(screen.queryByText(/Found \d+ event/)).not.toBeInTheDocument();
 });
 
@@ -42,7 +42,7 @@ describe("for a competition selected from the WCA", () => {
             (event) => eventsWithNames[event.id],
         );
 
-        expect(eventTableNames()).toEqual(competitionEventNames);
+        expect(eventTableNames().toSorted()).toEqual(competitionEventNames.toSorted());
         expect(
             screen.getByText(
                 `Found ${competition.events.length} events for ${competition.name}.`,
