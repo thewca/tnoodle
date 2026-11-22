@@ -17,16 +17,18 @@ const competitionStore = (wcif: Wcif) => {
 };
 
 // Only the top-level tables: nested ones (translations, colors) are unnamed.
-const eventTableNames = () =>
-    screen
-        .getAllByRole("table")
+const eventTableNames = async () => {
+    const allTables = await screen.findAllByRole("table");
+
+    return allTables
         .map((table) => table.getAttribute("aria-label"))
         .filter((name) => name !== null);
+}
 
 it("offers every WCA event for manual selection", async () => {
     await renderWithProviders(<EventPickerTable />);
 
-    expect(eventTableNames().toSorted()).toEqual(Object.values(eventsWithNames).toSorted());
+    expect((await eventTableNames()).toSorted()).toEqual(Object.values(eventsWithNames).toSorted());
     expect(screen.queryByText(/Found \d+ event/)).not.toBeInTheDocument();
 });
 
@@ -42,7 +44,9 @@ describe("for a competition selected from the WCA", () => {
             (event) => eventsWithNames[event.id],
         );
 
-        expect(eventTableNames().toSorted()).toEqual(competitionEventNames.toSorted());
+        expect((await eventTableNames()).toSorted()).toEqual(
+            competitionEventNames.toSorted(),
+        );
         expect(
             screen.getByText(
                 `Found ${competition.events.length} events for ${competition.name}.`,
@@ -71,7 +75,7 @@ describe("for a competition selected from the WCA", () => {
         });
 
         expect(
-            screen.getByText("Found 1 event for Tiny Open."),
+            await screen.findByText("Found 1 event for Tiny Open."),
         ).toBeInTheDocument();
     });
 });
