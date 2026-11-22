@@ -18,4 +18,10 @@ afterEach(() => {
     cleanup();
     server.resetHandlers();
 });
-afterAll(() => server.close());
+afterAll(async () => {
+    // keep the server alive for just a bit longer so that `React.StrictMode` can clean up.
+    // this will eventually go away with rearchitecting to Tanstack Query in a separate PR.
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    server.close();
+});
