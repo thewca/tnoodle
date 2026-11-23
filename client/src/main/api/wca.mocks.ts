@@ -25,9 +25,9 @@ export function createMeResponse(overrides?: Partial<MeResponse>): MeResponse {
 
 export function createScrambleProgramVersion(overrides?: Partial<ScrambleProgramVersion>): ScrambleProgramVersion {
     return {
-        name: "TNoodle-WCA-2",
+        name: "TNoodle-WCA-1.2.3",
         information: "https://www.worldcubeassociation.org/regulations/scrambles/",
-        download: "https://www.worldcubeassociation.org/regulations/scrambles/tnoodle/TNoodle-WCA-2.jar",
+        download: "https://www.worldcubeassociation.org/regulations/scrambles/tnoodle/TNoodle-WCA-1.2.3.jar",
         ...overrides
     };
 }
@@ -35,18 +35,18 @@ export function createScrambleProgramVersion(overrides?: Partial<ScrambleProgram
 export function createScrambleProgramInfo(overrides?: Partial<ScrambleProgramInfo>): ScrambleProgramInfo {
     return {
         current: {
-            name: "TNoodle-WCA-2",
+            name: "TNoodle-WCA-1.2.3",
             information: "https://www.worldcubeassociation.org/regulations/scrambles/",
-            download: "https://www.worldcubeassociation.org/regulations/scrambles/tnoodle/TNoodle-WCA-2.jar"
+            download: "https://www.worldcubeassociation.org/regulations/scrambles/tnoodle/TNoodle-WCA-1.2.3.jar"
         },
         allowed: [
-            "TNoodle-WCA-2"
+            "TNoodle-WCA-1.2.3"
         ],
         publicKeyBytes: "dG5vb2RsZQ==",
         history: [
-            "TNoodle-WCA-0",
-            "TNoodle-WCA-1",
-            "TNoodle-WCA-2"
+            "TNoodle-WCA-0.0.1",
+            "TNoodle-WCA-1.0.0",
+            "TNoodle-WCA-1.2.3"
         ],
         ...overrides
     };

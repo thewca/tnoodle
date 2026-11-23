@@ -15,7 +15,6 @@ import {
 import { renderWithProviders, replaceValue } from "./util/render";
 import { delay, http } from "msw";
 import type { Mock } from "vitest";
-import { getVersionInfoHandler } from "../main/api/tnoodle.mocks.ts";
 
 const lastZipRequest = (routeSpy: Mock) => {
     const [websocketPayload] = routeSpy.mock.lastCall!;
@@ -41,7 +40,6 @@ const selectCompetition = async (user: UserEvent, name: string) => {
 
 describe("manual selection", () => {
     it("generates a single round of 3x3x3 by default", async () => {
-        testMockServer.use(getVersionInfoHandler({ project_version: "2" }));
         const routeSpy = websocketSpy(testMockServer);
         const { user } = await renderWithProviders(<App />);
 
@@ -136,7 +134,6 @@ describe("manual selection", () => {
     });
 
     it("downloads the generated zip named after the competition", async () => {
-        testMockServer.use(getVersionInfoHandler({ project_version: "2" }));
         const { user } = await renderWithProviders(<App />);
         const download = vi
             .spyOn(HTMLAnchorElement.prototype, "click")

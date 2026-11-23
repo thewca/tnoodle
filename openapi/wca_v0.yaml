@@ -129,7 +129,7 @@ components:
             properties:
                 name:
                     type: string
-                    example: "TNoodle-WCA-2"
+                    example: "TNoodle-WCA-1.2.3"
                 information:
                     type: string
                     format: uri
@@ -137,7 +137,7 @@ components:
                 download:
                     type: string
                     format: url
-                    example: "https://www.worldcubeassociation.org/regulations/scrambles/tnoodle/TNoodle-WCA-2.jar"
+                    example: "https://www.worldcubeassociation.org/regulations/scrambles/tnoodle/TNoodle-WCA-1.2.3.jar"
             required:
                 - name
                 - information
@@ -152,7 +152,7 @@ components:
                     type: array
                     items:
                         type: string
-                        example: "TNoodle-WCA-2"
+                        example: "TNoodle-WCA-1.2.3"
                 publicKeyBytes:
                     type: string
                     format: byte
@@ -162,9 +162,9 @@ components:
                     items:
                         type: string
                     example:
-                        - "TNoodle-WCA-0"
-                        - "TNoodle-WCA-1"
-                        - "TNoodle-WCA-2"
+                        - "TNoodle-WCA-0.0.1"
+                        - "TNoodle-WCA-1.0.0"
+                        - "TNoodle-WCA-1.2.3"
             required:
                 - current
                 - allowed

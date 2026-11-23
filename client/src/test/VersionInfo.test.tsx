@@ -6,82 +6,58 @@ import { renderWithProviders } from "./util/render";
 import { getVersionInfoHandler } from "../main/api/tnoodle.mocks.ts";
 import { getScrambleProgramHandler } from "../main/api/wca.mocks.ts";
 
-const download =
-    "https://www.worldcubeassociation.org/regulations/scrambles/tnoodle/TNoodle-WCA-3.jar";
-
-const running = (overrides: Partial<ApiVersionInfo> = {}) => ({
-    project_name: "TNoodle-WCA",
-    project_version: "3",
-    is_signed_build: true,
-    signature_key_bytes: "key",
-    ...overrides,
-});
-
 const renderVersionInfo = async (
-    runningVersion: ApiVersionInfo,
+    runningVersion: Partial<ApiVersionInfo>,
     allowed: string[],
 ) => {
     testMockServer.use(
         getVersionInfoHandler(runningVersion),
-        getScrambleProgramHandler({
-            current: {
-                name: "TNoodle-WCA-3",
-                information:
-                    "https://www.worldcubeassociation.org/regulations/scrambles/",
-                download,
-            },
-            allowed,
-            publicKeyBytes: "key",
-            history: ["TNoodle-WCA-1", "TNoodle-WCA-2", "TNoodle-WCA-3"],
-        }),
+        getScrambleProgramHandler({ allowed }),
     );
 
     return renderWithProviders(<VersionInfo />);
 };
 
 it("shows no warning when running the latest signed release", async () => {
-    await renderVersionInfo(running(), ["TNoodle-WCA-3"]);
+    await renderVersionInfo({}, ["TNoodle-WCA-1.2.3"]);
 
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
 });
 
 it("asks to upgrade when the version is outdated but still allowed", async () => {
-    await renderVersionInfo(running({ project_version: "2" }), [
-        "TNoodle-WCA-2",
-        "TNoodle-WCA-3",
+    await renderVersionInfo({ project_version: "1.0.0" }, [
+        "TNoodle-WCA-1.0.0",
+        "TNoodle-WCA-1.2.3",
     ]);
 
     const alert = await screen.findByRole("alert");
     expect(alert).toHaveTextContent(
-        "You are running TNoodle-WCA-2, which is still allowed, but you should upgrade to TNoodle-WCA-3",
+        "You are running TNoodle-WCA-1.0.0, which is still allowed, but you should upgrade to TNoodle-WCA-1.2.3",
     );
     expect(screen.getByRole("link", { name: "here" })).toHaveAttribute(
         "href",
-        download,
+        "https://www.worldcubeassociation.org/regulations/scrambles/tnoodle/TNoodle-WCA-1.2.3.jar",
     );
 });
 
 it("forbids versions that are no longer allowed", async () => {
-    await renderVersionInfo(running({ project_version: "1" }), [
-        "TNoodle-WCA-2",
-        "TNoodle-WCA-3",
-    ]);
+    await renderVersionInfo({ project_version: "1.0.0" }, ["TNoodle-WCA-1.2.3"]);
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-        "You are running TNoodle-WCA-1, which is not allowed.",
+        "You are running TNoodle-WCA-1.0.0, which is not allowed.",
     );
 });
 
 it.each([
-    ["is not signed", running({ is_signed_build: false })],
+    ["is not signed", { is_signed_build: false }],
     [
         "is signed with a foreign key",
-        running({ signature_key_bytes: "fooBar" }),
+        { signature_key_bytes: "fooBar" },
     ],
 ])(
     "warns about an unofficial build when the latest version %s",
     async (_, runningVersion) => {
-        await renderVersionInfo(runningVersion, ["TNoodle-WCA-3"]);
+        await renderVersionInfo(runningVersion, ["TNoodle-WCA-1.2.3"]);
 
         expect(await screen.findByRole("alert")).toHaveTextContent(
             "You are running an unsigned TNoodle release.",
@@ -90,7 +66,7 @@ it.each([
 );
 
 it("does not bother the user when the running version is unknown", async () => {
-    await renderVersionInfo({} as ApiVersionInfo, ["TNoodle-WCA-3"]);
+    await renderVersionInfo({} as ApiVersionInfo, ["TNoodle-WCA-1.2.3"]);
 
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
 });
