@@ -2,13 +2,11 @@ import { http, HttpResponse, ws } from "msw";
 import { type SetupServer, setupServer } from "msw/node";
 import { handlers as tnoodleHandlers } from "../../main/api/tnoodle.mocks.ts";
 import { handlers as wcaHandlers } from "../../main/api/wca.mocks.ts";
-import { mockCompetitions } from "./wcif.mock.ts";
+import { mockCompetitions, testServerWcifVersion } from "./wcif.mock.ts";
 import {
     WEBSOCKET_API,
     WEBSOCKET_ZIP_ENDPOINT,
 } from "../../main/api/tnoodle.socket.ts";
-
-export const testServerWcifVersion = "2.2.0";
 
 const specificWcifHandlers = mockCompetitions.map((competition) =>
     http.get(
@@ -43,12 +41,12 @@ export const testMockServer = setupServer(
     fetchZipHandler,
 );
 
-export const httpSpy = (server: SetupServer, route: string) => {
+export const httpSpy = (server: SetupServer, route: string, withBody: boolean = true) => {
     const routeSpy = vi.fn();
 
     server.use(
         http.all(route, async ({ request }) => {
-            const body = await request.json();
+            const body = withBody ? await request.json() : undefined;
             routeSpy(body);
         }),
     );

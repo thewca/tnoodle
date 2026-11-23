@@ -63,7 +63,7 @@ export function createCompetitionSummary(overrides?: Partial<CompetitionSummary>
 export function createWcifExtension(overrides?: Partial<WcifExtension>): WcifExtension {
     return {
         id: "string",
-        specUrl: "https://example.com",
+        specUrl: "",
         data: {
             key: null
         },
@@ -80,7 +80,7 @@ export function createWcifRound(overrides?: Partial<WcifRound>): WcifRound {
         extensions: [
             {
                 id: "string",
-                specUrl: "https://example.com",
+                specUrl: "",
                 data: {
                     key: null
                 }
@@ -102,7 +102,7 @@ export function createWcifEvent(overrides?: Partial<WcifEvent>): WcifEvent {
                 extensions: [
                     {
                         id: "string",
-                        specUrl: "https://example.com",
+                        specUrl: "",
                         data: {
                             key: null
                         }
@@ -113,7 +113,7 @@ export function createWcifEvent(overrides?: Partial<WcifEvent>): WcifEvent {
         extensions: [
             {
                 id: "string",
-                specUrl: "https://example.com",
+                specUrl: "",
                 data: {
                     key: null
                 }
@@ -183,7 +183,7 @@ export function createWcif(overrides?: Partial<Wcif>): Wcif {
                         extensions: [
                             {
                                 id: "string",
-                                specUrl: "https://example.com",
+                                specUrl: "",
                                 data: {
                                     key: null
                                 }
@@ -194,7 +194,7 @@ export function createWcif(overrides?: Partial<Wcif>): Wcif {
                 extensions: [
                     {
                         id: "string",
-                        specUrl: "https://example.com",
+                        specUrl: "",
                         data: {
                             key: null
                         }
@@ -226,7 +226,7 @@ export function createWcif(overrides?: Partial<Wcif>): Wcif {
         extensions: [
             {
                 id: "string",
-                specUrl: "https://example.com",
+                specUrl: "",
                 data: {
                     key: null
                 }

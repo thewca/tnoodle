@@ -192,7 +192,6 @@ const SideBar = () => {
         (wcif: Wcif) => {
             dispatch(setIsManualSelection(false));
             dispatch(setWcif(wcif));
-            dispatch(setCompetitionName(wcif.name));
             dispatch(setFileZip());
         },
         [dispatch],

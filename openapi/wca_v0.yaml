@@ -192,6 +192,7 @@ components:
                 specUrl:
                     type: string
                     format: uri
+                    example: ""
                 data:
                     type: object
             required:

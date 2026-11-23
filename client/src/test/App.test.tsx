@@ -193,7 +193,8 @@ describe("logged in", () => {
     it("fetches each competition from the WCA only once", async () => {
         const routeSpy = httpSpy(
             testMockServer,
-            "/api/v0/competitions/:competitionId/wcif/version/:formatVersion",
+            "*/api/v0/competitions/:competitionId/wcif/version/:formatVersion",
+            false,
         );
 
         const { user } = await renderWithProviders(<App />, {

@@ -4,7 +4,8 @@ import {
     createWcifExtension,
     createWcifRound,
 } from "../../main/api/wca.mocks.ts";
-import { testServerWcifVersion } from "./api.mock.ts";
+
+export const testServerWcifVersion = "2.2.0";
 
 export const eventsWithNames = {
     "333": "3x3x3",
