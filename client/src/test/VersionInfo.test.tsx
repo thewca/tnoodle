@@ -41,7 +41,9 @@ it("asks to upgrade when the version is outdated but still allowed", async () =>
 });
 
 it("forbids versions that are no longer allowed", async () => {
-    await renderVersionInfo({ project_version: "1.0.0" }, ["TNoodle-WCA-1.2.3"]);
+    await renderVersionInfo({ project_version: "1.0.0" }, [
+        "TNoodle-WCA-1.2.3",
+    ]);
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
         "You are running TNoodle-WCA-1.0.0, which is not allowed.",
@@ -50,10 +52,7 @@ it("forbids versions that are no longer allowed", async () => {
 
 it.each([
     ["is not signed", { is_signed_build: false }],
-    [
-        "is signed with a foreign key",
-        { signature_key_bytes: "fooBar" },
-    ],
+    ["is signed with a foreign key", { signature_key_bytes: "fooBar" }],
 ])(
     "warns about an unofficial build when the latest version %s",
     async (_, runningVersion) => {

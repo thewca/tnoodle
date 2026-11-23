@@ -23,12 +23,14 @@ const eventTableNames = async () => {
     return allTables
         .map((table) => table.getAttribute("aria-label"))
         .filter((name) => name !== null);
-}
+};
 
 it("offers every WCA event for manual selection", async () => {
     await renderWithProviders(<EventPickerTable />);
 
-    expect((await eventTableNames()).toSorted()).toEqual(Object.values(eventsWithNames).toSorted());
+    expect((await eventTableNames()).toSorted()).toEqual(
+        Object.values(eventsWithNames).toSorted(),
+    );
     expect(screen.queryByText(/Found \d+ event/)).not.toBeInTheDocument();
 });
 
