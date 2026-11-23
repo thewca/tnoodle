@@ -55,7 +55,7 @@ export class ScrambleClient {
         targetMarker: String,
     ): Promise<WebsocketBlobResult> {
         return new Promise((resolve, reject) => {
-            let ws = new WebSocket(WEBSOCKET_API + WEBSOCKET_ZIP_ENDPOINT);
+            const ws = new WebSocket(WEBSOCKET_API + WEBSOCKET_ZIP_ENDPOINT);
 
             ws.onopen = () => {
                 this.state = ScramblingState.Initiate;
@@ -68,7 +68,7 @@ export class ScrambleClient {
 
             ws.onclose = (cls) => {
                 if (this.state === ScramblingState.Done && cls.wasClean) {
-                    let resultObject = {
+                    const resultObject = {
                         contentType: this.contentType,
                         payload: this.resultPayload,
                     };
@@ -110,6 +110,7 @@ export class ScrambleClient {
                     this.state = ScramblingState.Done;
 
                     this.resultPayload = msg.data;
+                    ws.close();
                 }
             };
         });

@@ -124,8 +124,6 @@ object JobSchedulingHandler : RouteHandler {
 
                         send(type.toString())
                         send(encodedData)
-
-                        close()
                     } catch (e: Throwable) {
                         val errorModel = e.asFrontendError()
                         val errorSerial = JsonConfig.SERIALIZER.encodeToString<FrontendErrorMessage>(errorModel)

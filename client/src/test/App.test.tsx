@@ -15,9 +15,11 @@ import {
 import { renderWithProviders, replaceValue } from "./util/render";
 import { delay, http } from "msw";
 import type { Mock } from "vitest";
+import { getVersionInfoHandler } from "../main/api/tnoodle.mocks.ts";
 
 const lastZipRequest = (routeSpy: Mock) => {
-    const [, websocketPayload] = routeSpy.mock.lastCall!;
+    const [websocketPayload] = routeSpy.mock.lastCall!;
+
     return {
         wcif: websocketPayload.wcif,
         password: websocketPayload.zipPassword,
@@ -39,6 +41,7 @@ const selectCompetition = async (user: UserEvent, name: string) => {
 
 describe("manual selection", () => {
     it("generates a single round of 3x3x3 by default", async () => {
+        testMockServer.use(getVersionInfoHandler({ project_version: "2" }));
         const routeSpy = websocketSpy(testMockServer);
         const { user } = await renderWithProviders(<App />);
 
@@ -46,7 +49,7 @@ describe("manual selection", () => {
 
         const { wcif, password } = lastZipRequest(routeSpy);
         expect(scrambledEventIds(wcif)).toEqual(["333"]);
-        expect(password).toBe("");
+        expect(password).toBeNull();
         expect(findExtension(wcif, frontendStatusExtensionId)?.data).toEqual({
             isStaging: false,
             isManual: true,
@@ -133,6 +136,7 @@ describe("manual selection", () => {
     });
 
     it("downloads the generated zip named after the competition", async () => {
+        testMockServer.use(getVersionInfoHandler({ project_version: "2" }));
         const { user } = await renderWithProviders(<App />);
         const download = vi
             .spyOn(HTMLAnchorElement.prototype, "click")
