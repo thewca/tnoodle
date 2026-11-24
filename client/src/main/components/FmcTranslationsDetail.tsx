@@ -3,10 +3,8 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type RootState from "../model/RootState";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
-import {
-    client as tnoodleClient,
-    type GetFmcSheetLanguagesResult,
-} from "../api/tnoodle";
+import { client as tnoodleClient } from "../api/tnoodle";
+import type { FmcLanguage } from "../api/tnoodle.schemas";
 import type { WcifEvent } from "../api/wca.schemas";
 import { fmcTranslationsExtensionId } from "../util/wcif.util";
 import { setWcifEvent } from "../redux/slice/WcifSlice";
@@ -29,7 +27,7 @@ const FmcTranslationsDetail = ({
     );
 
     const [availableTranslations, setAvailableTranslations] =
-        useState<GetFmcSheetLanguagesResult>();
+        useState<FmcLanguage[]>();
 
     useEffect(() => {
         if (availableTranslations === undefined) {
