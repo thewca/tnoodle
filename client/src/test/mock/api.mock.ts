@@ -41,7 +41,11 @@ export const testMockServer = setupServer(
     fetchZipHandler,
 );
 
-export const httpSpy = (server: SetupServer, route: string, withBody: boolean = true) => {
+export const httpSpy = (
+    server: SetupServer,
+    route: string,
+    withBody: boolean = true,
+) => {
     const routeSpy = vi.fn();
 
     server.use(
