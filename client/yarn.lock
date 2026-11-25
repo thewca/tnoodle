@@ -274,10 +274,10 @@
   dependencies:
     "@swc/helpers" "^0.5.0"
 
-"@redocly/cli@^2.79.0":
-  version "2.79.0"
-  resolved "https://registry.yarnpkg.com/@redocly/cli/-/cli-2.79.0.tgz#98450180c2739a5afcc2f92d73de07da3fab6663"
-  integrity sha512-MbaH+fA0KqUoGPm82vc/MBhY9D097QK8vSQbZJGzHUcYl3evwnVL9c9hAe5J9C0BenlKTSDPe70YCRGZ/DLHlg==
+"@redocly/cli@^2.83.0":
+  version "2.83.0"
+  resolved "https://registry.yarnpkg.com/@redocly/cli/-/cli-2.83.0.tgz#d60e02a47892ba027a5fa4535d88c5c05c350e6b"
+  integrity sha512-wH4JzRiNm38NDScf2B7oT7QmE2Wpa7q+Wnzt0L02rKxdgldAA8QLD6F1IDs+izSeJzLW2sGeygwO71Wn074oqQ==
 
 "@reduxjs/toolkit@^2.14.0":
   version "2.14.0"
