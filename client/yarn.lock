@@ -228,7 +228,7 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@msw/url@^0.1.2":
+"@msw/url@^0.1.3":
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/@msw/url/-/url-0.1.3.tgz#a4e1e3401e4ed0aad2e653a2c66d785628138fac"
   integrity sha512-IvN0kCVRFtr12gBS3Nk8PRqjWjE/80ydze2DNQ0Z74ZjnMDWibVoaYFqGv9vR2LoiUfcVgEVaBWLFyp15M5YJg==
@@ -1520,13 +1520,13 @@ ms@^2.1.3:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.3.tgz#574c8138ce1d2b5861f0b44579dbadd60c6615b2"
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
 
-msw@^3.0.6:
-  version "3.0.6"
-  resolved "https://registry.yarnpkg.com/msw/-/msw-3.0.6.tgz#a4d25f54f7e69b306fcc68c52e5f094d8d8abf87"
-  integrity sha512-0Axg6UFY1TulPoNYIEA2sk5h30CYa+02vSxtmcBC8WefnmewzXArKhhFyIFxIH3CgRltDLcgYHQ3k9WWWvFd0A==
+msw@^3.0.7:
+  version "3.0.7"
+  resolved "https://registry.yarnpkg.com/msw/-/msw-3.0.7.tgz#83118aa0d4f0888c2f3c3ae4fc200bd44dbde2cb"
+  integrity sha512-e9BmzG3HN2J8VOUbEYU7OJQ7tgNS7GfPmG86jv3hKZks0iiFA0sh1colqLVjPEckU+QLWjWNximsLzykVdINgQ==
   dependencies:
     "@inquirer/confirm" "^6.0.11"
-    "@msw/url" "^0.1.2"
+    "@msw/url" "^0.1.3"
     "@mswjs/interceptors" "^0.45.11"
     cookie "^2.0.1"
     headers-polyfill "^5.0.1"
