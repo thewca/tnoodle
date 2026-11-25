@@ -2,7 +2,7 @@ package org.worldcubeassociation.tnoodle.server.wcif
 
 import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.Translate
-import org.worldcubeassociation.tnoodle.server.wcif.model.Competition
+import org.worldcubeassociation.tnoodle.server.wcif.model.Person
 import org.worldcubeassociation.tnoodle.server.wcif.model.RegistrationStatus
 import org.worldcubeassociation.tnoodle.server.wcif.model.result.MultiBldResult
 import java.util.*
@@ -14,8 +14,8 @@ object WCIFCompetitorInfo {
     private val TRANSLATED_BY_LANGUAGE_TAG = Translate.TRANSLATED_LOCALES
         .groupBy { it.language }
 
-    fun detectTranslationLocales(wcif: Competition): Set<Locale> {
-        val competitorCountries = wcif.persons
+    fun detectTranslationLocales(persons: List<Person>): Set<Locale> {
+        val competitorCountries = persons
             .filter { it.registration?.status == RegistrationStatus.ACCEPTED }
             .map { it.countryIso2.isoString }
             .distinct()
@@ -37,8 +37,8 @@ object WCIFCompetitorInfo {
         return localLanguages + generalLanguages
     }
 
-    fun <T : Comparable<T>> getBestMultiPB(wcif: Competition, comparator: (MultiBldResult) -> T): MultiBldResult? {
-        val mbldResults = wcif.persons
+    fun <T : Comparable<T>> getBestMultiPB(persons: List<Person>, comparator: (MultiBldResult) -> T): MultiBldResult? {
+        val mbldResults = persons
             .filter { it.registration?.status == RegistrationStatus.ACCEPTED }
             .flatMap { it.personalBests }
             .filter { it.eventModel == EventData.THREE_MULTI_BLD }

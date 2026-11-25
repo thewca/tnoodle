@@ -8,14 +8,14 @@ import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.Translate
 import org.worldcubeassociation.tnoodle.server.serial.frontend.FmcLanguageFrontendData
 import org.worldcubeassociation.tnoodle.server.wcif.WCIFCompetitorInfo
-import org.worldcubeassociation.tnoodle.server.wcif.model.Competition
+import org.worldcubeassociation.tnoodle.server.wcif.model.Person
 
 object WcifDataHandler : RouteHandler {
     override fun install(router: Route) {
         router.route("fmc") {
             route("languages") {
                 post("competitors") {
-                    val wcif = call.receive<Competition>()
+                    val wcif = call.receive<List<Person>>()
 
                     val detectedLocales = WCIFCompetitorInfo.detectTranslationLocales(wcif)
                     val localeStrings = detectedLocales.map { it.toLanguageTag() }.sorted()
@@ -34,7 +34,7 @@ object WcifDataHandler : RouteHandler {
 
         router.route("mbld") {
             post("best") {
-                val wcif = call.receive<Competition>()
+                val wcif = call.receive<List<Person>>()
 
                 val bestMbldAttempt = WCIFCompetitorInfo.getBestMultiPB(wcif) { it.attempted }
 
