@@ -1,8 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type WcaEvent from "../../model/WcaEvent";
-import type WcaFormat from "../../model/WcaFormat";
-import type Wcif from "../../model/Wcif";
-import type WcifEvent from "../../model/WcifEvent";
+import type { WcaEvent, WcaFormat } from "../../api/tnoodle.schemas";
+import type { Wcif, WcifEvent } from "../../api/wca.schemas";
 import { competitionName2Id } from "../../util/competition.name.util";
 import {
     copiesExtensionId,
@@ -14,7 +12,7 @@ import {
 
 interface WcifState {
     wcaEvents?: WcaEvent[];
-    wcaFormats?: Record<string, WcaFormat>;
+    wcaFormats?: WcaFormat[];
     backendWcifVersion?: string;
     wcif: Wcif;
 }
@@ -55,10 +53,7 @@ export const wcifSlice = createSlice({
         setWcaEvents: (state, action: PayloadAction<WcaEvent[]>) => {
             state.wcaEvents = action.payload;
         },
-        setWcaFormats: (
-            state,
-            action: PayloadAction<Record<string, WcaFormat>>,
-        ) => {
+        setWcaFormats: (state, action: PayloadAction<WcaFormat[]>) => {
             state.wcaFormats = action.payload;
         },
         setBackendWcifVersion: (state, action: PayloadAction<string>) => {

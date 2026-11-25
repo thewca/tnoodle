@@ -2,9 +2,8 @@ import { OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { MAX_WCA_ROUNDS, MBLD_DEFAULT } from "../constants/wca.constants";
 import type RootState from "../model/RootState";
-import type Round from "../model/Round";
-import type WcaEvent from "../model/WcaEvent";
-import type WcifEvent from "../model/WcifEvent";
+import type { WcaEvent } from "../api/tnoodle.schemas";
+import type { WcifEvent, WcifRound } from "../api/wca.schemas";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
 import { setWcifEvent } from "../redux/slice/WcifSlice";
 import {
@@ -13,7 +12,7 @@ import {
     copiesExtensionId,
     getDefaultCopiesExtension,
 } from "../util/wcif.util";
-import tnoodleApi from "../api/tnoodle.api";
+import { client as tnoodleClient } from "../api/tnoodle";
 import "./EventPicker.css";
 import FmcTranslationsDetail from "./FmcTranslationsDetail";
 import MbldDetail from "./MbldDetail";
@@ -21,7 +20,6 @@ import "@cubing/icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import SVG from "react-inlinesvg";
 import SchemeColorPicker from "./SchemeColorPicker";
-import type ScrambleAndImage from "../model/ScrambleAndImage";
 import _ from "lodash";
 import { setExtensionLazily, findExtension } from "../util/extension.util";
 
@@ -56,9 +54,9 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         (state: RootState) => state.settingsSlice.showColorPicker,
     );
 
-    const [puzzleSvg, setPuzzleSvg] = useState<string>();
-    const [randomSampleScramble, setRandomSampleScramble] =
-        useState<ScrambleAndImage>();
+    const [solvedPuzzleSvg, setSolvedPuzzleSvg] = useState<string>();
+
+    const [scrambledPuzzleSvg, setScrambledPuzzleSvg] = useState<string>();
 
     const [defaultColorScheme, setDefaultColorScheme] =
         useState<Record<string, string>>();
@@ -78,10 +76,21 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
             // we need this additional boolean to make sure we can fetch only once
             // when the overlay is hidden, because its callback yields a `show` boolean.
             if (fetchNewScramble && colorScheme !== undefined) {
-                tnoodleApi
-                    .fetchPuzzleRandomScramble(wcaEvent.puzzle_id, colorScheme)
-                    .then((response) => {
-                        setRandomSampleScramble(response.data);
+                tnoodleClient
+                    .getRandomScramble({
+                        path: { puzzleId: wcaEvent.puzzle_id },
+                    })
+                    .then((scramble) => {
+                        tnoodleClient
+                            .paintScramble({
+                                path: { puzzleId: wcaEvent.puzzle_id },
+                                query: { scramble },
+                                body: colorScheme,
+                            })
+                            .then((response) => response.text())
+                            .then((svgXml) => {
+                                setScrambledPuzzleSvg(svgXml);
+                            });
                     });
             }
         },
@@ -90,10 +99,14 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
 
     useEffect(() => {
         if (colorScheme !== undefined) {
-            tnoodleApi
-                .fetchPuzzleSolvedSvg(wcaEvent.puzzle_id, colorScheme)
-                .then((response) => {
-                    setPuzzleSvg(response.data);
+            tnoodleClient
+                .paintScramble({
+                    path: { puzzleId: wcaEvent.puzzle_id },
+                    body: colorScheme,
+                })
+                .then((response) => response.text())
+                .then((svgXml) => {
+                    setSolvedPuzzleSvg(svgXml);
                 });
 
             fetchDisplayScramble();
@@ -105,10 +118,12 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     useEffect(() => {
         if (wcifEvent.rounds.length > 0) {
             if (defaultColorScheme === undefined) {
-                tnoodleApi
-                    .fetchPuzzleColorScheme(wcaEvent.puzzle_id)
+                tnoodleClient
+                    .getDefaultColorScheme({
+                        path: { puzzleId: wcaEvent.puzzle_id },
+                    })
                     .then((response) => {
-                        setDefaultColorScheme(response.data);
+                        setDefaultColorScheme(response);
                     });
             }
         }
@@ -122,7 +137,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         [dispatch],
     );
 
-    const updateEventRounds = (rounds: Round[]) => {
+    const updateEventRounds = (rounds: WcifRound[]) => {
         let event = {
             ...wcifEvent,
             rounds,
@@ -169,7 +184,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
 
     const handleNumberOfRoundsChange = (
         numberOfRounds: number,
-        rounds: Round[],
+        rounds: WcifRound[],
     ) => {
         let newRounds = [...rounds];
         // Ajust the number of rounds in case we have to remove
@@ -191,7 +206,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     const handleGeneralRoundChange = (
         roundNumber: number,
         value: string | number,
-        rounds: Round[],
+        rounds: WcifRound[],
         name: "format" | "scrambleSetCount",
     ) => {
         updateEventRounds(
@@ -204,7 +219,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     const handleNumberOfCopiesChange = (
         roundNumber: number,
         numCopies: number,
-        rounds: Round[],
+        rounds: WcifRound[],
     ) => {
         updateEventRounds(
             rounds.map((round, i) =>
@@ -232,7 +247,9 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     };
 
     const abbreviate = (str: string) =>
-        !!wcaFormats ? wcaFormats[str].shortName : "-";
+        !!wcaFormats
+            ? wcaFormats.find((format) => format.id === str)?.short_name
+            : "-";
 
     const updateForeignColorScheme = (wcaEvent: WcaEvent) => {
         let wcifEvent = wcifEvents.find(
@@ -271,7 +288,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         const samePuzzleGroupEvents =
             wcaEvents?.filter((event) => {
                 return (
-                    wcaEvent.puzzle_group_id !== null &&
+                    wcaEvent.puzzle_group_id !== undefined &&
                     event.id !== wcaEvent.id &&
                     event.puzzle_group_id === wcaEvent.puzzle_group_id
                 );
@@ -386,7 +403,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                 {Array.from({ length: wcifRounds.length }, (_, i) => {
                     let copies = wcifRounds[i].extensions.find(
                         (extension) => extension.id === copiesExtensionId,
-                    )?.data.numCopies;
+                    )?.data.numCopies as number;
 
                     return (
                         <tr key={i}>
@@ -521,8 +538,8 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                     </th>
                     <th className="lastTwoColumns" scope="col">
                         {wcifEvent.rounds.length > 0 &&
-                            puzzleSvg !== undefined &&
-                            randomSampleScramble !== undefined &&
+                            solvedPuzzleSvg !== undefined &&
+                            scrambledPuzzleSvg !== undefined &&
                             showColorPicker && (
                                 <div className="mb-2">
                                     <OverlayTrigger
@@ -531,9 +548,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                         overlay={
                                             <Tooltip className="fit-content">
                                                 <SVG
-                                                    src={
-                                                        randomSampleScramble.svgImage
-                                                    }
+                                                    src={scrambledPuzzleSvg}
                                                     width={200}
                                                     height={200}
                                                 />
@@ -548,7 +563,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                             <SVG
                                                 innerRef={ref}
                                                 className={"lastTwoColumns"}
-                                                src={puzzleSvg}
+                                                src={solvedPuzzleSvg}
                                                 height={50}
                                                 onClick={() =>
                                                     setShowColorSchemeConfig(

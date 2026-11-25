@@ -1,90 +1,78 @@
-import { AxiosHeaders, type AxiosResponse } from "axios";
-import tnoodleApi from "../../main/api/tnoodle.api";
-import wcaApi from "../../main/api/wca.api";
+import { http, HttpResponse, ws } from "msw";
+import { type SetupServer, setupServer } from "msw/node";
+import { handlers as tnoodleHandlers } from "../../main/api/tnoodle.mocks.ts";
+import { handlers as wcaHandlers } from "../../main/api/wca.mocks.ts";
+import { mockCompetitions, testServerWcifVersion } from "./wcif.mock.ts";
 import {
-    bestMbldAttempt,
-    colorScheme,
-    emptySvg,
-    events,
-    formats,
-    languages,
-    plainZip,
-    scrambleAndImage,
-    version,
-    wcifTestVersion,
-} from "./tnoodle.api.test.mock";
-import { competitions, me, scrambleProgram, wcifs } from "./wca.api.test.mock";
+    WEBSOCKET_API,
+    WEBSOCKET_ZIP_ENDPOINT,
+} from "../../main/api/tnoodle.socket.ts";
 
-/** Wraps data in a successful axios response. */
-export const ok = <T>(data: T): Promise<AxiosResponse<T>> =>
-    Promise.resolve({
-        data,
-        status: 200,
-        statusText: "OK",
-        headers: {},
-        config: { headers: new AxiosHeaders() },
-    });
+const specificWcifHandlers = mockCompetitions.map((competition) =>
+    http.get(
+        `*/api/v0/competitions/${competition.id}/wcif/version/${testServerWcifVersion}`,
+        () => HttpResponse.json(competition),
+    ),
+);
 
-/** A request that never comes back, e.g. a slow backend. */
-export const pending = <T>(): Promise<T> => new Promise<T>(() => {});
+const zipWebsocket = ws.link(WEBSOCKET_API + WEBSOCKET_ZIP_ENDPOINT);
 
-/**
- * Stubs every call to the TNoodle backend and the WCA website with
- * happy-path fixtures. Individual tests override single calls with
- * `vi.mocked(api.method).mockImplementation(...)`.
- * Spies are restored automatically after each test (`restoreMocks`).
- */
-export const mockApis = () => {
-    vi.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() => ok(events));
-    vi.spyOn(tnoodleApi, "fetchFormats").mockImplementation(() => ok(formats));
-    vi.spyOn(tnoodleApi, "fetchBackendWcifVersion").mockImplementation(() =>
-        ok(wcifTestVersion),
-    );
-    vi.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockImplementation(
-        () => ok(languages),
-    );
-    // Matches the FMC translations stored in the fixture competition WCIFs
-    vi.spyOn(tnoodleApi, "fetchSuggestedFmcTranslations").mockImplementation(
-        () => ok(["de", "es", "pt-BR"]),
-    );
-    vi.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockImplementation(() =>
-        ok(bestMbldAttempt),
-    );
-    vi.spyOn(tnoodleApi, "fetchPuzzleColorScheme").mockImplementation(() =>
-        ok(colorScheme),
-    );
-    vi.spyOn(tnoodleApi, "fetchPuzzleRandomScramble").mockImplementation(() =>
-        ok(scrambleAndImage),
-    );
-    vi.spyOn(tnoodleApi, "fetchPuzzleSolvedSvg").mockImplementation(() =>
-        ok(emptySvg),
-    );
-    vi.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        ok(version),
-    );
-    vi.spyOn(tnoodleApi, "fetchZip").mockResolvedValue(plainZip);
-    vi.spyOn(tnoodleApi, "convertToBlob").mockResolvedValue(new Blob());
+const fetchZipHandler = zipWebsocket.addEventListener(
+    "connection",
+    ({ client }) => {
+        client.addEventListener("message", (event) => {
+            const zipRequest = JSON.parse(event.data.toString());
 
-    vi.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
-        ok(scrambleProgram),
+            // mock target data
+            client.send("{}");
+            // "computation done" target marker
+            client.send(zipRequest.wcif.id);
+            // end result: dummy empty zip
+            client.send("application/zip");
+            client.send("UEsFBgAAAAAAAAAAAAAAAAAAAAAAAA==");
+        });
+    },
+);
+
+export const testMockServer = setupServer(
+    ...specificWcifHandlers,
+    ...wcaHandlers,
+    ...tnoodleHandlers,
+    fetchZipHandler,
+);
+
+export const httpSpy = (
+    server: SetupServer,
+    route: string,
+    withBody: boolean = true,
+) => {
+    const routeSpy = vi.fn();
+
+    server.use(
+        http.all(route, async ({ request }) => {
+            const body = withBody ? await request.json() : undefined;
+            routeSpy(body);
+        }),
     );
-    vi.spyOn(wcaApi, "fetchMe").mockImplementation(() => ok({ me }));
-    vi.spyOn(wcaApi, "getUpcomingManageableCompetitions").mockImplementation(
-        () => ok(competitions),
-    );
-    vi.spyOn(wcaApi, "getCompetitionJson").mockImplementation((competitionId) =>
-        ok(wcifs[competitionId]),
-    );
+
+    return routeSpy;
 };
 
-/** The `[wcif, password]` of the most recent scramble generation request. */
-export const lastZipRequest = () => {
-    const call = vi.mocked(tnoodleApi.fetchZip).mock.lastCall;
+export const websocketSpy = (server: SetupServer, once: boolean = true) => {
+    const routeSpy = vi.fn();
 
-    if (call === undefined) {
-        throw new Error("No scrambles were requested");
-    }
+    server.use(
+        zipWebsocket.addEventListener("connection", ({ client }) => {
+            client.addEventListener(
+                "message",
+                (event) => {
+                    const body = JSON.parse(event.data.toString());
+                    routeSpy(body);
+                },
+                { once },
+            );
+        }),
+    );
 
-    const [, wcif, password] = call;
-    return { wcif, password };
+    return routeSpy;
 };

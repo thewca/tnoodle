@@ -1,8 +1,8 @@
 import { chunk } from "lodash";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import tnoodleApi from "../api/tnoodle.api";
-import { toWcaUrl } from "../api/wca.api";
+import { client as tnoodleClient } from "../api/tnoodle";
+import { getWcaOrigin } from "../api/wca.oidc";
 import type RootState from "../model/RootState";
 import {
     setBackendWcifVersion,
@@ -10,7 +10,7 @@ import {
     setWcaFormats,
 } from "../redux/slice/WcifSlice";
 import EventPicker from "./EventPicker";
-import type WcaEvent from "../model/WcaEvent";
+import type { WcaEvent } from "../api/tnoodle.schemas";
 import { buildMbldExtension } from "../util/wcif.util";
 import { MBLD_DEFAULT } from "../constants/wca.constants";
 
@@ -28,14 +28,14 @@ const EventPickerTable = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        tnoodleApi.fetchFormats().then((response) => {
-            dispatch(setWcaFormats(response.data));
+        tnoodleClient.getWcaFormats().then((response) => {
+            dispatch(setWcaFormats(response));
         });
-        tnoodleApi.fetchWcaEvents().then((response) => {
-            dispatch(setWcaEvents(response.data));
+        tnoodleClient.getWcaEvents().then((response) => {
+            dispatch(setWcaEvents(response));
         });
-        tnoodleApi.fetchBackendWcifVersion().then((response) => {
-            dispatch(setBackendWcifVersion(response.data));
+        tnoodleClient.getBackendWcifVersion().then((response) => {
+            dispatch(setBackendWcifVersion(response));
         });
     }, [dispatch]);
 
@@ -66,9 +66,7 @@ const EventPickerTable = () => {
                     <p>
                         You can view and change the rounds over on{" "}
                         <a
-                            href={toWcaUrl(
-                                `/competitions/${wcif.id}/events/edit`,
-                            )}
+                            href={`${getWcaOrigin()}/competitions/${wcif.id}/events/edit`}
                         >
                             {" "}
                             the WCA

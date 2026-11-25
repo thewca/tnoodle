@@ -3,7 +3,7 @@ import { MBLD_DEFAULT, MBLD_MIN } from "../constants/wca.constants";
 import type RootState from "../model/RootState";
 import { setWcifEvent } from "../redux/slice/WcifSlice";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
-import type WcifEvent from "../model/WcifEvent";
+import type { WcifEvent } from "../api/wca.schemas";
 import { buildMbldExtension, mbldCubesExtensionId } from "../util/wcif.util";
 import { useCallback, useEffect, useMemo } from "react";
 import {

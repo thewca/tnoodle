@@ -3,8 +3,9 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type RootState from "../model/RootState";
 import { setFileZip } from "../redux/slice/ScramblingSlice";
-import tnoodleApi from "../api/tnoodle.api";
-import type WcifEvent from "../model/WcifEvent";
+import { client as tnoodleClient } from "../api/tnoodle";
+import type { FmcLanguage } from "../api/tnoodle.schemas";
+import type { WcifEvent } from "../api/wca.schemas";
 import { fmcTranslationsExtensionId } from "../util/wcif.util";
 import { setWcifEvent } from "../redux/slice/WcifSlice";
 import { findExtension, setExtensionLazily } from "../util/extension.util";
@@ -26,12 +27,12 @@ const FmcTranslationsDetail = ({
     );
 
     const [availableTranslations, setAvailableTranslations] =
-        useState<Record<string, string>>();
+        useState<FmcLanguage[]>();
 
     useEffect(() => {
         if (availableTranslations === undefined) {
-            tnoodleApi.fetchAvailableFmcTranslations().then((response) => {
-                setAvailableTranslations(response.data);
+            tnoodleClient.getFmcSheetLanguages().then((response) => {
+                setAvailableTranslations(response);
             });
         }
     }, [availableTranslations]);
@@ -106,7 +107,9 @@ const FmcTranslationsDetail = ({
         if (availableTranslations === undefined) {
             selectNoneTranslation();
         } else {
-            updateEventSelectedTranslations(Object.keys(availableTranslations));
+            updateEventSelectedTranslations(
+                availableTranslations.map((trans) => trans.code),
+            );
         }
     };
 
@@ -123,19 +126,18 @@ const FmcTranslationsDetail = ({
             return;
         }
 
-        let availableTranslationKeys = Object.keys(availableTranslations);
-
         let translationsChunks = chunk(
-            availableTranslationKeys,
+            availableTranslations,
             TRANSLATIONS_PER_LINE,
         );
 
         return translationsChunks.map((translationsChunk, i) => (
             <tr key={i}>
                 {translationsChunk.map((translation, j) => {
-                    let checkboxId = `fmc-${translation}`;
-                    let translationStatus =
-                        selectedTranslations.includes(translation);
+                    let checkboxId = `fmc-${translation.code}`;
+                    let translationStatus = selectedTranslations.includes(
+                        translation.code,
+                    );
 
                     return (
                         <React.Fragment key={j}>
@@ -144,7 +146,7 @@ const FmcTranslationsDetail = ({
                                     className="form-label text-capitalize"
                                     htmlFor={checkboxId}
                                 >
-                                    {availableTranslations[translation]}
+                                    {translation.name}
                                 </label>
                             </th>
                             <th>
@@ -155,7 +157,7 @@ const FmcTranslationsDetail = ({
                                     checked={translationStatus}
                                     onChange={(e) =>
                                         handleTranslation(
-                                            translation,
+                                            translation.code,
                                             e.target.checked,
                                         )
                                     }

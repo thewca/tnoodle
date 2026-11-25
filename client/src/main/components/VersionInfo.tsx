@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import tnoodleApi from "../api/tnoodle.api";
-import wcaApi from "../api/wca.api";
-import type CurrentTnoodle from "../model/CurrentTnoodle";
+import { client as wcaClient } from "../api/wca";
+import { client as tnoodleClient } from "../api/tnoodle";
+import type { ScrambleProgramVersion } from "../api/wca.schemas";
 import { setWcif } from "../redux/slice/WcifSlice";
 import { frontendStatusExtensionId } from "../util/wcif.util";
 import type RootState from "../model/RootState";
@@ -16,7 +16,8 @@ const VersionInfo = () => {
     );
 
     // WCA API response
-    const [currentTnoodle, setCurrentTnoodle] = useState<CurrentTnoodle>();
+    const [currentTnoodle, setCurrentTnoodle] =
+        useState<ScrambleProgramVersion>();
     const [allowedTnoodleVersions, setAllowedTnoodleVersions] =
         useState<string[]>();
     const [wcaPublicKeyBytes, setWcaPublicKeyBytes] = useState<string>();
@@ -34,21 +35,21 @@ const VersionInfo = () => {
 
     useEffect(() => {
         // Fetch from WCA API.
-        wcaApi.fetchVersionInfo().then((response) => {
-            setCurrentTnoodle(response.data.current);
-            setAllowedTnoodleVersions(response.data.allowed);
-            setWcaPublicKeyBytes(response.data.publicKeyBytes);
+        wcaClient.getScrambleProgram().then((response) => {
+            setCurrentTnoodle(response.current);
+            setAllowedTnoodleVersions(response.allowed);
+            setWcaPublicKeyBytes(response.publicKeyBytes);
         });
 
-        tnoodleApi.fetchRunningVersion().then((response) => {
+        tnoodleClient.getVersionInfo().then((response) => {
             let versionString =
-                !!response.data.projectName && !!response.data.projectVersion
-                    ? `${response.data.projectName}-${response.data.projectVersion}`
+                !!response.project_name && !!response.project_version
+                    ? `${response.project_name}-${response.project_version}`
                     : "";
 
             setRunningVersion(versionString);
-            setSignedBuild(response.data.signedBuild);
-            setSignatureKeyBytes(response.data.signatureKeyBytes);
+            setSignedBuild(response.is_signed_build);
+            setSignatureKeyBytes(response.signature_key_bytes);
         });
     }, []);
 

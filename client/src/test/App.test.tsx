@@ -1,13 +1,10 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import type { UserEvent } from "@testing-library/user-event";
 import App from "../App";
-import tnoodleApi from "../main/api/tnoodle.api";
-import wcaApi from "../main/api/wca.api";
 import { findExtension } from "../main/util/extension.util";
 import { defaultWcif, frontendStatusExtensionId } from "../main/util/wcif.util";
-import { lastZipRequest, mockApis, pending } from "./mock/api.mock";
-import { defaultStatus } from "./mock/tnoodle.api.test.mock";
-import { competitions, wcifs } from "./mock/wca.api.test.mock";
+import { httpSpy, testMockServer, websocketSpy } from "./mock/api.mock";
+import { mockCompetitions } from "./mock/wcif.mock.ts";
 import {
     getCopies,
     getFmcLanguageTags,
@@ -16,6 +13,17 @@ import {
     scrambledEventIds,
 } from "./util/wcif.test.util";
 import { renderWithProviders, replaceValue } from "./util/render";
+import { delay, http } from "msw";
+import type { Mock } from "vitest";
+
+const lastZipRequest = (routeSpy: Mock) => {
+    const [websocketPayload] = routeSpy.mock.lastCall!;
+
+    return {
+        wcif: websocketPayload.wcif,
+        password: websocketPayload.zipPassword,
+    };
+};
 
 const eventTable = async (name: string) =>
     within(await screen.findByRole("table", { name }));
@@ -30,23 +38,26 @@ const selectCompetition = async (user: UserEvent, name: string) => {
     await screen.findByText(new RegExp(`Found \\d+ events? for ${name}\\.`));
 };
 
-beforeEach(() => mockApis());
-
 describe("manual selection", () => {
     it("generates a single round of 3x3x3 by default", async () => {
+        const routeSpy = websocketSpy(testMockServer);
         const { user } = await renderWithProviders(<App />);
 
         await generateScrambles(user);
 
-        const { wcif, password } = lastZipRequest();
+        const { wcif, password } = lastZipRequest(routeSpy);
         expect(scrambledEventIds(wcif)).toEqual(["333"]);
-        expect(password).toBe("");
-        expect(findExtension(wcif, frontendStatusExtensionId)?.data).toEqual(
-            defaultStatus,
-        );
+        expect(password).toBeNull();
+        expect(findExtension(wcif, frontendStatusExtensionId)?.data).toEqual({
+            isStaging: false,
+            isManual: true,
+            isSignedBuild: true,
+            isAllowedVersion: true,
+        });
     });
 
     it("sends round settings and the password along", async () => {
+        const routeSpy = websocketSpy(testMockServer);
         const { user } = await renderWithProviders(<App />);
         const cube = await eventTable("3x3x3");
 
@@ -62,7 +73,7 @@ describe("manual selection", () => {
 
         await generateScrambles(user);
 
-        const { wcif, password } = lastZipRequest();
+        const { wcif, password } = lastZipRequest(routeSpy);
         expect(password).toBe("wca123");
         expect(getRounds(wcif, "333")).toEqual([
             expect.objectContaining({
@@ -92,6 +103,7 @@ describe("manual selection", () => {
     });
 
     it("sends MBLD cube count and FMC translations along", async () => {
+        const routeSpy = websocketSpy(testMockServer);
         const { user } = await renderWithProviders(<App />);
         const cube = await eventTable("3x3x3");
         const fmc = await eventTable("3x3x3 Fewest Moves");
@@ -113,7 +125,7 @@ describe("manual selection", () => {
 
         await generateScrambles(user);
 
-        const { wcif } = lastZipRequest();
+        const { wcif } = lastZipRequest(routeSpy);
         expect(scrambledEventIds(wcif)).toEqual(["333fm", "333mbf"]);
         expect(getRounds(wcif, "333fm")).toHaveLength(3);
         expect(getRounds(wcif, "333mbf")).toHaveLength(3);
@@ -146,18 +158,19 @@ describe("manual selection", () => {
 });
 
 describe("logged in", () => {
-    const [firstCompetition, secondCompetition] = competitions;
+    const [firstCompetition, secondCompetition] = mockCompetitions;
 
     it("generates scrambles for the selected competition", async () => {
         const { user } = await renderWithProviders(<App />, {
             isAuthenticated: true,
         });
 
-        for (const competition of competitions) {
+        for (const competition of mockCompetitions) {
+            const routeSpy = websocketSpy(testMockServer);
             await selectCompetition(user, competition.name);
             await generateScrambles(user);
 
-            expect(lastZipRequest().wcif).toStrictEqual(wcifs[competition.id]);
+            expect(lastZipRequest(routeSpy).wcif).toStrictEqual(competition);
         }
     });
 
@@ -178,6 +191,12 @@ describe("logged in", () => {
     });
 
     it("fetches each competition from the WCA only once", async () => {
+        const routeSpy = httpSpy(
+            testMockServer,
+            "*/api/v0/competitions/:competitionId/wcif/version/:formatVersion",
+            false,
+        );
+
         const { user } = await renderWithProviders(<App />, {
             isAuthenticated: true,
         });
@@ -187,13 +206,21 @@ describe("logged in", () => {
         await selectCompetition(user, firstCompetition.name);
         await selectCompetition(user, secondCompetition.name);
 
-        expect(wcaApi.getCompetitionJson).toHaveBeenCalledTimes(2);
+        expect(routeSpy).toHaveBeenCalledTimes(2);
     });
 
     it("does not wait for suggested MBLD and FMC settings to generate scrambles", async () => {
-        vi.mocked(tnoodleApi.fetchBestMbldAttempt).mockReturnValue(pending());
-        vi.mocked(tnoodleApi.fetchSuggestedFmcTranslations).mockReturnValue(
-            pending(),
+        const routeSpy = websocketSpy(testMockServer);
+
+        testMockServer.use(
+            http.post(
+                "/frontend/fmc/languages/competitors",
+                async () => await delay("infinite"),
+            ),
+            http.post(
+                "/frontend/mbld/best",
+                async () => await delay("infinite"),
+            ),
         );
 
         const { user } = await renderWithProviders(<App />, {
@@ -203,6 +230,6 @@ describe("logged in", () => {
         await selectCompetition(user, firstCompetition.name);
         await generateScrambles(user);
 
-        expect(tnoodleApi.fetchZip).toHaveBeenCalledTimes(1);
+        expect(routeSpy).toHaveBeenCalledTimes(1);
     });
 });

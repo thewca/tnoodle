@@ -1,0 +1,329 @@
+openapi: 3.1.0
+info:
+    title: TNoodle backend
+    description: Endpoints exposed by the backend server
+    version: 1.0.0
+servers:
+    - url: 'https://worldcubeassociation.org'
+paths:
+    /api/v0/me:
+        get:
+            summary: Show information about currently logged in user
+            operationId: getMe
+            security:
+                - bearerAuth: []
+            responses:
+                '200':
+                    description: The user currently logged in through bearer token auth
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/MeResponse'
+    /api/v0/scramble-program:
+        get:
+            summary: Show information about scramble program(s) permitted by the WCA
+            operationId: getScrambleProgram
+            responses:
+                '200':
+                    description: Information about scramble program(s) permitted by the WCA
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ScrambleProgramInfo'
+    /api/v0/competitions:
+        get:
+            summary: Get a list of competitions
+            operationId: getCompetitions
+            security:
+                - bearerAuth:
+                      - "manage_competitions"
+            parameters:
+                - in: query
+                  name: managed_by_me
+                  schema:
+                      type: boolean
+                  description: Limit to competitions managed by the authenticated user
+                - in: query
+                  name: start
+                  schema:
+                      type: string
+                      format: date-time
+                  description: Limit to competitions starting after this date
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
+                  description: Field to determine sorting order of result competitions
+            responses:
+                '200':
+                    description: A list of competitions
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/CompetitionSummary'
+                                example:
+                                    - id: Worlds2026
+                                      name: "World Championship 2026"
+                                    - id: ExamplistanNationals2026
+                                      name: "Examplistan Nationals 2026"
+    /api/v0/competitions/{competitionId}/wcif/version/{formatVersion}:
+        get:
+            summary: Retrieve the WCIF of a specific competition in a specific format version
+            operationId: getWcif
+            security:
+                - bearerAuth:
+                      - "manage_competitions"
+            parameters:
+                - in: path
+                  name: competitionId
+                  schema:
+                      type: string
+                  required: true
+                  description: The ID of the competition to fetch
+                - in: path
+                  name: formatVersion
+                  schema:
+                      type: string
+                      format: semver
+                  required: true
+                  description: The format version of the resulting WCIF
+            responses:
+                '200':
+                    description: The WCIF of the competition
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Wcif'
+components:
+    securitySchemes:
+        bearerAuth:
+            type: http
+            scheme: bearer
+
+    schemas:
+        User:
+            type: object
+            properties:
+                name:
+                    type: string
+                    example: John Doe
+                wca_id:
+                    type: string
+                    example: "2003DOEJ01"
+            required:
+                - name
+                - wca_id
+
+        MeResponse:
+            type: object
+            properties:
+                me:
+                    $ref: '#/components/schemas/User'
+            required:
+                - me
+
+        ScrambleProgramVersion:
+            type: object
+            properties:
+                name:
+                    type: string
+                    example: "TNoodle-WCA-1.2.3"
+                information:
+                    type: string
+                    format: uri
+                    example: "https://www.worldcubeassociation.org/regulations/scrambles/"
+                download:
+                    type: string
+                    format: url
+                    example: "https://www.worldcubeassociation.org/regulations/scrambles/tnoodle/TNoodle-WCA-1.2.3.jar"
+            required:
+                - name
+                - information
+                - download
+
+        ScrambleProgramInfo:
+            type: object
+            properties:
+                current:
+                    $ref: '#/components/schemas/ScrambleProgramVersion'
+                allowed:
+                    type: array
+                    items:
+                        type: string
+                        example: "TNoodle-WCA-1.2.3"
+                publicKeyBytes:
+                    type: string
+                    format: byte
+                    example: dG5vb2RsZQ==
+                history:
+                    type: array
+                    items:
+                        type: string
+                    example:
+                        - "TNoodle-WCA-0.0.1"
+                        - "TNoodle-WCA-1.0.0"
+                        - "TNoodle-WCA-1.2.3"
+            required:
+                - current
+                - allowed
+                - publicKeyBytes
+                - history
+
+        CompetitionSummary:
+            type: object
+            properties:
+                id:
+                    type: string
+                    example: Worlds2026
+                name:
+                    type: string
+                    example: "World Championship 2026"
+            required:
+                - id
+                - name
+
+        WcifExtension:
+            type: object
+            properties:
+                id:
+                    type: string
+                specUrl:
+                    type: string
+                    format: uri
+                    example: ""
+                data:
+                    type: object
+            required:
+                - id
+                - specUrl
+                - data
+
+        WcifRound:
+            type: object
+            properties:
+                id:
+                    type: string
+                format:
+                    type: string
+                scrambleSetCount:
+                    type: integer
+                timeLimit:
+                    type: number
+                extensions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/WcifExtension'
+            required:
+                - id
+                - format
+                - scrambleSetCount
+                - extensions
+
+        WcifEvent:
+            type: object
+            properties:
+                id:
+                    type: string
+                rounds:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/WcifRound'
+                extensions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/WcifExtension'
+            required:
+                - id
+                - rounds
+                - extensions
+
+        WcifRegistration:
+            type: object
+            properties:
+                status:
+                    type: string
+                    enum:
+                        - accepted
+                        - pending
+                        - rejected
+                        - cancelled
+            required:
+                - status
+
+        WcifPersonalBest:
+            type: object
+            properties:
+                eventId:
+                    type: string
+                value:
+                    type: integer
+            required:
+                - eventId
+                - value
+
+        WcifPerson:
+            type: object
+            properties:
+                name:
+                    type: string
+                registration:
+                    $ref: '#/components/schemas/WcifRegistration'
+                countryIso2:
+                    type: string
+                personalBests:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/WcifPersonalBest'
+            required:
+                - name
+                - registration
+                - countryIso2
+                - personalBests
+
+        WcifSchedule:
+            type: object
+            properties:
+                numberOfDays:
+                    type: integer
+                venues:
+                    type: array
+            required:
+                - numberOfDays
+                - venues
+
+        Wcif:
+            type: object
+            properties:
+                id:
+                    type: string
+                formatVersion:
+                    type: string
+                name:
+                    type: string
+                shortName:
+                    type: string
+                events:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/WcifEvent'
+                persons:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/WcifPerson'
+                schedule:
+                    $ref: '#/components/schemas/WcifSchedule'
+                extensions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/WcifExtension'
+            required:
+                - id
+                - formatVersion
+                - name
+                - shortName
+                - events
+                - persons
+                - schedule
+                - extensions

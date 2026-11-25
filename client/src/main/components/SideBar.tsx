@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Collapse, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import tnoodleApi from "../api/tnoodle.api";
-import wcaApi from "../api/wca.api";
+import { client as tnoodleClient } from "../api/tnoodle";
 import logo from "../assets/tnoodle_logo.svg";
 import type RootState from "../model/RootState";
 import {
@@ -23,12 +22,12 @@ import {
 } from "../util/query.param.util";
 import { defaultWcif } from "../util/wcif.util";
 import "./SideBar.css";
-import type Wcif from "../model/Wcif";
+import type { Wcif } from "../api/wca.schemas";
 import { setShowColorPicker } from "../redux/slice/SettingsSlice";
-import type Competition from "../model/Competition";
-import type Person from "../model/Person";
+import type { CompetitionSummary, User } from "../api/wca.schemas";
 import { useAuth } from "react-oidc-context";
 import type { CustomAuthState } from "../api/wca.oidc";
+import { client as wcaClient, configure } from "../api/wca";
 
 const SideBar = () => {
     const [loadingUser, setLoadingUser] = useState(false);
@@ -49,9 +48,9 @@ const SideBar = () => {
         (state: RootState) => state.settingsSlice.showColorPicker,
     );
 
-    const [me, setMe] = useState<Person>();
+    const [me, setMe] = useState<User>();
     const [upcomingCompetitions, setUpcomingCompetitions] =
-        useState<Competition[]>();
+        useState<CompetitionSummary[]>();
 
     const [isOpen, setIsOpen] = useState(true);
 
@@ -77,22 +76,30 @@ const SideBar = () => {
         }
 
         const wcaToken = oidcAuth.user!.access_token;
+        configure({ auth: { bearer: wcaToken } });
 
         if (!me) {
             setLoadingUser(true);
 
-            wcaApi
-                .fetchMe(wcaToken)
-                .then((response) => setMe(response.data.me))
+            wcaClient
+                .getMe()
+                .then((response) => setMe(response.me))
                 .finally(() => setLoadingUser(false));
         }
 
         if (!upcomingCompetitions) {
+            const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
             setLoadingCompetitions(true);
 
-            wcaApi
-                .getUpcomingManageableCompetitions(wcaToken)
-                .then((response) => setUpcomingCompetitions(response.data))
+            wcaClient
+                .getCompetitions({
+                    query: {
+                        managed_by_me: true,
+                        start: oneWeekAgo.toISOString(),
+                        sort: "start_date",
+                    },
+                })
+                .then((response) => setUpcomingCompetitions(response))
                 .finally(() => setLoadingCompetitions(false));
         }
     }, [upcomingCompetitions, me, oidcAuth.isAuthenticated, oidcAuth.user]);
@@ -139,36 +146,44 @@ const SideBar = () => {
 
     const getAndCacheBestMbldAttempt = useCallback(
         (wcif: Wcif) => {
-            tnoodleApi.fetchBestMbldAttempt(wcif).then((response) => {
-                const attempted = response.data?.attempted;
+            tnoodleClient
+                .calculateMbldBest({
+                    body: wcif.persons,
+                })
+                .then((response) => {
+                    const attempted = response?.attempted;
 
-                if (!!attempted) {
-                    dispatch(
-                        addCachedObject({
-                            competitionId: wcif.id,
-                            identifier: "bestMbldAttempt",
-                            object: attempted,
-                        }),
-                    );
-                    dispatch(setBestMbldAttempt(attempted));
-                }
-            });
+                    if (!!attempted) {
+                        dispatch(
+                            addCachedObject({
+                                competitionId: wcif.id,
+                                identifier: "bestMbldAttempt",
+                                object: attempted,
+                            }),
+                        );
+                        dispatch(setBestMbldAttempt(attempted));
+                    }
+                });
         },
         [dispatch],
     );
 
     const getAndCacheSuggestedFmcTranslations = useCallback(
         (wcif: Wcif) => {
-            tnoodleApi.fetchSuggestedFmcTranslations(wcif).then((response) => {
-                dispatch(
-                    addCachedObject({
-                        competitionId: wcif.id,
-                        identifier: "suggestedFmcTranslations",
-                        object: response.data,
-                    }),
-                );
-                dispatch(setSuggestedFmcTranslations(response.data));
-            });
+            tnoodleClient
+                .calculateSuggestedFmcTranslations({
+                    body: wcif.persons,
+                })
+                .then((response) => {
+                    dispatch(
+                        addCachedObject({
+                            competitionId: wcif.id,
+                            identifier: "suggestedFmcTranslations",
+                            object: response,
+                        }),
+                    );
+                    dispatch(setSuggestedFmcTranslations(response));
+                });
         },
         [dispatch],
     );
@@ -177,7 +192,6 @@ const SideBar = () => {
         (wcif: Wcif) => {
             dispatch(setIsManualSelection(false));
             dispatch(setWcif(wcif));
-            dispatch(setCompetitionName(wcif.name));
             dispatch(setFileZip());
         },
         [dispatch],
@@ -212,25 +226,28 @@ const SideBar = () => {
                 dispatch(setBestMbldAttempt(cachedBestMbldAttempt));
             } else if (!!backendWcifVersion) {
                 const wcaToken = oidcAuth.user!.access_token;
+                configure({ auth: { bearer: wcaToken } });
+
                 setLoadingCompetitionInfo(true);
 
-                wcaApi
-                    .getCompetitionJson(
-                        competitionId,
-                        backendWcifVersion,
-                        wcaToken,
-                    )
+                wcaClient
+                    .getWcif({
+                        path: {
+                            competitionId,
+                            formatVersion: backendWcifVersion,
+                        },
+                    })
                     .then((response) => {
-                        updateWcif(response.data);
+                        updateWcif(response);
                         dispatch(
                             addCachedObject({
                                 competitionId,
                                 identifier: "wcif",
-                                object: response.data,
+                                object: response,
                             }),
                         );
-                        getAndCacheSuggestedFmcTranslations(response.data);
-                        getAndCacheBestMbldAttempt(response.data);
+                        getAndCacheSuggestedFmcTranslations(response);
+                        getAndCacheBestMbldAttempt(response);
                     })
                     .finally(() => setLoadingCompetitionInfo(false));
             }

@@ -1,0 +1,16 @@
+extends:
+    - spec
+
+client:
+    outputMode: split
+    generators:
+        - typescript
+        - mock
+
+apis:
+    tnoodle:
+        root: ../openapi/tnoodle.yaml
+        clientOutput: ./src/main/api/tnoodle.ts
+    wca:
+        root: ../openapi/wca_v0.yaml
+        clientOutput: ./src/main/api/wca.ts

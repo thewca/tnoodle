@@ -3,11 +3,9 @@ import EventPickerTable from "../main/components/EventPickerTable";
 import { setIsManualSelection } from "../main/redux/slice/InformationSlice";
 import { setWcif } from "../main/redux/slice/WcifSlice";
 import { createStore } from "../main/redux/Store";
-import type Wcif from "../main/model/Wcif";
+import type { Wcif } from "../main/api/wca.schemas";
 import { defaultWcif } from "../main/util/wcif.util";
-import { mockApis } from "./mock/api.mock";
-import { events } from "./mock/tnoodle.api.test.mock";
-import { competitions, wcifs } from "./mock/wca.api.test.mock";
+import { eventsWithNames, mockCompetitions } from "./mock/wcif.mock.ts";
 import { renderWithProviders } from "./util/render";
 import { getWcaOrigin } from "../main/api/wca.oidc";
 
@@ -19,36 +17,38 @@ const competitionStore = (wcif: Wcif) => {
 };
 
 // Only the top-level tables: nested ones (translations, colors) are unnamed.
-const eventTableNames = () =>
-    screen
-        .getAllByRole("table")
+const eventTableNames = async () => {
+    const allTables = await screen.findAllByRole("table");
+
+    return allTables
         .map((table) => table.getAttribute("aria-label"))
         .filter((name) => name !== null);
-
-beforeEach(() => mockApis());
+};
 
 it("offers every WCA event for manual selection", async () => {
     await renderWithProviders(<EventPickerTable />);
 
-    expect(eventTableNames()).toEqual(events.map((event) => event.name));
+    expect((await eventTableNames()).toSorted()).toEqual(
+        Object.values(eventsWithNames).toSorted(),
+    );
     expect(screen.queryByText(/Found \d+ event/)).not.toBeInTheDocument();
 });
 
 describe("for a competition selected from the WCA", () => {
-    const competition = wcifs[competitions[0].id];
+    const competition = mockCompetitions[0];
 
     it("only shows the competition's events", async () => {
         await renderWithProviders(<EventPickerTable />, {
             store: competitionStore(competition),
         });
 
-        const competitionEventNames = events
-            .filter((event) =>
-                competition.events.some(({ id }) => id === event.id),
-            )
-            .map((event) => event.name);
+        const competitionEventNames = competition.events.map(
+            (event) => eventsWithNames[event.id],
+        );
 
-        expect(eventTableNames()).toEqual(competitionEventNames);
+        expect((await eventTableNames()).toSorted()).toEqual(
+            competitionEventNames.toSorted(),
+        );
         expect(
             screen.getByText(
                 `Found ${competition.events.length} events for ${competition.name}.`,
@@ -77,7 +77,7 @@ describe("for a competition selected from the WCA", () => {
         });
 
         expect(
-            screen.getByText("Found 1 event for Tiny Open."),
+            await screen.findByText("Found 1 event for Tiny Open."),
         ).toBeInTheDocument();
     });
 });

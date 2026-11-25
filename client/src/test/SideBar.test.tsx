@@ -1,18 +1,15 @@
 import { screen, within } from "@testing-library/react";
-import wcaApi from "../main/api/wca.api";
 import SideBar from "../main/components/SideBar";
-import { mockApis } from "./mock/api.mock";
-import { competitions, me } from "./mock/wca.api.test.mock";
+import { mockCompetitions } from "./mock/wcif.mock.ts";
 import { renderWithProviders } from "./util/render";
-
-beforeEach(() => mockApis());
+import { httpSpy, testMockServer } from "./mock/api.mock.ts";
 
 describe("when logged in", () => {
     it("welcomes the user and offers their upcoming competitions", async () => {
         await renderWithProviders(<SideBar />, { isAuthenticated: true });
 
         expect(
-            screen.getByText(`Welcome, ${me.name}.`, { exact: false }),
+            screen.getByText("Welcome, John Doe.", { exact: false }),
         ).toBeInTheDocument();
 
         expect(
@@ -24,7 +21,7 @@ describe("when logged in", () => {
         ).getAllByRole("button");
 
         expect(competitionButtons.map((button) => button.textContent)).toEqual(
-            competitions.map((competition) => competition.name),
+            mockCompetitions.map((competition) => competition.name),
         );
 
         expect(
@@ -35,6 +32,8 @@ describe("when logged in", () => {
 
 describe("when logged out", () => {
     it("only offers to log in", async () => {
+        const routeSpy = httpSpy(testMockServer, "/api/v0/competitions");
+
         await renderWithProviders(<SideBar />);
 
         expect(
@@ -45,6 +44,6 @@ describe("when logged out", () => {
             screen.queryByRole("button", { name: "Manual Selection" }),
         ).not.toBeInTheDocument();
 
-        expect(wcaApi.getUpcomingManageableCompetitions).not.toHaveBeenCalled();
+        expect(routeSpy).not.toHaveBeenCalled();
     });
 });

@@ -1,13 +1,11 @@
 import { screen, within } from "@testing-library/react";
 import type { UserEvent } from "@testing-library/user-event";
-import tnoodleApi from "../main/api/tnoodle.api";
 import Main from "../main/components/Main";
 import { setSuggestedFmcTranslations } from "../main/redux/slice/EventDataSlice";
 import { createStore } from "../main/redux/Store";
-import { mockApis } from "./mock/api.mock";
-import { languages } from "./mock/tnoodle.api.test.mock";
 import { getFmcLanguageTags } from "./util/wcif.test.util";
 import { renderWithProviders } from "./util/render";
+import { testMockServer, websocketSpy } from "./mock/api.mock.ts";
 
 const suggestedTranslations = ["de", "en", "pt-BR"];
 
@@ -31,9 +29,9 @@ const openFmcTranslations = async (user: UserEvent) => {
     return fmc;
 };
 
-beforeEach(() => mockApis());
-
 it("only submits the form through the Generate Scrambles button", async () => {
+    const routeSpy = websocketSpy(testMockServer);
+
     const { user } = await renderMain();
     const fmc = await openFmcTranslations(user);
 
@@ -48,12 +46,12 @@ it("only submits the form through the Generate Scrambles button", async () => {
     ]) {
         await user.click(screen.getByRole("button", { name }));
     }
-    expect(tnoodleApi.fetchZip).not.toHaveBeenCalled();
+    expect(routeSpy).not.toHaveBeenCalled();
 
     await user.click(
         screen.getByRole("button", { name: "Generate Scrambles" }),
     );
-    expect(tnoodleApi.fetchZip).toHaveBeenCalledTimes(1);
+    expect(routeSpy).toHaveBeenCalledTimes(1);
 });
 
 describe("FMC translations", () => {
@@ -77,7 +75,30 @@ describe("FMC translations", () => {
         );
 
         await user.click(fmc.getByRole("button", { name: "Select All" }));
-        expect(fmcLanguageTags()).toEqual(Object.keys(languages));
+        expect(fmcLanguageTags()).toEqual([
+            "da",
+            "de",
+            "en",
+            "es",
+            "et",
+            "fi",
+            "fr",
+            "hr",
+            "hu",
+            "id",
+            "it",
+            "ja",
+            "ko",
+            "pl",
+            "pt",
+            "pt-BR",
+            "ro",
+            "ru",
+            "sl",
+            "vi",
+            "zh-CN",
+            "zh-TW",
+        ]);
         expect(fmc.queryAllByRole("checkbox", { checked: false })).toHaveLength(
             0,
         );
