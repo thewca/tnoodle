@@ -22,6 +22,8 @@ import org.worldcubeassociation.tnoodle.server.wcif.model.extension.MultiScrambl
 import java.time.LocalDateTime
 import kotlin.random.Random
 import kotlin.system.measureTimeMillis
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.measureTimedValue
 
 class APIIntegrationTest {
     private fun getClient(): HttpClient {
@@ -34,38 +36,67 @@ class APIIntegrationTest {
                 // This matches the configuration of our monolith at the time of writing this comment
                 requestTimeoutMillis = 60000
             }
+
+            expectSuccess = true
         }
+    }
+
+    companion object {
+        val MIN_REQUEST_INTERVAL = 5.seconds
     }
 
     @Test
     fun `test that every upcoming competition produces some output without error`() = runBlocking {
-        val upcomingCompIds =
-            getClient().use {
-                it.get("https://www.worldcubeassociation.org/api/v0/competitions/").body<List<UpcomingCompetition>>()
-            }.shuffled().map { it.id }
+        // Fetch competition IDs and all WCIF payloads sequentially with rate limiting
+        val fetchedWcifs = getClient().use { client ->
+            val upcomingCompIds = client
+                .get("https://www.worldcubeassociation.org/api/v0/competitions/")
+                .body<List<UpcomingCompetition>>()
+                .map { it.id }
 
+            upcomingCompIds.mapIndexed { index, compId ->
+                val url =
+                    "https://www.worldcubeassociation.org/api/v0/competitions/$compId/wcif/version/${Competition.FORMAT_VERSION}"
+
+                val (websiteWcif, fetchDuration) = measureTimedValue {
+                    client.get(url).body<Competition>()
+                }
+
+                println("[$compId] Fetched WCIF in ${fetchDuration.inWholeMilliseconds} ms.")
+
+                // Enforce 5-second pacing between requests (skip delay after the very last fetch)
+                if (index < upcomingCompIds.lastIndex) {
+                    val remainingWait = MIN_REQUEST_INTERVAL - fetchDuration
+
+                    if (remainingWait.isPositive()) {
+                        delay(remainingWait)
+                    }
+                }
+
+                websiteWcif
+            }
+        }
+
+        // Run all scramble generation and PDF/ZIP rendering in parallel
         val generationDate = LocalDateTime.now()
 
-        val jobs = upcomingCompIds.map {
+        val jobs = fetchedWcifs.map { wcif ->
             launch(Dispatchers.Default) {
-                val url = "https://www.worldcubeassociation.org/api/v0/competitions/$it/wcif/version/${Competition.FORMAT_VERSION}"
                 val multiCubes = MultiScrambleCountExtension(Random.nextInt(10, 20))
-
-                val websiteWcif = getClient().use { it.get(url).body<Competition>() }
                 val blankWcif =
-                    WCIFScrambleMatcher.installExtensionForEvents(websiteWcif, multiCubes, EventData.THREE_MULTI_BLD)
+                    WCIFScrambleMatcher.installExtensionForEvents(wcif, multiCubes, EventData.THREE_MULTI_BLD)
 
-                println("[$it] Fetched WCIF. On to computing scrambles…")
+                println("[${wcif.id}] Computing scrambles…")
                 val scrambledWcif = WCIFScrambleMatcher.fillScrambleSets(blankWcif)
 
-                println("[$it] Scrambles generated successfully. On to rendering the PDF…")
+                println("[${wcif.id}] Scrambles generated successfully. On to rendering the PDF…")
                 val sheets = scrambledWcif.toDocuments("JUnit-Test", Translate.DEFAULT_LOCALE)
                 val renderedPdf =
                     Assertions.assertDoesNotThrow(ThrowingSupplier { WCIFDataBuilder.compileOutlinePdf(sheets) })
                 Assertions.assertTrue(renderedPdf.isNotEmpty())
 
                 val computationTime = measureTimeMillis {
-                    println("[$it] Single PDF rendered successfully. On to compiling the ZIP…")
+                    println("[${wcif.id}] Single PDF rendered successfully. On to compiling the ZIP…")
                     val completeZip = WCIFDataBuilder.wcifToZip(
                         scrambledWcif,
                         null,
@@ -79,7 +110,7 @@ class APIIntegrationTest {
                     Assertions.assertTrue(compiledZip.isNotEmpty())
                 }
 
-                println("[$it] ZIP compilation was successful! Took $computationTime ms")
+                println("[${wcif.id}] ZIP compilation was successful! Took $computationTime ms")
             }
         }
 
